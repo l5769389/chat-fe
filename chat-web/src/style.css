@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 自定义样式 */
+@layer base {
+    color: @apply text-black;
+}

@@ -1,6 +1,6 @@
 <template>
-    <div class="flex h-full">
-        <div class="w-20">
+    <div class="flex h-full ">
+        <div class="w-[50px]">
             <menubar/>
         </div>
         <router-view/>

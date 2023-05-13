@@ -1,6 +1,17 @@
-{
-    "compilerOptions": {
-        "allowJs": true,
-        }
-    
-}
+    {
+        "compilerOptions": {
+            "allowJs": true,
+            "target": "ES6",
+            "module": "commonjs",
+            "allowSyntheticDefaultImports": true,
+            "baseUrl": "./",
+            "paths": {
+                "@/*": [
+                    "src/*"
+                ]
+            }
+        },
+        "exclude": [
+            "node_modules"
+        ]
+    }

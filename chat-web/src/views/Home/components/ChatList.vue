@@ -1,107 +1,49 @@
 <template>
-      <div class="flex overflow-auto flex-col h-full">
-          <chat-item v-for="item in arr" :key="item" :content="item"/>
-      </div>
+  <div class="flex  overflow-x-hidden overflow-y-auto flex-col h-full pt-3">
+    <chat-item v-for="item in totalChatList" :key="item" :class="activeDialogId == item ? 'bg-dark-400-active' : ''"
+      @click="chooseDialog(item)" :dialog-info="getUnreadMsg(item)" :msg="getUnreadMsg1(item)" />
+  </div>
 </template>
 
 <script setup>
-import {reactive, ref} from "vue";
-import ChatItem from './ChatItem.vue'
-const arr = reactive([
-    {
-        id:1,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:2,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-    {
-        id:3,
-        url:'',
-        nickname:'爱妃',
-        recentMsg:'aaa',
-        time: '20:21'
-    },
-])
+import { computed } from "vue";
+import ChatItem from '../../../common/components/ChatItem.vue'
+import store from "@/store/index.js";
+const friends = computed(() => store.getters.friends)
+const activeDialogId = computed(() => store.getters.currentDialogUserId)
+const totalMsgMap = computed(() => store.getters.totalMsgMap)
+const totalChatList = computed(() => store.getters.totalChatList)
+const unreadMsgMap = computed(() => store.getters.unreadMsgMap)
+
+const getUnreadMsg = (userId) => {
+  const arr = totalMsgMap.value[userId] || []
+  const unreadmsg = unreadMsgMap.value[userId] || []
+  const friendInfo = friends.value.find(item => item.userId == userId)
+  return {
+    avatar: friendInfo?.avatar,
+    nickname: friendInfo?.nickname,
+    msgInfo: {
+      count: unreadmsg.length,
+      timestamp: arr.length > 0 ? arr[arr.length - 1].timestamp : ''
+    }
+  }
+}
+
+const getUnreadMsg1 = (userId) => {
+  const arr = totalMsgMap.value[userId] || []
+  let msg = {
+    content: '',
+    type: 'text'
+  }
+  if (arr.length > 0) {
+    msg = arr[arr.length - 1];
+  }
+  return msg
+}
+
+const chooseDialog = (id) => {
+  store.commit('setCurrentDialog', id)
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

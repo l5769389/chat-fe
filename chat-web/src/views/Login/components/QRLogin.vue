@@ -1,11 +1,11 @@
 <template>
-$END$
+  <div class="w-full h-full">
+      qrcode
+  </div>
 </template>
 
-<script>
-export default {
-name: "QRLogin"
-}
+<script setup>
+
 </script>
 
 <style scoped>
