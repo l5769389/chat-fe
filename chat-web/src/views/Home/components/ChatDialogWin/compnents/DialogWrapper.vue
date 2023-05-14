@@ -7,7 +7,7 @@
 
 <script setup>
 import MessageItem from "@/views/Home/components/ChatDialogWin/compnents/MessageItem.vue";
-import { getDialogInfoHook} from '@/utils/hooks';
+import { getDialogInfoHook} from '@/utils/hooks/hooks.js';
 const { messageRef } = getDialogInfoHook()
 </script>
 

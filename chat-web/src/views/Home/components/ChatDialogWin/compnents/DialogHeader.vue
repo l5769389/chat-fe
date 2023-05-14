@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { getDialogInfoHook } from '@/utils/hooks';
+import { getDialogInfoHook } from '@/utils/hooks/hooks.js';
 import { More } from '@icon-park/vue-next';
 import { ref } from 'vue';
 import { toggleShowAddMoreHook } from '@/views/Home/homeHooks';

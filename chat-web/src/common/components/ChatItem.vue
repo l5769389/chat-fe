@@ -50,6 +50,8 @@
 </template>
 
 <script setup>
+import {computed} from "vue";
+
 const props = defineProps({
     dialogInfo: {
         type: Object,

@@ -36,7 +36,7 @@
 
 </template>
 <script setup>
-import { getDialogInfoHook } from '@/utils/hooks';
+import { getDialogInfoHook } from '@/utils/hooks/hooks.js';
 import { AddThree, Right } from '@icon-park/vue-next';
 const { currentDialogUserId, currentDialogUserInfo } = getDialogInfoHook()
 import AddressListWrapper from '@/views/Address/components/AddressListWrapper.vue';

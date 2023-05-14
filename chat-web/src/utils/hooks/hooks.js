@@ -1,7 +1,6 @@
-import { computed, reactive, inject, onBeforeMount, onMounted, watch } from "vue";
-import { useStore } from "vuex";
-import { getFormatTime, buffer2base64, base642File } from "@/utils/utils";
-
+import {computed, reactive, inject, onBeforeMount, onMounted, watch, ref} from "vue";
+import {useStore} from "vuex";
+import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
 
 const getDialogInfoHook = function () {
     const store = useStore()
@@ -75,7 +74,7 @@ const sockInitHook = function () {
         });
 
         socket.on("msg", (data) => {
-            const { fromUserId, msg: { type, content }, timestamp } = data;
+            const {fromUserId, msg: {type, content}, timestamp} = data;
             console.log(`收到服务器推送的${type}类型消息`)
             let imgUrl;
             if (type === 'img') {
@@ -111,14 +110,11 @@ const sockInitHook = function () {
         });
 
 
-
-
         socket.connect();
     };
 }
 
-
 export {
     getDialogInfoHook,
-    sockInitHook
+    sockInitHook,
 }

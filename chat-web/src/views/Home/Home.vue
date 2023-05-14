@@ -1,6 +1,6 @@
 <template>
     <div class="w-[230px] bg-gray-100 h-100 overflow-auto relative border border-solid border-black">
-        <div class="bg-dark-100 sticky inset-x-0 top-0 h-14 flex items-center box-border shadow">
+        <div class="bg-dark-100 sticky inset-x-0 top-0 h-14 flex items-center box-border shadow h-[50px]">
             <chat-search />
         </div>
         <div class="overflow-hidden bg-dark-200" style="height: calc( 100% - 3.5rem)">
@@ -22,6 +22,7 @@ import ChatSearch from '@/common/components/ChatSearch.vue'
 import ChatDialogWin from './components/ChatDialogWin/ChatDialogWin.vue'
 import { showAddMore } from './homeHooks'
 import AddUserChat from './components/AddUserChat.vue'
+
 </script>
 <style scoped>
 .slide-enter-active {
