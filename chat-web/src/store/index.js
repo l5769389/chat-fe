@@ -13,7 +13,8 @@ export default createStore({
 
             },
             totalMsgMap: {},
-            chatList: []  // 用户点击通讯录产生的对话id
+            chatList: [],  // 用户点击通讯录产生的对话id,
+            recentChatIds:[],
         }
     },
     getters: {
@@ -31,6 +32,9 @@ export default createStore({
         currentDialogDetails: state => {
             const d = state.totalMsgMap[state.currentDialogUserId] || []
             return d
+        },
+        recentChatIds:state => {
+            return state.recentChatIds
         }
     },
     mutations: {
@@ -93,6 +97,9 @@ export default createStore({
             const index = state.chatList.findIndex(item => item === userId)
             state.chatList.splice(index, 1)
             state.chatList = [userId, ...state.chatList]
+        },
+        setRecentChatIds(state,payload){
+            state.recentChatIds = payload
         }
     },
     actions: {
@@ -107,7 +114,6 @@ export default createStore({
             const res = await service.get('/api/user')
             commit('login', res)
         },
-
         async checkLogin({ commit, state, dispatch }) {
             const token = sessionStore.get('access_token')
             if (!state.isLogin && token) {
@@ -116,6 +122,26 @@ export default createStore({
             } else {
                 return false
             }
+        },
+        async getRecentChatIds({commit,state}){
+            const list = await service.get(`/recent-chat?userId=${state.user.userId}`)
+            commit('setRecentChatIds',list)
+        },
+        async createRoom(state,joinIds){
+            const createUserId = state.user.userId;
+            const res = await service.post('/chat-room',{
+                createId:createUserId,
+                joinIds,
+            })
+            console.log(res)
+        },
+        async updateRecentChat({state,dispatch},{toUserId}){
+           const res = await service.patch('/recent-chat',{
+                userId:state.user.userId,
+                chatType: 'single',
+                id: toUserId
+            })
+           dispatch('getRecentChatIds')
         }
     }
 })

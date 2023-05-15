@@ -8,7 +8,7 @@
                 <template v-for="item in filtered_friends" :key="item.nickname">
                     <div>
                         <chat-item :dialog-info="item" :use-type="canSelect ? 'select' : 'address'"
-                                   v-model="checkedFriendIds[item.userId]" @db-click="gotoDialog"/>
+                                   v-model="checkedFriendIds[item.userId]" @dbClick="gotoDialog"/>
                     </div>
                 </template>
             </div>
@@ -37,13 +37,15 @@ const {checkedFriendIds, filtered_friends, searchKey} = getSelectFriendsHooks()
 
 
 const totalChatList = computed(() => store.getters.totalChatList)
-const gotoDialog = (userId) => {
-    if (totalChatList.value.includes(userId)) {
-        invokeDialog(userId)
-    } else {
-        createDialog(userId)
-    }
+const gotoDialog =async (userId) => {
+    // if (totalChatList.value.includes(userId)) {
+    //     invokeDialog(userId)
+    // } else {
+    //     createDialog(userId)
+    // }
+   await createDialog(userId)
 }
+
 const invokeDialog = (userId) => {
     store.commit('setCurrentDialog', userId)
     store.commit('updateChatList', userId)
@@ -51,10 +53,13 @@ const invokeDialog = (userId) => {
         name: 'home'
     })
 }
-const createDialog = (userId) => {
+const createDialog =async (userId) => {
+    await store.dispatch('updateRecentChat',{
+        toUserId:userId
+    })
     store.commit('addChatList', userId)
     store.commit('setCurrentDialog', userId)
-    router.push({
+    await router.push({
         name: 'home'
     })
 }

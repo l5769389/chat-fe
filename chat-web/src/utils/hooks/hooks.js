@@ -76,6 +76,7 @@ const sockInitHook = function () {
         socket.on("msg", (data) => {
             const {fromUserId, msg: {type, content}, timestamp} = data;
             console.log(`收到服务器推送的${type}类型消息`)
+            store.dispatch('getRecentChatIds')
             let imgUrl;
             if (type === 'img') {
                 let image = buffer2base64(content)

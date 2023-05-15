@@ -1,7 +1,7 @@
 <template>
   <div class="flex  overflow-x-hidden overflow-y-auto flex-col h-full pt-3">
-    <chat-item v-for="item in totalChatList" :key="item" :class="activeDialogId == item ? 'bg-dark-400-active' : ''"
-      @click="chooseDialog(item)" :dialog-info="getUnreadMsg(item)" :msg="getUnreadMsg1(item)" />
+    <chat-item v-for="item in recentChatIds" :key="item.id" :class="activeDialogId == item.id ? 'bg-dark-400-active' : ''"
+      @click="chooseDialog(item.id)" :dialog-info="getUnreadMsg(item.id)" :msg="getUnreadMsg1(item.id)" />
   </div>
 </template>
 
@@ -12,7 +12,7 @@ import store from "@/store/index.js";
 const friends = computed(() => store.getters.friends)
 const activeDialogId = computed(() => store.getters.currentDialogUserId)
 const totalMsgMap = computed(() => store.getters.totalMsgMap)
-const totalChatList = computed(() => store.getters.totalChatList)
+const recentChatIds = computed(() => store.getters.recentChatIds)
 const unreadMsgMap = computed(() => store.getters.unreadMsgMap)
 
 const getUnreadMsg = (userId) => {

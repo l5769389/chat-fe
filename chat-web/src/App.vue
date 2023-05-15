@@ -5,16 +5,18 @@ import {ElAvatar} from 'element-plus';
 import Removable from '@/common/components/Removable.vue'
 import {onMounted, ref, watch} from "vue";
 import getSelectFriendsHooks from "@/utils/hooks/getSelectFriendsHooks.js";
+import {useStore} from "vuex";
 
 sockInitHook()
-const addUserFlag = ref(true)
+const addUserFlag = ref(false)
 const {checkedFriendsInfo,remove_checked,checkedFriendIds} = getSelectFriendsHooks()
-
+const store = useStore()
 const handleRemove = (item) => {
     remove_checked(item.userId)
 }
-const handleSubmit =() => {
-    console.log(Object.keys(checkedFriendIds))
+const handleSubmit =async () => {
+    const joinIds = Object.keys(checkedFriendIds)
+    await store.dispatch('createRoom',joinIds)
 }
 </script>
 

@@ -1,12 +1,11 @@
 import axios from "axios";
+import sessionStore from '../utils/sessionStore'
+import router from "@/router/router.js";
 
 const service = axios.create({
     baseURL: 'http://localhost:3000',
     timeout: 6000,
 })
-import sessionStore from '../utils/sessionStore'
-import router from "@/router/router.js";
-
 
 service.interceptors.request.use(config => {
     const access_token = sessionStore.get('access_token')

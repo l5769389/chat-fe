@@ -1,6 +1,6 @@
 <template>
     <template v-if="useType === 'shortMsg'">
-        <div class="h-20 flex items-center  box-border p-1 w-52">
+        <div class="h-20 flex items-center  box-border p-1 w-52" @click="$emit('click', dialogInfo.userId)">
             <div class="w-10 flex justify-center items-center mr-2">
                 <el-badge :value="dialogInfo.msgInfo.count" :hidden="dialogInfo.msgInfo.count === 0">
                     <el-avatar shape="square" :size="40" :src="dialogInfo.avatar" />
@@ -11,7 +11,7 @@
                     <span class="text-black font-bold">{{ dialogInfo.nickname }}</span>
                     <span class="text-gray-400">{{ dialogInfo.msgInfo.timestamp }}</span>
                 </div>
-                <p class="overflow-ellipsis overflow-hidden whitespace-nowrap">{{ msgContent }}</p>
+                <p class="overflow-ellipsis overflow-hidden whitespace-nowrap min-w-full">{{ msgContent }}</p>
             </div>
         </div>
     </template>
