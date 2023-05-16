@@ -48,7 +48,9 @@ const router = createRouter({
 })
 router.beforeEach(async (to, from, next) => {
     const isLogin = store.getters.isLogin
+    // 如果没有登录且前往的页面不是登录页面
     if (!isLogin && to.name !== 'login'){
+        // 验证token
        const flag = await store.dispatch('checkLogin')
        if (flag){
            await store.dispatch('getRecentChatIds')

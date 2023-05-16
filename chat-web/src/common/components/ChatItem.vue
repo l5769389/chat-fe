@@ -1,12 +1,12 @@
 <template>
     <template v-if="useType === 'shortMsg'">
-        <div class="h-20 flex items-center  box-border p-1 w-52" @click="$emit('click', dialogInfo.userId)">
-            <div class="w-10 flex justify-center items-center mr-2">
-                <el-badge :value="dialogInfo.msgInfo.count" :hidden="dialogInfo.msgInfo.count === 0">
-                    <el-avatar shape="square" :size="40" :src="dialogInfo.avatar" />
+        <div class="h-[60px] flex items-center  box-border p-1 w-52" @click="$emit('click', dialogInfo.userId)">
+            <div class="w-[50px] h-full flex justify-center items-center mr-2">
+                <el-badge class="w-full h-full" :value="dialogInfo.msgInfo.count" :hidden="dialogInfo.msgInfo.count === 0">
+                    <chat-avatar  :avatars="msgType === 'Single' ? [dialogInfo.avatar]: avatars"></chat-avatar>
                 </el-badge>
             </div>
-            <div class="flex-1 overflow-hidden">
+            <div class="flex-1 h-full overflow-hidden">
                 <div class="flex justify-between">
                     <span class="text-black font-bold">{{ dialogInfo.nickname }}</span>
                     <span class="text-gray-400">{{ dialogInfo.msgInfo.timestamp }}</span>
@@ -19,7 +19,7 @@
         <!-- 通讯录中的 -->
         <el-badge class="hover:bg-dark-400-hover" :hidden="true" @dblclick="$emit('dbClick', dialogInfo.userId)">
             <div class="h-20 flex items-center  box-border p-3 w-52">
-                <el-avatar shape="square" :size="35" class="mr-2" :src="dialogInfo.avatar" />
+                <el-avatar shape="square" :size="35" class="mr-2" :src="dialogInfo.avatar"/>
                 <div class="flex-1">
                     <div class="flex justify-between">
                         <span class="text-black font-bold">{{ dialogInfo.nickname }}</span>
@@ -33,10 +33,10 @@
         <el-badge class="hover:bg-dark-400-hover" :hidden="true">
             <div class="flex items-center pl-5">
                 <span>
-                    <el-checkbox size="large" v-model="checked" />
+                    <el-checkbox size="large" v-model="checked"/>
                 </span>
                 <div class="flex items-center  box-border p-3 w-52 h-14">
-                    <el-avatar shape="square" :size="35" class="mr-2" :src="dialogInfo.avatar" />
+                    <el-avatar shape="square" :size="35" class="mr-2" :src="dialogInfo.avatar"/>
                     <div class="flex-1">
                         <div class="flex justify-between">
                             <span class="text-black font-bold">{{ dialogInfo.nickname }}</span>
@@ -45,12 +45,12 @@
                 </div>
             </div>
         </el-badge>
-
     </template>
 </template>
 
 <script setup>
 import {computed} from "vue";
+import ChatAvatar from "@/common/components/components/ChatAvatar.vue";
 
 const props = defineProps({
     dialogInfo: {
@@ -63,7 +63,8 @@ const props = defineProps({
                 msgInfo: {
                     count: 0,
                     timestamp: ''
-                }
+                },
+                group: []
             }
         }
     },
@@ -86,11 +87,23 @@ const props = defineProps({
     },
     modelValue: {
         type: Boolean,
-        default:false
+        default: false
+    },
+    msgType: {
+        validator(value) {
+            return ['Single', 'Multi'].includes(value)
+        },
+        default() {
+            return 'Single'
+        }
     }
 })
 const emit = defineEmits(['click', 'dbClick', 'update:modelValue'])
-
+const avatars = computed(() => {
+    return props.dialogInfo.group.map(item => {
+        return item.avatar
+    })
+})
 
 const msgContent = computed(() => {
     const msg = props.msg
@@ -103,10 +116,10 @@ const msgContent = computed(() => {
 
 
 const checked = computed({
-    get(){
+    get() {
         return props.modelValue
     },
-    set(val){
+    set(val) {
         emit('update:modelValue', val)
     }
 })

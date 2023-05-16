@@ -1,20 +1,21 @@
-import { createStore } from "vuex";
+import {createStore} from "vuex";
 import service from "@/api/index.js";
 import sessionStore from "../utils/sessionStore";
+import _ from 'lodash'
+
 export default createStore({
     state() {
         return {
             isLogin: false,
             user: {},
-            friends: [],
-            currentDialogUserId: '',
-            socketStatus: 'close',
-            unreadMsgMap: {
-
-            },
+            friends: [], // 用户的通讯录中的所有朋友列表
+            groupFriends: {}, // 用户群聊中的所有用户信息
+            currentDialogUserId: '', //chatList中当前位于的聊天，可能是群聊、单个用户
+            socketStatus: 'close',  // 与服务器socket通讯的状态
+            unreadMsgMap: {},
             totalMsgMap: {},
             chatList: [],  // 用户点击通讯录产生的对话id,
-            recentChatIds:[],
+            recentChatIds: [],
         }
     },
     getters: {
@@ -33,12 +34,15 @@ export default createStore({
             const d = state.totalMsgMap[state.currentDialogUserId] || []
             return d
         },
-        recentChatIds:state => {
+        recentChatIds: state => {
             return state.recentChatIds
+        },
+        groupFriends: state => {
+            return state.groupFriends
         }
     },
     mutations: {
-        login(state, { user, friends }) {
+        login(state, {user, friends}) {
             state.isLogin = true
             Object.assign(state.user, user)
             state.friends = friends
@@ -57,8 +61,8 @@ export default createStore({
         setSocketStatus(state, payload) {
             state.socketStatus = payload
         },
-        addUnreadMsgMap(state, { ...params }) {
-            const { userId } = params;
+        addUnreadMsgMap(state, {...params}) {
+            const {userId} = params;
             const arr = state.unreadMsgMap[userId]
             if (arr) {
                 state.unreadMsgMap[userId].push({
@@ -72,12 +76,12 @@ export default createStore({
                 ]
             }
         },
-        addTotalMsgMap(state, { ...params }) {
-            const { userId, content } = params;
+        addTotalMsgMap(state, {...params}) {
+            const {userId, content} = params;
             const arr = state.totalMsgMap[userId]
             if (arr) {
                 if (Array.isArray(content)) {
-                    state.totalMsgMap[userId] = [...arr,...content]
+                    state.totalMsgMap[userId] = [...arr, ...content]
                 } else {
                     state.totalMsgMap[userId].push(content)
                 }
@@ -98,23 +102,26 @@ export default createStore({
             state.chatList.splice(index, 1)
             state.chatList = [userId, ...state.chatList]
         },
-        setRecentChatIds(state,payload){
+        setRecentChatIds(state, payload) {
             state.recentChatIds = payload
+        },
+        setGroupFriends(state,payload){
+            state.groupFriends = payload
         }
     },
     actions: {
-        async login({ commit, state, dispatch }, { username, password }) {
+        async login({commit, state, dispatch}, {username, password}) {
             await service.post('/auth/login', {
                 username,
                 password
             })
             await dispatch('loginByToken')
         },
-        async loginByToken({ commit, state }) {
+        async loginByToken({commit, state}) {
             const res = await service.get('/api/user')
             commit('login', res)
         },
-        async checkLogin({ commit, state, dispatch }) {
+        async checkLogin({commit, state, dispatch}) {
             const token = sessionStore.get('access_token')
             if (!state.isLogin && token) {
                 await dispatch('loginByToken')
@@ -123,25 +130,43 @@ export default createStore({
                 return false
             }
         },
-        async getRecentChatIds({commit,state}){
+        getRecentChatIds: _.debounce(async ({commit, state, dispatch}) => {
             const list = await service.get(`/recent-chat?userId=${state.user.userId}`)
-            commit('setRecentChatIds',list)
+            const group = list.filter(item => item.type === 'Multi')
+            let ids = [];
+            group.forEach(item => {
+                ids = [...ids,...item.joinIds]
+            })
+            ids = Array.from(new Set(ids))
+            await dispatch('getUnfriendInfo', ids)
+            commit('setRecentChatIds', list)
+        }, 500),
+        async getUnfriendInfo({commit}, userIds) {
+            if (!userIds){
+                return;
+            }
+            const res = await service.get('/api/users', {
+                params: {
+                    ids:userIds + ''
+                }
+            })
+            commit('setGroupFriends',res)
         },
-        async createRoom(state,joinIds){
+        async createRoom({state}, joinIds) {
             const createUserId = state.user.userId;
-            const res = await service.post('/chat-room',{
-                createId:createUserId,
+            const res = await service.post('/chat-room', {
+                createId: createUserId,
                 joinIds,
             })
             console.log(res)
         },
-        async updateRecentChat({state,dispatch},{toUserId}){
-           const res = await service.patch('/recent-chat',{
-                userId:state.user.userId,
+        async updateRecentChat({state, dispatch}, {toUserId}) {
+            const res = await service.patch('/recent-chat', {
+                userId: state.user.userId,
                 chatType: 'single',
                 id: toUserId
             })
-           dispatch('getRecentChatIds')
+            dispatch('getRecentChatIds')
         }
     }
 })

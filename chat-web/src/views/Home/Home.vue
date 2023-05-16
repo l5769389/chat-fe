@@ -22,7 +22,12 @@ import ChatSearch from '@/common/components/ChatSearch.vue'
 import ChatDialogWin from './components/ChatDialogWin/ChatDialogWin.vue'
 import { showAddMore } from './homeHooks'
 import AddUserChat from './components/AddUserChat.vue'
-
+import {onBeforeMount} from "vue";
+import {useStore} from "vuex";
+const store = useStore()
+onBeforeMount(() => {
+    store.dispatch('getRecentChatIds')
+})
 </script>
 <style scoped>
 .slide-enter-active {
