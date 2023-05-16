@@ -5,14 +5,25 @@ import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
 const getDialogInfoHook = function () {
     const store = useStore()
     const friends = computed(() => store.getters.friends)
-    const currentDialogUserId = computed(() => store.getters.currentDialogUserId)
+    const currentDialogId = computed(() => store.getters.currentDialogId)
+    const recentChatIds = computed(() => store.getters.recentChatIds)
     const currentDialogUserInfo = computed(() => {
-        const friend = friends.value.find(item => item.userId == currentDialogUserId.value)
-        return {
-            userId: currentDialogUserId.value,
-            avatar: friend?.avatar || '',
-            nickname: friend?.nickname || ''
+        if (currentDialogId.value.type === 'Single') {
+            const friend = friends.value.find(item => item.userId == currentDialogId.value.id)
+            return {
+                userId: currentDialogId.value,
+                avatar: friend?.avatar || '',
+                nickname: friend?.nickname || ''
+            }
+        } else if (currentDialogId.value.type === 'Multi') {
+            const friend = recentChatIds.value.find(item => item.id == currentDialogId.value.id)
+            return {
+                userId: currentDialogId.value,
+                avatar: friend?.avatar || '',
+                nickname: friend?.name || ''
+            }
         }
+
     })
 
     const currentDialogDetails = computed(() => store.getters.currentDialogDetails)
@@ -25,7 +36,7 @@ const getDialogInfoHook = function () {
         }
     })
     return {
-        currentDialogUserId,
+        currentDialogId,
         currentDialogUserInfo,
         currentDialogDetails,
         messageRef
@@ -38,7 +49,7 @@ const sockInitHook = function () {
     const store = useStore();
     const isLogin = computed(() => store.getters.isLogin);
     const user = computed(() => store.getters.user);
-    const currentDialogUserId = computed(() => store.getters.currentDialogUserId);
+    const currentDialogId = computed(() => store.getters.currentDialogId);
     watch(
         () => isLogin.value,
         (newVal, oldValue) => {
@@ -84,7 +95,7 @@ const sockInitHook = function () {
                 imgUrl = window.URL.createObjectURL(file)
             }
             // 当前窗口就在与该用户的会话窗口
-            if (currentDialogUserId.value != fromUserId) {
+            if (currentDialogId.value != fromUserId) {
                 store.commit("addUnreadMsgMap", {
                     userId: fromUserId,
                     content: {
@@ -98,12 +109,11 @@ const sockInitHook = function () {
                 });
             }
             store.commit("addTotalMsgMap", {
-                userId: fromUserId,
+                chatId: fromUserId,
                 content: {
                     type: type,
                     content: type === 'img' ? imgUrl : content,
                     timestamp: getFormatTime(timestamp),
-
                 },
                 messageId: new Date().getTime(),
                 source: "other",

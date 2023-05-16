@@ -10,7 +10,10 @@ export default createStore({
             user: {},
             friends: [], // 用户的通讯录中的所有朋友列表
             groupFriends: {}, // 用户群聊中的所有用户信息
-            currentDialogUserId: '', //chatList中当前位于的聊天，可能是群聊、单个用户
+            currentDialogId: {
+                type: 'Single', //Single or Multi
+                id: '', //Single为 userId
+            }, //chatList中当前位于的聊天，可能是群聊、单个用户
             socketStatus: 'close',  // 与服务器socket通讯的状态
             unreadMsgMap: {},
             totalMsgMap: {},
@@ -22,7 +25,7 @@ export default createStore({
         isLogin: state => state.isLogin,
         user: state => state.user,
         friends: state => state.friends,
-        currentDialogUserId: state => state.currentDialogUserId,
+        currentDialogId: state => state.currentDialogId,
         socketStatus: state => state.socketStatus,
         unreadMsgMap: state => state.unreadMsgMap,
         totalMsgMap: state => state.totalMsgMap,
@@ -31,7 +34,7 @@ export default createStore({
             return list
         },
         currentDialogDetails: state => {
-            const d = state.totalMsgMap[state.currentDialogUserId] || []
+            const d = state.totalMsgMap[state.currentDialogId.id] || []
             return d
         },
         recentChatIds: state => {
@@ -54,8 +57,8 @@ export default createStore({
         },
         setCurrentDialog(state, payload) {
             // 设置当前激活的会话框。需要将该id未读的消息清空。
-            state.currentDialogUserId = payload
-            state.unreadMsgMap[state.currentDialogUserId] = []
+            state.currentDialogId = payload
+            state.unreadMsgMap[state.currentDialogId.id] = []
 
         },
         setSocketStatus(state, payload) {
@@ -77,20 +80,20 @@ export default createStore({
             }
         },
         addTotalMsgMap(state, {...params}) {
-            const {userId, content} = params;
-            const arr = state.totalMsgMap[userId]
+            const {chatId, content} = params;
+            const arr = state.totalMsgMap[chatId]
             if (arr) {
                 if (Array.isArray(content)) {
-                    state.totalMsgMap[userId] = [...arr, ...content]
+                    state.totalMsgMap[chatId] = [...arr, ...content]
                 } else {
-                    state.totalMsgMap[userId].push(content)
+                    state.totalMsgMap[chatId].push(content)
                 }
             } else {
                 // 如果要存储的消息是一个数组，比如输入框中：1+ 图片 需要依次存储。
                 if (!Array.isArray(content)) {
-                    state.totalMsgMap[userId] = [content]
+                    state.totalMsgMap[chatId] = [content]
                 } else {
-                    state.totalMsgMap[userId] = content
+                    state.totalMsgMap[chatId] = content
                 }
             }
         },
@@ -154,9 +157,11 @@ export default createStore({
         },
         async createRoom({state}, joinIds) {
             const createUserId = state.user.userId;
+            const joinIds_str = joinIds.join(',')
             const res = await service.post('/chat-room', {
-                createId: createUserId,
-                joinIds,
+                createUserId: createUserId,
+                joinUserId:joinIds_str,
+                chatRoomName:'default11'
             })
             console.log(res)
         },

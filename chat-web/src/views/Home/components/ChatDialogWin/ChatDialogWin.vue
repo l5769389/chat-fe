@@ -27,7 +27,7 @@ import DialogWrapper from "@/views/Home/components/ChatDialogWin/compnents/Dialo
 import EnumInput from "./compnents/EnumInput.vue";
 import { useStore } from "vuex";
 const store = useStore();
-const activeDialogId = computed(() => store.getters.currentDialogUserId);
+const activeDialogId = computed(() => store.getters.currentDialogId);
 </script>
 
 <style scoped></style>

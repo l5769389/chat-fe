@@ -1,14 +1,14 @@
 <template>
     <template v-if="useType === 'shortMsg'">
         <div class="h-[60px] flex items-center  box-border p-1 w-52" @click="$emit('click', dialogInfo.userId)">
-            <div class="w-[50px] h-full flex justify-center items-center mr-2">
+            <div class="w-[50px] h-full flex justify-center items-center">
                 <el-badge class="w-full h-full" :value="dialogInfo.msgInfo.count" :hidden="dialogInfo.msgInfo.count === 0">
                     <chat-avatar  :avatars="msgType === 'Single' ? [dialogInfo.avatar]: avatars"></chat-avatar>
                 </el-badge>
             </div>
             <div class="flex-1 h-full overflow-hidden">
                 <div class="flex justify-between">
-                    <span class="text-black font-bold">{{ dialogInfo.nickname }}</span>
+                    <span class="text-black font-bold">{{dialogInfo.nickname }}</span>
                     <span class="text-gray-400">{{ dialogInfo.msgInfo.timestamp }}</span>
                 </div>
                 <p class="overflow-ellipsis overflow-hidden whitespace-nowrap min-w-full">{{ msgContent }}</p>

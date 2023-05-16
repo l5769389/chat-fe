@@ -47,7 +47,10 @@ const gotoDialog =async (userId) => {
 }
 
 const invokeDialog = (userId) => {
-    store.commit('setCurrentDialog', userId)
+    store.commit('setCurrentDialog', {
+        type:'Single',
+        id: userId
+    })
     store.commit('updateChatList', userId)
     router.push({
         name: 'home'
@@ -58,7 +61,10 @@ const createDialog =async (userId) => {
         toUserId:userId
     })
     store.commit('addChatList', userId)
-    store.commit('setCurrentDialog', userId)
+    store.commit('setCurrentDialog', {
+        type:'Single',
+        id: userId
+    })
     await router.push({
         name: 'home'
     })

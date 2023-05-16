@@ -14,7 +14,7 @@ import { getFormatTime } from "../../../../../utils/utils";
 import EditInput from "@/views/components/EditInput.vue";
 const socket = inject("socket");
 const store = useStore();
-const activeDialogId = computed(() => store.getters.currentDialogUserId);
+const activeDialogId = computed(() => store.getters.currentDialogId);
 const user = computed(() => store.getters.user);
 const editInputRef = ref(null)
 const sendMsg = () => {
@@ -28,6 +28,7 @@ const sendMsg = () => {
 };
 
 const storeToLocal = (msg) => {
+    debugger
     if (Array.isArray(msg)) {
         const mapped_msg = msg.map(item => {
             if (item.type === 'img') {
@@ -49,7 +50,7 @@ const storeToLocal = (msg) => {
             }
         })
         store.commit("addTotalMsgMap", {
-            userId: activeDialogId.value,
+            chatId: activeDialogId.value.id,
             content: mapped_msg
         });
     }
