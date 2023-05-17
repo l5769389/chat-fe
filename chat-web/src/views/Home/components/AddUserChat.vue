@@ -103,7 +103,7 @@ const handleRemove = (item) => {
 }
 
 const joinIds =computed(() => {
-    const ids = Object.keys(checkedFriendIds)
+    const ids = Object.keys(checkedFriendIds.value)
     if (currentDialogUserInfo.value.chatType === 'Single'){
         return  [...ids,currentDialogUserInfo.value.userId]
     }else if (currentDialogUserInfo.value.chatType === 'Multi'){

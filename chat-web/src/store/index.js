@@ -157,7 +157,8 @@ export default createStore({
         },
         async createRoom({state}, joinIds) {
             const createUserId = state.user.userId;
-            const joinIds_str = joinIds.join(',')
+            const joinIds_str = joinIds.map(item=>Number.parseInt(item)).join(',')
+            debugger
             const res = await service.post('/chat-room', {
                 createUserId: createUserId,
                 joinUserId: joinIds_str,
