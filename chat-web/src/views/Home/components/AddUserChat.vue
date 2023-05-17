@@ -1,13 +1,21 @@
 <template>
     <div class="w-full h-full pt-5 pl-2 pr-2 border-box divide-y-2 text-xs">
         <div class="grid grid-cols-3 pl-3 pr-3 pb-5 border-box gap-y-1">
-            <div class="flex flex-col items-center">
-                <el-avatar shape="square" :size="35" :src="currentDialogUserInfo.avatar" />
-                <span class="text-xs mt-1 overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-center">{{
-                    currentDialogUserInfo.nickname }}</span>
-            </div>
-
-            <div class=" flex flex-col items-center" @click="addUserFlag = true">
+            <template v-if="currentDialogUserInfo.chatType === 'Single'">
+                <div class="flex flex-col items-center">
+                    <el-avatar shape="square" :size="35" :src="currentDialogUserInfo.avatar" />
+                    <span class="text-xs mt-1 overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-center">{{
+                            currentDialogUserInfo.nickname }}</span>
+                </div>
+            </template>
+            <template v-else-if="currentDialogUserInfo.chatType === 'Multi'">
+                <div class="flex flex-col items-center" v-for="id in currentDialogUserInfo.joinIds">
+                    <el-avatar shape="square" :size="35" :src="groupFriends[id].avatar" />
+                    <span class="text-xs mt-1 overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-center">{{
+                            groupFriends[id].nickname }}</span>
+                </div>
+            </template>
+            <div class=" flex flex-col items-center" @click="handleShowModal">
                 <add-three theme="outline" size="35" fill="#333" strokeLinejoin="miter" />
                 <span class="text-xs mt-1">添加</span>
             </div>
@@ -33,7 +41,9 @@
         </div>
     </div>
 
-    <el-dialog class="no-header" v-model="addUserFlag" width="600px" :modal="false"
+    <el-dialog class="no-header" v-model="addUserFlag" width="600px"
+               :modal="false"
+               @close="handleClose"
                :show-close="false">
         <div class="h-[400px] w-full divide-x-2 flex overflow-hidden">
             <div class="flex-1 w-0 border-box">
@@ -69,27 +79,51 @@
 <script setup>
 import { getDialogInfoHook } from '@/utils/hooks/hooks.js';
 import { AddThree, Right } from '@icon-park/vue-next';
-import {reactive, ref} from "vue";
+import {computed, nextTick, reactive, ref, watch} from "vue";
 import Removable from "@/common/components/Removable.vue";
 import {ElAvatar} from "element-plus";
 import AddressListWrapper from "@/views/Address/components/AddressListWrapper.vue";
 import getSelectFriendsHooks from "@/utils/hooks/getSelectFriendsHooks.js";
 import {useStore} from "vuex";
+const store = useStore()
+
 const { currentDialogUserInfo } = getDialogInfoHook()
+const {checkedFriendsInfo,remove_checked,checkedFriendIds,setExceptUserId,reset} = getSelectFriendsHooks()
+
 const setting = reactive({
     noDisturb: false,
     onTop: false
 })
+const groupFriends = computed(() => {
+    return store.getters.groupFriends
+})
 const addUserFlag = ref(false)
-const {checkedFriendsInfo,remove_checked,checkedFriendIds} = getSelectFriendsHooks()
-const store = useStore()
 const handleRemove = (item) => {
     remove_checked(item.userId)
 }
+
+const joinIds =computed(() => {
+    const ids = Object.keys(checkedFriendIds)
+    if (currentDialogUserInfo.value.chatType === 'Single'){
+        return  [...ids,currentDialogUserInfo.value.userId]
+    }else if (currentDialogUserInfo.value.chatType === 'Multi'){
+        return  [...ids, ...currentDialogUserInfo.value.joinIds]
+    }
+})
+
+
 const handleSubmit =async () => {
-    const joinIds = Object.keys(checkedFriendIds)
-    await store.dispatch('createRoom',joinIds)
+    await store.dispatch('createRoom',joinIds.value)
 }
+const handleShowModal = () => {
+    setExceptUserId(joinIds.value)
+    addUserFlag.value = true
+}
+const handleClose = () =>{
+    reset()
+}
+
+
 </script>
 
 <style lang="css" scoped>

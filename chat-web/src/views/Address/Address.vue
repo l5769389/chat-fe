@@ -13,6 +13,8 @@
 <script setup>
 import AddressListWrapper from './components/AddressListWrapper.vue';
 import { Wechat } from '@icon-park/vue-next';
+import {useStore} from "vuex";
+const store = useStore()
 </script>
 
 <style scoped></style>

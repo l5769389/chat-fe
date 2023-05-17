@@ -5,22 +5,25 @@ import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
 const getDialogInfoHook = function () {
     const store = useStore()
     const friends = computed(() => store.getters.friends)
-    const currentDialogId = computed(() => store.getters.currentDialogId)
+    const currentDialogInfo = computed(() => store.getters.currentDialogInfo)
     const recentChatIds = computed(() => store.getters.recentChatIds)
     const currentDialogUserInfo = computed(() => {
-        if (currentDialogId.value.type === 'Single') {
-            const friend = friends.value.find(item => item.userId == currentDialogId.value.id)
+        if (currentDialogInfo.value.type === 'Single') {
+            const friend = friends.value.find(item => item.userId == currentDialogInfo.value.id)
             return {
-                userId: currentDialogId.value,
+                userId: currentDialogInfo.value.id,
                 avatar: friend?.avatar || '',
-                nickname: friend?.nickname || ''
+                nickname: friend?.nickname || '',
+                chatType: 'Single',
             }
-        } else if (currentDialogId.value.type === 'Multi') {
-            const friend = recentChatIds.value.find(item => item.id == currentDialogId.value.id)
+        } else if (currentDialogInfo.value.type === 'Multi') {
+            const friend = recentChatIds.value.find(item => item.id == currentDialogInfo.value.id)
             return {
-                userId: currentDialogId.value,
+                chatId: currentDialogInfo.value.id,
+                joinIds:friend?.joinIds,
                 avatar: friend?.avatar || '',
-                nickname: friend?.name || ''
+                nickname: friend?.name || '',
+                chatType: 'Multi',
             }
         }
 
@@ -36,7 +39,7 @@ const getDialogInfoHook = function () {
         }
     })
     return {
-        currentDialogId,
+        currentDialogInfo,
         currentDialogUserInfo,
         currentDialogDetails,
         messageRef
@@ -49,7 +52,7 @@ const sockInitHook = function () {
     const store = useStore();
     const isLogin = computed(() => store.getters.isLogin);
     const user = computed(() => store.getters.user);
-    const currentDialogId = computed(() => store.getters.currentDialogId);
+    const currentDialogInfo = computed(() => store.getters.currentDialogInfo);
     watch(
         () => isLogin.value,
         (newVal, oldValue) => {
@@ -95,7 +98,7 @@ const sockInitHook = function () {
                 imgUrl = window.URL.createObjectURL(file)
             }
             // 当前窗口就在与该用户的会话窗口
-            if (currentDialogId.value != fromUserId) {
+            if (currentDialogInfo.value != fromUserId) {
                 store.commit("addUnreadMsgMap", {
                     userId: fromUserId,
                     content: {

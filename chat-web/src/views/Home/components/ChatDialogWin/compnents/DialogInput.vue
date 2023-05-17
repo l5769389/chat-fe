@@ -14,7 +14,7 @@ import { getFormatTime } from "../../../../../utils/utils";
 import EditInput from "@/views/components/EditInput.vue";
 const socket = inject("socket");
 const store = useStore();
-const activeDialogId = computed(() => store.getters.currentDialogId);
+const activeDialogId = computed(() => store.getters.currentDialogInfo);
 const user = computed(() => store.getters.user);
 const editInputRef = ref(null)
 const sendMsg = () => {
@@ -28,7 +28,6 @@ const sendMsg = () => {
 };
 
 const storeToLocal = (msg) => {
-    debugger
     if (Array.isArray(msg)) {
         const mapped_msg = msg.map(item => {
             if (item.type === 'img') {
@@ -64,19 +63,35 @@ const sendToServer = (msg) => {
 };
 
 const sendToServerOneMsg = (msgSingle) => {
-    socket.emit(
-        "events",
-        {
-            toUserId: Number.parseInt(activeDialogId.value),
-            fromUserId: user.value.userId,
-            msg: msgSingle,
-            msgType: msgSingle.type,
-            timestamp: new Date().getTime(),
-        },
-        () => {
-            console.log("发送成功");
-        }
-    );
+    if (activeDialogId.value.type === 'Single'){
+        socket.emit(
+            "SingleMsg",
+            {
+                toUserId: Number.parseInt(activeDialogId.value.id),
+                fromUserId: user.value.userId,
+                msg: msgSingle,
+                msgType: msgSingle.type,
+                timestamp: new Date().getTime(),
+            },
+            () => {
+                console.log("发送成功");
+            }
+        );
+    } else if (activeDialogId.value.type === 'Multi'){
+        socket.emit(
+            "MultiMsg",
+            {
+                toChatRoomId: activeDialogId.value.id,
+                fromUserId: user.value.userId,
+                msg: msgSingle,
+                msgType: msgSingle.type,
+                timestamp: new Date().getTime(),
+            },
+            () => {
+                console.log("发送成功");
+            }
+        );
+    }
 }
 
 </script>

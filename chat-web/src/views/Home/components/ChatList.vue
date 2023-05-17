@@ -1,8 +1,9 @@
 <template>
     <div class="flex  overflow-x-hidden overflow-y-auto flex-col h-full pt-3 items-center">
         <chat-item v-for="item in recentChatIds" :key="item.id"
-                   :class="activeDialogId == item.id ? 'bg-dark-400-active' : ''"
+                   :class="activeDialogId.id == item.id ? 'bg-dark-400-active' : ''"
                    @click="chooseDialog(item)"
+                   class="hover:bg-dark-400-hover"
                    :msgType="item.type"
                    :dialog-info="getUnreadMsg(item)"
                    :msg="getUnreadMsg1(item.id)"/>
@@ -15,7 +16,7 @@ import ChatItem from '../../../common/components/ChatItem.vue'
 import store from "@/store/index.js";
 
 const friends = computed(() => store.getters.friends)
-const activeDialogId = computed(() => store.getters.currentDialogId)
+const activeDialogId = computed(() => store.getters.currentDialogInfo)
 const totalMsgMap = computed(() => store.getters.totalMsgMap)
 const recentChatIds = computed(() => store.getters.recentChatIds)
 const unreadMsgMap = computed(() => store.getters.unreadMsgMap)
@@ -55,7 +56,6 @@ const getUnreadMsg = (item) => {
             group: friends
         }
     }
-
 }
 
 const getUnreadMsg1 = (id) => {

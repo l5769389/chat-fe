@@ -4,24 +4,36 @@ import {useRouter} from "vue-router";
 
 
 const searchKey = ref('')
-const checkedFriendIds = reactive({})
-
+let checkedFriendIds = ref({})
+let exceptChatUserIds = ref([]);
 
 
 export default function (){
     const store = useStore()
     const router = useRouter()
     const friends = computed(() => store.getters.friends)
-    const friendsList = computed(() => friends.value.map(item => {
-        return {
-            avatar: item.avatar,
-            nickname: item.nickname,
-            userId: item.userId
+    const exceptChatFriends = computed(() => {
+        if (exceptChatUserIds.value.length === 0){
+            return  friends.value
         }
-    }))
+        return friends.value.filter(friend => {
+            if (!exceptChatUserIds.value.includes(friend.userId)){
+                return friend
+            }
+        })
+    } )
+    const friendsList = computed(() => {
+        return exceptChatFriends.value.map(item => {
+            return {
+                avatar: item.avatar,
+                nickname: item.nickname,
+                userId: item.userId
+            }
+        })
+    })
     const checkedFriendsInfo = computed(() => {
         let arr = [];
-        for (const [id, v] of Object.entries(checkedFriendIds)) {
+        for (const [id, v] of Object.entries(checkedFriendIds.value)) {
             if (!v) {
                 continue;
             }
@@ -45,14 +57,24 @@ export default function (){
         })
     })
     const remove_checked = id => {
-        checkedFriendIds[id] = false
+        checkedFriendIds.value[id] = false
     }
+    const setExceptUserId = (ids) => {
+        exceptChatUserIds.value = ids
+    }
+    const reset = () => {
+        checkedFriendIds.value = {}
+        exceptChatUserIds.value =[]
+    }
+
     return {
         searchKey,
         checkedFriendIds,
         checkedFriendsInfo,
         filtered_friends,
-        remove_checked
+        remove_checked,
+        setExceptUserId,
+        reset
     }
 
 }

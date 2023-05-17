@@ -23,27 +23,29 @@ import ChatItem from '../../../common/components/ChatItem.vue';
 import ChatSearch from '@/common/components/ChatSearch.vue';
 import getSelectFriendsHooks from "@/utils/hooks/getSelectFriendsHooks.js";
 
-defineProps({
+const props = defineProps({
     canSelect: {
         type: Boolean,
         default: false
+    },
+    dialogList: {
+        type: Array,
+        default:[]
     }
-
 })
 const store = useStore()
 const router = useRouter()
 
 const {checkedFriendIds, filtered_friends, searchKey} = getSelectFriendsHooks()
 
+const showDialogList = computed(() => props.dialogList)
 
-const totalChatList = computed(() => store.getters.totalChatList)
 const gotoDialog =async (userId) => {
-    // if (totalChatList.value.includes(userId)) {
-    //     invokeDialog(userId)
-    // } else {
-    //     createDialog(userId)
-    // }
-   await createDialog(userId)
+    if (showDialogList.value.includes(userId)) {
+        invokeDialog(userId)
+    } else {
+       await createDialog(userId)
+    }
 }
 
 const invokeDialog = (userId) => {

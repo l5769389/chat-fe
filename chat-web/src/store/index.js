@@ -7,25 +7,25 @@ export default createStore({
     state() {
         return {
             isLogin: false,
-            user: {},
+            user: {},    //用户信息
             friends: [], // 用户的通讯录中的所有朋友列表
             groupFriends: {}, // 用户群聊中的所有用户信息
-            currentDialogId: {
+            currentDialogInfo: {
                 type: 'Single', //Single or Multi
                 id: '', //Single为 userId
             }, //chatList中当前位于的聊天，可能是群聊、单个用户
             socketStatus: 'close',  // 与服务器socket通讯的状态
-            unreadMsgMap: {},
-            totalMsgMap: {},
+            unreadMsgMap: {}, //未读消息
+            totalMsgMap: {},  //所有消息
             chatList: [],  // 用户点击通讯录产生的对话id,
-            recentChatIds: [],
+            recentChatIds: [], //
         }
     },
     getters: {
         isLogin: state => state.isLogin,
         user: state => state.user,
         friends: state => state.friends,
-        currentDialogId: state => state.currentDialogId,
+        currentDialogInfo: state => state.currentDialogInfo,
         socketStatus: state => state.socketStatus,
         unreadMsgMap: state => state.unreadMsgMap,
         totalMsgMap: state => state.totalMsgMap,
@@ -34,7 +34,7 @@ export default createStore({
             return list
         },
         currentDialogDetails: state => {
-            const d = state.totalMsgMap[state.currentDialogId.id] || []
+            const d = state.totalMsgMap[state.currentDialogInfo.id] || []
             return d
         },
         recentChatIds: state => {
@@ -57,8 +57,8 @@ export default createStore({
         },
         setCurrentDialog(state, payload) {
             // 设置当前激活的会话框。需要将该id未读的消息清空。
-            state.currentDialogId = payload
-            state.unreadMsgMap[state.currentDialogId.id] = []
+            state.currentDialogInfo = payload
+            state.unreadMsgMap[state.currentDialogInfo.id] = []
 
         },
         setSocketStatus(state, payload) {
@@ -108,7 +108,7 @@ export default createStore({
         setRecentChatIds(state, payload) {
             state.recentChatIds = payload
         },
-        setGroupFriends(state,payload){
+        setGroupFriends(state, payload) {
             state.groupFriends = payload
         }
     },
@@ -138,40 +138,40 @@ export default createStore({
             const group = list.filter(item => item.type === 'Multi')
             let ids = [];
             group.forEach(item => {
-                ids = [...ids,...item.joinIds]
+                ids = [...ids, ...item.joinIds]
             })
             ids = Array.from(new Set(ids))
             await dispatch('getUnfriendInfo', ids)
             commit('setRecentChatIds', list)
         }, 500),
         async getUnfriendInfo({commit}, userIds) {
-            if (!userIds){
+            if (userIds?.length === 0) {
                 return;
             }
             const res = await service.get('/api/users', {
                 params: {
-                    ids:userIds + ''
+                    ids: userIds + ''
                 }
             })
-            commit('setGroupFriends',res)
+            commit('setGroupFriends', res)
         },
         async createRoom({state}, joinIds) {
             const createUserId = state.user.userId;
             const joinIds_str = joinIds.join(',')
             const res = await service.post('/chat-room', {
                 createUserId: createUserId,
-                joinUserId:joinIds_str,
-                chatRoomName:'default11'
+                joinUserId: joinIds_str,
+                chatRoomName: 'default11'
             })
             console.log(res)
         },
         async updateRecentChat({state, dispatch}, {toUserId}) {
             const res = await service.patch('/recent-chat', {
                 userId: state.user.userId,
-                chatType: 'single',
+                chatType: 'Single',
                 id: toUserId
             })
-            dispatch('getRecentChatIds')
+            await dispatch('getRecentChatIds')
         }
     }
 })
