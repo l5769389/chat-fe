@@ -14,10 +14,10 @@ import { getFormatTime } from "../../../../../utils/utils";
 import EditInput from "@/views/components/EditInput.vue";
 const socket = inject("socket");
 const store = useStore();
-const activeDialogId = computed(() => store.getters.currentDialogInfo);
+const currentDialogInfo = computed(() => store.getters.currentDialogInfo);
 const user = computed(() => store.getters.user);
 const editInputRef = ref(null)
-const sendMsg = () => {
+  const sendMsg = () => {
     const msg = editInputRef.value.getEditContent()
     if (msg.length === 0) {
         return
@@ -49,7 +49,7 @@ const storeToLocal = (msg) => {
             }
         })
         store.commit("addTotalMsgMap", {
-            chatId: activeDialogId.value.id,
+            chatId: currentDialogInfo.value.id,
             content: mapped_msg
         });
     }
@@ -63,11 +63,11 @@ const sendToServer = (msg) => {
 };
 
 const sendToServerOneMsg = (msgSingle) => {
-    if (activeDialogId.value.type === 'Single'){
+    if (currentDialogInfo.value.type === 'Single'){
         socket.emit(
             "SingleMsg",
             {
-                toUserId: Number.parseInt(activeDialogId.value.id),
+                toUserId: Number.parseInt(currentDialogInfo.value.id),
                 fromUserId: user.value.userId,
                 msg: msgSingle,
                 msgType: msgSingle.type,
@@ -77,14 +77,15 @@ const sendToServerOneMsg = (msgSingle) => {
                 console.log("发送成功");
             }
         );
-    } else if (activeDialogId.value.type === 'Multi'){
+    } else if (currentDialogInfo.value.type === 'Multi'){
         socket.emit(
             "MultiMsg",
             {
-                toChatRoomId: activeDialogId.value.id,
+                toChatRoomId: currentDialogInfo.value.id,
                 fromUserId: user.value.userId,
                 msg: msgSingle,
                 msgType: msgSingle.type,
+                joinUserIds: currentDialogInfo.value.joinIds,
                 timestamp: new Date().getTime(),
             },
             () => {

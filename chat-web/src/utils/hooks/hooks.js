@@ -98,7 +98,7 @@ const sockInitHook = function () {
             store.dispatch('getUnfriendInfo',joinIds)
         })
         socket.on("msg", (data) => {
-            const {fromUserId, msg: {type, content}, timestamp} = data;
+            const {fromUserId, msg: {type, content}, timestamp,chatId} = data;
             console.log(`收到服务器推送的${type}类型消息,内容：${JSON.stringify(data)}`)
             let imgUrl;
             if (type === 'img') {
@@ -107,9 +107,10 @@ const sockInitHook = function () {
                 imgUrl = window.URL.createObjectURL(file)
             }
             // 当前窗口就在与该用户的会话窗口
-            if (currentDialogInfo.value != fromUserId) {
+            if (currentDialogInfo.value.id != chatId) {
                 store.commit("addUnreadMsgMap", {
                     userId: fromUserId,
+                    chatId: chatId,
                     content: {
                         type: type,
                         content: type === 'img' ? imgUrl : content,
@@ -120,8 +121,15 @@ const sockInitHook = function () {
                     messageId: new Date().getTime(),
                 });
             }
+            store.commit('updateChatList', {
+                type:'Multi',
+                id: chatId,
+                joinIds,
+                chatRoomName
+            })
             store.commit("addTotalMsgMap", {
-                chatId: fromUserId,
+                userId: fromUserId,
+                chatId: chatId,
                 content: {
                     type: type,
                     content: type === 'img' ? imgUrl : content,

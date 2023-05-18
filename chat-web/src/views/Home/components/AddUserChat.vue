@@ -122,15 +122,6 @@ const handleSubmit = async () => {
     addUserFlag.value = false
     try {
         const {roomId,  chatRoomName} = await store.dispatch('createRoom', joinUserIds.value)
-        store.commit('updateChatList', {
-            type: 'Multi',
-            id: roomId,
-            joinIds:joinUserIds.value,
-            chatRoomName
-        })
-        // console.log('add',joinUserIds.value)
-        // store.dispatch('getUnfriendInfo', joinUserIds.value)
-
     } catch (e) {
 
     }

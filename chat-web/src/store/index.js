@@ -74,14 +74,14 @@ export default createStore({
             state.socketStatus = payload
         },
         addUnreadMsgMap(state, {...params}) {
-            const {userId} = params;
-            const arr = state.unreadMsgMap[userId]
+            const {chatId,userId} = params;
+            const arr = state.unreadMsgMap[chatId]
             if (arr) {
-                state.unreadMsgMap[userId].push({
+                state.unreadMsgMap[chatId].push({
                     ...params
                 })
             } else {
-                state.unreadMsgMap[userId] = [
+                state.unreadMsgMap[chatId] = [
                     {
                         ...params
                     }
