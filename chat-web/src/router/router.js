@@ -53,7 +53,6 @@ router.beforeEach(async (to, from, next) => {
         // 验证token
        const flag = await store.dispatch('checkLogin')
        if (flag){
-           await store.dispatch('getRecentChatIds')
            next()
        } else {
            next({

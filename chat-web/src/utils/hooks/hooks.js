@@ -86,11 +86,20 @@ const sockInitHook = function () {
         socket.on("connect_error", () => {
             store.commit("setSocketStatus", "connect_error");
         });
-
+        socket.on('joinRoom',(data) => {
+            const {msg: {roomId,joinUserIds:joinIds,chatRoomName}} = data;
+            console.log('joinRoom',joinIds)
+            store.commit('updateChatList', {
+                type:'Multi',
+                id: roomId,
+                joinIds,
+                chatRoomName
+            })
+            store.dispatch('getUnfriendInfo',joinIds)
+        })
         socket.on("msg", (data) => {
             const {fromUserId, msg: {type, content}, timestamp} = data;
-            console.log(`收到服务器推送的${type}类型消息`)
-            store.dispatch('getRecentChatIds')
+            console.log(`收到服务器推送的${type}类型消息,内容：${JSON.stringify(data)}`)
             let imgUrl;
             if (type === 'img') {
                 let image = buffer2base64(content)
@@ -122,8 +131,6 @@ const sockInitHook = function () {
                 source: "other",
             });
         });
-
-
         socket.connect();
     };
 }

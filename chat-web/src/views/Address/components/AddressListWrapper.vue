@@ -28,41 +28,20 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    dialogList: {
-        type: Array,
-        default:[]
-    }
 })
 const store = useStore()
 const router = useRouter()
 
 const {checkedFriendIds, filtered_friends, searchKey} = getSelectFriendsHooks()
 
-const showDialogList = computed(() => props.dialogList)
-
 const gotoDialog =async (userId) => {
-    if (showDialogList.value.includes(userId)) {
-        invokeDialog(userId)
-    } else {
-       await createDialog(userId)
-    }
+      await invokeDialog(userId)
 }
-
-const invokeDialog = (userId) => {
-    store.commit('setCurrentDialog', {
-        type:'Single',
+const invokeDialog =async (userId) => {
+    await store.dispatch('updateRecentChat',{
+        type: 'Single',
         id: userId
     })
-    store.commit('updateChatList', userId)
-    router.push({
-        name: 'home'
-    })
-}
-const createDialog =async (userId) => {
-    await store.dispatch('updateRecentChat',{
-        toUserId:userId
-    })
-    store.commit('addChatList', userId)
     store.commit('setCurrentDialog', {
         type:'Single',
         id: userId

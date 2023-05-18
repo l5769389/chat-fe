@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-full">
-    <template v-if="activeDialogId !== ''">
+    <template v-if="currentDialogInfo.id !== ''">
       <div class="h-12">
         <dialog-header />
       </div>
@@ -27,7 +27,7 @@ import DialogWrapper from "@/views/Home/components/ChatDialogWin/compnents/Dialo
 import EnumInput from "./compnents/EnumInput.vue";
 import { useStore } from "vuex";
 const store = useStore();
-const activeDialogId = computed(() => store.getters.currentDialogInfo);
+const currentDialogInfo = computed(() => store.getters.currentDialogInfo);
 </script>
 
 <style scoped></style>

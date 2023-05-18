@@ -3,26 +3,28 @@
         <div class="grid grid-cols-3 pl-3 pr-3 pb-5 border-box gap-y-1">
             <template v-if="currentDialogUserInfo.chatType === 'Single'">
                 <div class="flex flex-col items-center">
-                    <el-avatar shape="square" :size="35" :src="currentDialogUserInfo.avatar" />
+                    <el-avatar shape="square" :size="35" :src="currentDialogUserInfo.avatar"/>
                     <span class="text-xs mt-1 overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-center">{{
-                            currentDialogUserInfo.nickname }}</span>
+                        currentDialogUserInfo.nickname
+                        }}</span>
                 </div>
             </template>
             <template v-else-if="currentDialogUserInfo.chatType === 'Multi'">
                 <div class="flex flex-col items-center" v-for="id in currentDialogUserInfo.joinIds">
-                    <el-avatar shape="square" :size="35" :src="groupFriends[id].avatar" />
+                    <el-avatar shape="square" :size="35" :src="groupFriends[id].avatar"/>
                     <span class="text-xs mt-1 overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-center">{{
-                            groupFriends[id].nickname }}</span>
+                        groupFriends[id].nickname
+                        }}</span>
                 </div>
             </template>
             <div class=" flex flex-col items-center" @click="handleShowModal">
-                <add-three theme="outline" size="35" fill="#333" strokeLinejoin="miter" />
+                <add-three theme="outline" size="35" fill="#333" strokeLinejoin="miter"/>
                 <span class="text-xs mt-1">添加</span>
             </div>
         </div>
         <div class="flex justify-between pt-3 pb-3 items-center">
             <span>聊天记录</span>
-            <right theme="outline" size="24" fill="#333" />
+            <right theme="outline" size="24" fill="#333"/>
         </div>
 
         <div class="pt-3 pb-3">
@@ -61,7 +63,7 @@
                                 <div class="flex flex-col justify-center items-center">
                                     <el-avatar shape="square" :src="item.avatar" :size="30"></el-avatar>
                                     <span class="max-w-[50px] overflow-ellipsis overflow-hidden whitespace-nowrap">{{
-                                            item.nickname
+                                        item.nickname
                                         }}</span>
                                 </div>
                             </removable>
@@ -77,19 +79,20 @@
     </el-dialog>
 </template>
 <script setup>
-import { getDialogInfoHook } from '@/utils/hooks/hooks.js';
-import { AddThree, Right } from '@icon-park/vue-next';
+import {getDialogInfoHook} from '@/utils/hooks/hooks.js';
+import {AddThree, Right} from '@icon-park/vue-next';
 import {computed, nextTick, reactive, ref, watch} from "vue";
 import Removable from "@/common/components/Removable.vue";
 import {ElAvatar} from "element-plus";
 import AddressListWrapper from "@/views/Address/components/AddressListWrapper.vue";
 import getSelectFriendsHooks from "@/utils/hooks/getSelectFriendsHooks.js";
 import {useStore} from "vuex";
+
 const store = useStore()
 
-const { currentDialogUserInfo } = getDialogInfoHook()
-const {checkedFriendsInfo,remove_checked,checkedFriendIds,setExceptUserId,reset} = getSelectFriendsHooks()
-
+const {currentDialogUserInfo} = getDialogInfoHook()
+const {checkedFriendsInfo, remove_checked, checkedFriendIds, setExceptUserId, reset} = getSelectFriendsHooks()
+const user = computed(() => store.getters.user);
 const setting = reactive({
     noDisturb: false,
     onTop: false
@@ -102,24 +105,41 @@ const handleRemove = (item) => {
     remove_checked(item.userId)
 }
 
-const joinIds =computed(() => {
+const joinUserIds = computed(() => {
     const ids = Object.keys(checkedFriendIds.value)
-    if (currentDialogUserInfo.value.chatType === 'Single'){
-        return  [...ids,currentDialogUserInfo.value.userId]
-    }else if (currentDialogUserInfo.value.chatType === 'Multi'){
-        return  [...ids, ...currentDialogUserInfo.value.joinIds]
+    if (currentDialogUserInfo.value.chatType === 'Single') {
+        return [...ids, currentDialogUserInfo.value.userId,Number.parseInt(user.value.userId)]
+    } else if (currentDialogUserInfo.value.chatType === 'Multi') {
+        return [...ids, ...currentDialogUserInfo.value.joinIds,Number.parseInt(user.value.userId)]
     }
 })
 
 
-const handleSubmit =async () => {
-    await store.dispatch('createRoom',joinIds.value)
+const handleSubmit = async () => {
+    if (joinUserIds.value.length <= 2){
+        return
+    }
+    addUserFlag.value = false
+    try {
+        const {roomId,  chatRoomName} = await store.dispatch('createRoom', joinUserIds.value)
+        store.commit('updateChatList', {
+            type: 'Multi',
+            id: roomId,
+            joinIds:joinUserIds.value,
+            chatRoomName
+        })
+        // console.log('add',joinUserIds.value)
+        // store.dispatch('getUnfriendInfo', joinUserIds.value)
+
+    } catch (e) {
+
+    }
 }
 const handleShowModal = () => {
-    setExceptUserId(joinIds.value)
+    setExceptUserId(joinUserIds.value)
     addUserFlag.value = true
 }
-const handleClose = () =>{
+const handleClose = () => {
     reset()
 }
 
@@ -127,14 +147,15 @@ const handleClose = () =>{
 </script>
 
 <style lang="css" scoped>
-    .radio {
-     --el-switch-on-color: rgb(16,174,15);
-    }
-    .no-header .el-dialog__header {
-        display: none;
-    }
+.radio {
+    --el-switch-on-color: rgb(16, 174, 15);
+}
 
-    .no-header .el-dialog__body {
-        @apply pt-4 pb-4
-    }
+.no-header .el-dialog__header {
+    display: none;
+}
+
+.no-header .el-dialog__body {
+    @apply pt-4 pb-4
+}
 </style>

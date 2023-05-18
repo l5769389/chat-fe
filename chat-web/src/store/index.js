@@ -17,6 +17,12 @@ export default createStore({
             socketStatus: 'close',  // 与服务器socket通讯的状态
             unreadMsgMap: {}, //未读消息
             totalMsgMap: {},  //所有消息
+            /**
+             * [{
+             *      type: 'Single',
+             *      id: ''
+             *  }]
+             */
             chatList: [],  // 用户点击通讯录产生的对话id,
             recentChatIds: [], //
         }
@@ -29,7 +35,7 @@ export default createStore({
         socketStatus: state => state.socketStatus,
         unreadMsgMap: state => state.unreadMsgMap,
         totalMsgMap: state => state.totalMsgMap,
-        totalChatList: state => {  //在chat页面所有的对话的userId
+        totalChatList: state => {  //在chat页面所有的对话的chatId,有可能是userId,也有可能是groupId
             const list = [...Object.keys(state.unreadMsgMap)]
             return list
         },
@@ -42,6 +48,9 @@ export default createStore({
         },
         groupFriends: state => {
             return state.groupFriends
+        },
+        chatList:state => {
+            return state.chatList
         }
     },
     mutations: {
@@ -100,10 +109,14 @@ export default createStore({
         addChatList(state, newUserId) {
             state.chatList.unshift(newUserId)
         },
-        updateChatList(state, userId) {
-            const index = state.chatList.findIndex(item => item === userId)
-            state.chatList.splice(index, 1)
-            state.chatList = [userId, ...state.chatList]
+        updateChatList(state, {...newChat}) {
+            const index = state.chatList.findIndex(item => item.id === newChat.id)
+            if (index === -1){
+                state.chatList.unshift(newChat)
+            }else {
+                state.chatList.splice(index, 1)
+                state.chatList = [newChat, ...state.chatList]
+            }
         },
         setRecentChatIds(state, payload) {
             state.recentChatIds = payload
@@ -133,17 +146,6 @@ export default createStore({
                 return false
             }
         },
-        getRecentChatIds: _.debounce(async ({commit, state, dispatch}) => {
-            const list = await service.get(`/recent-chat?userId=${state.user.userId}`)
-            const group = list.filter(item => item.type === 'Multi')
-            let ids = [];
-            group.forEach(item => {
-                ids = [...ids, ...item.joinIds]
-            })
-            ids = Array.from(new Set(ids))
-            await dispatch('getUnfriendInfo', ids)
-            commit('setRecentChatIds', list)
-        }, 500),
         async getUnfriendInfo({commit}, userIds) {
             if (userIds?.length === 0) {
                 return;
@@ -158,21 +160,15 @@ export default createStore({
         async createRoom({state}, joinIds) {
             const createUserId = state.user.userId;
             const joinIds_str = joinIds.map(item=>Number.parseInt(item)).join(',')
-            debugger
             const res = await service.post('/chat-room', {
                 createUserId: createUserId,
                 joinUserId: joinIds_str,
                 chatRoomName: 'default11'
             })
-            console.log(res)
+            return res.data
         },
-        async updateRecentChat({state, dispatch}, {toUserId}) {
-            const res = await service.patch('/recent-chat', {
-                userId: state.user.userId,
-                chatType: 'Single',
-                id: toUserId
-            })
-            await dispatch('getRecentChatIds')
+        async updateRecentChat({state,commit, dispatch}, payload) {
+            commit('updateChatList',payload)
         }
     }
 })

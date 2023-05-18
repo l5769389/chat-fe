@@ -6,7 +6,7 @@
                     <chat-avatar  :avatars="msgType === 'Single' ? [dialogInfo.avatar]: avatars"></chat-avatar>
                 </el-badge>
             </div>
-            <div class="flex-1 h-full overflow-hidden">
+            <div class="ml-1 flex-1 h-full overflow-hidden">
                 <div class="flex justify-between">
                     <span class="text-black font-bold">{{dialogInfo.nickname }}</span>
                     <span class="text-gray-400">{{ dialogInfo.msgInfo.timestamp }}</span>
