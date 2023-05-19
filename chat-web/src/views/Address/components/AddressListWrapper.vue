@@ -8,7 +8,7 @@
                 <template v-for="item in filtered_friends" :key="item.nickname">
                     <div>
                         <chat-item :dialog-info="item" :use-type="canSelect ? 'select' : 'address'"
-                                   v-model="checkedFriendIds[item.userId]" @dbClick="gotoDialog"/>
+                                   v-model="checkedFriendIds[item.userId]" @dbClick="gotoDialog(item)"/>
                     </div>
                 </template>
             </div>
@@ -34,17 +34,19 @@ const router = useRouter()
 
 const {checkedFriendIds, filtered_friends, searchKey} = getSelectFriendsHooks()
 
-const gotoDialog =async (userId) => {
-      await invokeDialog(userId)
+const gotoDialog =async (item) => {
+      await invokeDialog(item)
 }
-const invokeDialog =async (userId) => {
+const invokeDialog =async (item) => {
     await store.dispatch('updateRecentChat',{
         type: 'Single',
-        id: userId
+        id: item.userId,
     })
     store.commit('setCurrentDialog', {
         type:'Single',
-        id: userId
+        id: item.userId,
+        nickname: item.nickname,
+        avatar: item.avatar
     })
     await router.push({
         name: 'home'

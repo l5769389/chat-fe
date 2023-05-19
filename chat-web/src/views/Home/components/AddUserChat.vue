@@ -1,16 +1,16 @@
 <template>
     <div class="w-full h-full pt-5 pl-2 pr-2 border-box divide-y-2 text-xs">
         <div class="grid grid-cols-3 pl-3 pr-3 pb-5 border-box gap-y-1">
-            <template v-if="currentDialogUserInfo.chatType === 'Single'">
+            <template v-if="currentDialogInfo.type === 'Single'">
                 <div class="flex flex-col items-center">
-                    <el-avatar shape="square" :size="35" :src="currentDialogUserInfo.avatar"/>
+                    <el-avatar shape="square" :size="35" :src="currentDialogInfo.avatar"/>
                     <span class="text-xs mt-1 overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-center">{{
-                        currentDialogUserInfo.nickname
+                        currentDialogInfo.nickname
                         }}</span>
                 </div>
             </template>
-            <template v-else-if="currentDialogUserInfo.chatType === 'Multi'">
-                <div class="flex flex-col items-center" v-for="id in currentDialogUserInfo.joinIds">
+            <template v-else-if="currentDialogInfo.type === 'Multi'">
+                <div class="flex flex-col items-center" v-for="id in currentDialogInfo.joinIds">
                     <el-avatar shape="square" :size="35" :src="groupFriends[id].avatar"/>
                     <span class="text-xs mt-1 overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-center">{{
                         groupFriends[id].nickname
@@ -90,7 +90,7 @@ import {useStore} from "vuex";
 
 const store = useStore()
 
-const {currentDialogUserInfo} = getDialogInfoHook()
+const currentDialogInfo = computed(() => store.getters.currentDialogInfo)
 const {checkedFriendsInfo, remove_checked, checkedFriendIds, setExceptUserId, reset} = getSelectFriendsHooks()
 const user = computed(() => store.getters.user);
 const setting = reactive({
@@ -106,11 +106,15 @@ const handleRemove = (item) => {
 }
 
 const joinUserIds = computed(() => {
+    let ans = [];
     const ids = Object.keys(checkedFriendIds.value)
-    if (currentDialogUserInfo.value.chatType === 'Single') {
-        return [...ids, currentDialogUserInfo.value.userId,Number.parseInt(user.value.userId)]
-    } else if (currentDialogUserInfo.value.chatType === 'Multi') {
-        return [...ids, ...currentDialogUserInfo.value.joinIds,Number.parseInt(user.value.userId)]
+    if (ids){
+        ans.push(ids)
+    }
+    if (currentDialogInfo.value.type === 'Single') {
+        return [...ans, currentDialogInfo.value.id,Number.parseInt(user.value.userId)]
+    } else if (currentDialogInfo.value.type === 'Multi') {
+        return [...ans, ...currentDialogInfo.value.joinIds,Number.parseInt(user.value.userId)]
     }
 })
 

@@ -13,6 +13,9 @@ export default createStore({
             currentDialogInfo: {
                 type: 'Single', //Single or Multi
                 id: '', //Single为 userId
+                nickname:'',
+                avatar: '',
+                joinIds:[],
             }, //chatList中当前位于的聊天，可能是群聊、单个用户
             socketStatus: 'close',  // 与服务器socket通讯的状态
             unreadMsgMap: {}, //未读消息
@@ -88,22 +91,13 @@ export default createStore({
                 ]
             }
         },
-        addTotalMsgMap(state, {...params}) {
-            const {chatId, content} = params;
+        addTotalMsgMap(state, {chatId,...msg}) {
             const arr = state.totalMsgMap[chatId]
+            console.log(msg)
             if (arr) {
-                if (Array.isArray(content)) {
-                    state.totalMsgMap[chatId] = [...arr, ...content]
-                } else {
-                    state.totalMsgMap[chatId].push(content)
-                }
+                state.totalMsgMap[chatId].push(msg)
             } else {
-                // 如果要存储的消息是一个数组，比如输入框中：1+ 图片 需要依次存储。
-                if (!Array.isArray(content)) {
-                    state.totalMsgMap[chatId] = [content]
-                } else {
-                    state.totalMsgMap[chatId] = content
-                }
+                state.totalMsgMap[chatId] = [msg]
             }
         },
         addChatList(state, newUserId) {
@@ -146,13 +140,15 @@ export default createStore({
                 return false
             }
         },
-        async getUnfriendInfo({commit}, userIds) {
+        async getUnfriendInfo({state,commit}, userIds) {
             if (userIds?.length === 0) {
                 return;
             }
+            const groupFriends = Object.keys(state.groupFriends)
+            const unKnownFriends = userIds.filter(item => !groupFriends.includes(item))
             const res = await service.get('/api/users', {
                 params: {
-                    ids: userIds + ''
+                    ids: unKnownFriends + ''
                 }
             })
             commit('setGroupFriends', res)

@@ -22,7 +22,7 @@ const editInputRef = ref(null)
     if (msg.length === 0) {
         return
     }
-    // editInputRef.value.clearAllInput()
+    editInputRef.value.clearAllInput()
     sendToServer(msg);
     storeToLocal(msg);
 };
@@ -37,6 +37,7 @@ const storeToLocal = (msg) => {
                     timestamp: getFormatTime(),
                     messageId: new Date().getTime(),
                     source: "self",
+                    userId: user.value.userId
                 }
             } else {
                 return {
@@ -45,23 +46,27 @@ const storeToLocal = (msg) => {
                     timestamp: getFormatTime(),
                     messageId: new Date().getTime(),
                     source: "self",
+                    userId: user.value.userId
                 }
             }
         })
-        store.commit("addTotalMsgMap", {
-            chatId: currentDialogInfo.value.id,
-            content: mapped_msg
-        });
+        mapped_msg.forEach(msg => {
+            store.commit("addTotalMsgMap", {
+                chatId: currentDialogInfo.value.id,
+                ...msg,
+            });
+        })
+
     }
 };
-
-
 const sendToServer = (msg) => {
     for (const msgSingle of msg) {
+        Object.assign(msgSingle,{
+            timestamp: new Date().getTime()
+        })
         sendToServerOneMsg(msgSingle)
     }
 };
-
 const sendToServerOneMsg = (msgSingle) => {
     if (currentDialogInfo.value.type === 'Single'){
         socket.emit(
@@ -71,7 +76,6 @@ const sendToServerOneMsg = (msgSingle) => {
                 fromUserId: user.value.userId,
                 msg: msgSingle,
                 msgType: msgSingle.type,
-                timestamp: new Date().getTime(),
             },
             () => {
                 console.log("发送成功");
@@ -84,9 +88,7 @@ const sendToServerOneMsg = (msgSingle) => {
                 toChatRoomId: currentDialogInfo.value.id,
                 fromUserId: user.value.userId,
                 msg: msgSingle,
-                msgType: msgSingle.type,
                 joinUserIds: currentDialogInfo.value.joinIds,
-                timestamp: new Date().getTime(),
             },
             () => {
                 console.log("发送成功");

@@ -6,7 +6,8 @@ const getDialogInfoHook = function () {
     const store = useStore()
     const friends = computed(() => store.getters.friends)
     const currentDialogInfo = computed(() => store.getters.currentDialogInfo)
-    const recentChatIds = computed(() => store.getters.recentChatIds)
+    const groupFriends = computed(() => store.getters.groupFriends)
+    const currentDialogDetails = computed(() => store.getters.currentDialogDetails)
     const currentDialogUserInfo = computed(() => {
         if (currentDialogInfo.value.type === 'Single') {
             const friend = friends.value.find(item => item.userId == currentDialogInfo.value.id)
@@ -17,32 +18,21 @@ const getDialogInfoHook = function () {
                 chatType: 'Single',
             }
         } else if (currentDialogInfo.value.type === 'Multi') {
-            const friend = recentChatIds.value.find(item => item.id == currentDialogInfo.value.id)
+            const friend = groupFriends.value[currentDialogInfo.value.id]
             return {
                 chatId: currentDialogInfo.value.id,
-                joinIds:friend?.joinIds,
+                joinIds:currentDialogInfo?.joinIds,
                 avatar: friend?.avatar || '',
                 nickname: friend?.name || '',
                 chatType: 'Multi',
             }
         }
-
     })
 
-    const currentDialogDetails = computed(() => store.getters.currentDialogDetails)
-    const messageRef = computed(() => {
-        return {
-            avatar: currentDialogUserInfo.value.avatar,
-            userId: currentDialogUserInfo.value.userId,
-            nickName: currentDialogUserInfo.value.nickname,
-            message: currentDialogDetails.value,
-        }
-    })
     return {
         currentDialogInfo,
         currentDialogUserInfo,
         currentDialogDetails,
-        messageRef
     }
 }
 
@@ -87,19 +77,19 @@ const sockInitHook = function () {
             store.commit("setSocketStatus", "connect_error");
         });
         socket.on('joinRoom',(data) => {
-            const {msg: {roomId,joinUserIds:joinIds,chatRoomName}} = data;
-            console.log('joinRoom',joinIds)
-            store.commit('updateChatList', {
-                type:'Multi',
-                id: roomId,
-                joinIds,
-                chatRoomName
-            })
-            store.dispatch('getUnfriendInfo',joinIds)
+            updateChatlist(data)
         })
-        socket.on("msg", (data) => {
-            const {fromUserId, msg: {type, content}, timestamp,chatId} = data;
-            console.log(`收到服务器推送的${type}类型消息,内容：${JSON.stringify(data)}`)
+        socket.on("singleMsg", (data) => {
+            msgHandler(data,'Single')
+        });
+
+        socket.on('multiMsg',data => {
+            msgHandler(data,'Multi')
+        })
+        
+        const msgHandler = (data,eventName) => {
+            const {fromUserId, msg: {type, content,timestamp}, chatId,joinUserIds: joinIds} = data;
+            console.log(`收到消息:类型为：${eventName},内容为：${JSON.stringify(data)}`)
             let imgUrl;
             if (type === 'img') {
                 let image = buffer2base64(content)
@@ -121,26 +111,43 @@ const sockInitHook = function () {
                     messageId: new Date().getTime(),
                 });
             }
-            store.commit('updateChatList', {
-                type:'Multi',
-                id: chatId,
-                joinIds,
-                chatRoomName
-            })
+            if (eventName === 'Single'){
+                store.commit('updateChatList', {
+                    type:'Single',
+                    id: chatId,
+                })
+            }else if (eventName === 'Multi'){
+                updateChatlist(data)
+                store.commit('updateChatList', {
+                    type:'Multi',
+                    id: chatId,
+                    joinIds:joinIds
+                })
+            }
             store.commit("addTotalMsgMap", {
-                userId: fromUserId,
                 chatId: chatId,
-                content: {
-                    type: type,
-                    content: type === 'img' ? imgUrl : content,
-                    timestamp: getFormatTime(timestamp),
-                },
-                messageId: new Date().getTime(),
+                userId: fromUserId,
+                type: type,
+                content: type === 'img' ? imgUrl : content,
+                timestamp: getFormatTime(timestamp),
+                messageId:timestamp,
                 source: "other",
             });
-        });
+        }
         socket.connect();
     };
+
+    const updateChatlist = (data) => {
+        const {chatId:roomId,joinUserIds:joinIds,chatRoomName,fromUserId} = data;
+        console.log('joinRoom',JSON.stringify(data))
+        store.commit('updateChatList', {
+            type:'Multi',
+            id: roomId,
+            joinIds,
+            chatRoomName
+        })
+        store.dispatch('getUnfriendInfo',joinIds)
+    }
 }
 
 export {
