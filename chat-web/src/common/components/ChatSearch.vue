@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import {computed, ref} from "vue";
 import { Search } from "@icon-park/vue-next";
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])

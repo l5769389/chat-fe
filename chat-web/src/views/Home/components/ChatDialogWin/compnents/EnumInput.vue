@@ -5,6 +5,7 @@
       :key="item.type"
       class="text-dark-200 mr-3 flex justify-center items-center"
       :class="item.className"
+      @click="item?.handler"
     >
       <template v-if="item.type === 'meme'">
         <el-popover
@@ -35,6 +36,7 @@
       </template>
     </div>
   </div>
+
 </template>
 <script setup>
 import {
@@ -46,6 +48,8 @@ import {
   VideoOne,
 } from "@icon-park/vue-next";
 import Meme from "@/common/components/Meme.vue";
+import {ref} from "vue";
+
 const icons = [
   {
     type: "meme",
@@ -66,7 +70,9 @@ const icons = [
   },
   {
     icon: VideoOne,
+    handler: invokeRTCDialog
   },
 ];
+
 </script>
 <style scope></style>
