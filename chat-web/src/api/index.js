@@ -1,9 +1,10 @@
 import axios from "axios";
 import sessionStore from '../utils/sessionStore'
 import router from "@/router/router.js";
+import {baseURL} from "@/config/config.js";
 
 const service = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: baseURL,
     timeout: 6000,
 })
 

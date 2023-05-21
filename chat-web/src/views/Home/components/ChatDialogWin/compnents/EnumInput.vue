@@ -10,7 +10,6 @@
       <template v-if="item.type === 'meme'">
         <el-popover
           placement="top"
-          :width="200"
           trigger="click"
           content="this is content, this is content, this is content"
         >
@@ -37,6 +36,7 @@
     </div>
   </div>
 
+  <connect-rtc-dialog v-model:showConnect="showConnect"/>
 </template>
 <script setup>
 import {
@@ -49,7 +49,13 @@ import {
 } from "@icon-park/vue-next";
 import Meme from "@/common/components/Meme.vue";
 import {ref} from "vue";
+import ConnectRtcDialog from "@/common/components/connectRtcDialog/ConnectRtcDialog.vue";
 
+const showConnect = ref(false)
+const invokeRTCDialog = () => {
+  console.log(112)
+  showConnect.value = true;
+}
 const icons = [
   {
     type: "meme",
@@ -73,6 +79,8 @@ const icons = [
     handler: invokeRTCDialog
   },
 ];
+
+
 
 </script>
 <style scope></style>

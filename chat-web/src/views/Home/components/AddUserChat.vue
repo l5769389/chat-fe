@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <el-dialog class="no-header" v-model="addUserFlag" width="600px"
+    <el-dialog class="no-header1" v-model="addUserFlag" width="600px"
                :modal="false"
                @close="handleClose"
                :show-close="false">
@@ -146,11 +146,11 @@ const handleClose = () => {
     --el-switch-on-color: rgb(16, 174, 15);
 }
 
-.no-header .el-dialog__header {
+.no-header1 .el-dialog__header {
     display: none;
 }
 
-.no-header .el-dialog__body {
+.no-header1 .el-dialog__body {
     @apply pt-4 pb-4
 }
 </style>

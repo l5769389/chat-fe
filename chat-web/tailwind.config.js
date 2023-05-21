@@ -30,6 +30,8 @@ export default {
       'white': 'rgb(255,255,255)',
       'green-100-hover': 'rgb(137,217,97)',
       'green-100': 'rgb(149,236,15)',
+      'black':'rgb(0,0,0)',
+      'red': colors.red["500"]
     }),
     extend: {
       zIndex: {
