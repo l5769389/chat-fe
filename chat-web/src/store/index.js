@@ -20,14 +20,10 @@ export default createStore({
             socketStatus: 'close',  // 与服务器socket通讯的状态
             unreadMsgMap: {}, //未读消息
             totalMsgMap: {},  //所有消息
-            /**
-             * [{
-             *      type: 'Single',
-             *      id: ''
-             *  }]
-             */
             chatList: [],  // 用户点击通讯录产生的对话id,
             recentChatIds: [], //
+            showVideoModal:false,
+            videoStatus: 'beInvited' // inviting 邀请中， beInvited 接受邀请， connecting 连接
         }
     },
     getters: {
@@ -117,6 +113,12 @@ export default createStore({
         },
         setGroupFriends(state, payload) {
             state.groupFriends = payload
+        },
+        setShowVideoModal(state,payload){
+            state.showVideoModal = payload
+        },
+        setVideoStatus(state,paylaod){
+            state.videoStatus = paylaod; // OFFER_INVITE  ANSWER_INVITE connecting
         }
     },
     actions: {

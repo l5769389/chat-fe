@@ -1,6 +1,10 @@
 <script setup>
 import {CloseSmall, PhoneCall, Voice} from "@icon-park/vue-next";
-
+import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
+const {hideVideoModal} = modalVideoHooks()
+const closeVideo = () => {
+    hideVideoModal()
+}
 </script>
 
 <template>
@@ -12,7 +16,7 @@ import {CloseSmall, PhoneCall, Voice} from "@icon-park/vue-next";
       <span class="block mt-1">切到语音聊天</span>
     </div>
 
-    <div class="item">
+    <div class="item" @click="closeVideo">
         <span class="w-[40px] h-[40px] bg-red rounded-full">
           <close-small theme="outline" size="40" fill="#fff"/>
         </span>

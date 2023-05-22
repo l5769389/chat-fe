@@ -1,7 +1,9 @@
 import {computed, reactive, inject, onBeforeMount, onMounted, watch, ref} from "vue";
 import {useStore} from "vuex";
 import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
-
+import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
+import {JUDGE_ANSWER, OFFER_INVITE} from "@/config/config.js";
+const {showVideoModal, setInviteVideoInfo} = modalVideoHooks()
 const getDialogInfoHook = function () {
     const store = useStore()
     const friends = computed(() => store.getters.friends)
@@ -86,7 +88,23 @@ const sockInitHook = function () {
         socket.on('multiMsg',data => {
             msgHandler(data,'Multi')
         })
-        
+        socket.on('create_invite_room',data =>{
+            console.log(`房间roomId:${data}`)
+        })
+
+        // 收到视频邀请
+        socket.on(OFFER_INVITE,data => {
+            const {fromUserId, msg: {roomId}} = data;
+            setInviteVideoInfo({
+                videoRoomId : roomId,
+                oppositeUserId: fromUserId,
+                userId: user.value.userId
+            })
+            console.log(`收到服务器事件： ${OFFER_INVITE}`)
+            store.commit('setVideoStatus',JUDGE_ANSWER)
+            showVideoModal();
+        })
+
         const msgHandler = (data,eventName) => {
             const {fromUserId, msg: {type, content,timestamp}, chatId,joinUserIds: joinIds} = data;
             console.log(`收到消息:类型为：${eventName},内容为：${JSON.stringify(data)}`)
@@ -149,6 +167,7 @@ const sockInitHook = function () {
         store.dispatch('getUnfriendInfo',joinIds)
     }
 }
+
 
 export {
     getDialogInfoHook,

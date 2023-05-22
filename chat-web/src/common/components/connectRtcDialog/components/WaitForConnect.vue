@@ -7,7 +7,7 @@ const currentDialogInfo = computed(() => store.getters.currentDialogInfo)
 </script>
 
 <template>
-  <div class="w-full h-full bg-black p-3 pt-5 pb-10 flex flex-col justify-between items-center ">
+  <div class="w-full h-full bg-black p-3 pt-5 pb-10 flex flex-col justify-between items-center">
     <div class="flex self-start">
       <el-avatar :src="currentDialogInfo.avatar" shape="square" :size="50"></el-avatar>
      <div class="flex flex-col ml-1">

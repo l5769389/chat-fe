@@ -35,8 +35,6 @@
       </template>
     </div>
   </div>
-
-  <connect-rtc-dialog v-model:showConnect="showConnect"/>
 </template>
 <script setup>
 import {
@@ -48,13 +46,14 @@ import {
   VideoOne,
 } from "@icon-park/vue-next";
 import Meme from "@/common/components/Meme.vue";
-import {ref} from "vue";
-import ConnectRtcDialog from "@/common/components/connectRtcDialog/ConnectRtcDialog.vue";
-
-const showConnect = ref(false)
+import {useStore} from "vuex";
+import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
+import {WAITING_FOR_ANSWER} from "@/config/config.js";
+const store= useStore()
+const {showVideoModal} = modalVideoHooks()
 const invokeRTCDialog = () => {
-  console.log(112)
-  showConnect.value = true;
+    store.commit('setVideoStatus',WAITING_FOR_ANSWER)
+    showVideoModal()
 }
 const icons = [
   {
