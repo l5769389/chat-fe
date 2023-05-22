@@ -90,6 +90,9 @@ const sockInitHook = function () {
         })
         socket.on('create_invite_room',data =>{
             console.log(`房间roomId:${data}`)
+            setInviteVideoInfo({
+                videoRoomId: data,
+            })
         })
 
         // 收到视频邀请
@@ -100,7 +103,7 @@ const sockInitHook = function () {
                 oppositeUserId: fromUserId,
                 userId: user.value.userId
             })
-            console.log(`收到服务器事件： ${OFFER_INVITE}`)
+            console.log(`收到服务器事件：${OFFER_INVITE}`)
             store.commit('setVideoStatus',JUDGE_ANSWER)
             showVideoModal();
         })

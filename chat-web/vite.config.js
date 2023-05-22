@@ -21,8 +21,8 @@ export default defineConfig({
     // },
     host:'0.0.0.0',
     https: {
-      key: readFileSync(path.resolve(path.join(__dirname,'/src/config/cert/localhost-key.pem'))),
-      cert: readFileSync(path.resolve(path.join(__dirname,'/src/config/cert/localhost.pem')))
+      key: readFileSync(path.resolve(path.join(__dirname,'/src/config/needIgnore/cert/localhost-key.pem'))),
+      cert: readFileSync(path.resolve(path.join(__dirname,'/src/config/needIgnore/cert/localhost.pem')))
     }
   },
   resolve: {

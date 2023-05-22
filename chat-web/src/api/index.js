@@ -1,7 +1,7 @@
 import axios from "axios";
 import sessionStore from '../utils/sessionStore'
 import router from "@/router/router.js";
-import {baseURL} from "@/config/config.js";
+import {baseURL} from "@/config/needIgnore/config.js";
 
 const service = axios.create({
     baseURL: baseURL,

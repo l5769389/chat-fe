@@ -12,7 +12,7 @@ import engine from 'store/src/store-engine';
 const storages = [sessionStorage];
 const sessionStore = engine.createStore(storages)
 const app = createApp(App)
-import {baseURL} from '@/config/config.js'
+import {baseURL} from "@/config/needIgnore/config.js";
 install(app)
 install(app, 'i')
 app.use(router)
