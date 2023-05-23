@@ -12,6 +12,7 @@ import { computed, inject, ref } from "vue";
 import { useStore } from "vuex";
 import { getFormatTime } from "../../../../../utils/utils";
 import EditInput from "@/views/components/EditInput.vue";
+import {SocketEvent} from "@/config/config.js";
 const socket = inject("socket");
 const store = useStore();
 const currentDialogInfo = computed(() => store.getters.currentDialogInfo);
@@ -70,7 +71,7 @@ const sendToServer = (msg) => {
 const sendToServerOneMsg = (msgSingle) => {
     if (currentDialogInfo.value.type === 'Single'){
         socket.emit(
-            "SingleMsg",
+            SocketEvent.CHAT_MSG_SINGLE,
             {
                 toUserId: Number.parseInt(currentDialogInfo.value.id),
                 fromUserId: user.value.userId,
@@ -83,7 +84,7 @@ const sendToServerOneMsg = (msgSingle) => {
         );
     } else if (currentDialogInfo.value.type === 'Multi'){
         socket.emit(
-            "MultiMsg",
+            SocketEvent.CHAT_MSG_MULTI,
             {
                 toChatRoomId: currentDialogInfo.value.id,
                 fromUserId: user.value.userId,

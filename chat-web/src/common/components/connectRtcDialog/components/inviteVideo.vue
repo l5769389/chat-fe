@@ -1,7 +1,7 @@
 <script setup>
 import {inject} from "vue";
-import {ANSWER_INVITE} from "@/config/config.js";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
+import {SocketEvent} from "@/config/config.js";
 const {invite_info,hideVideoModal} = modalVideoHooks();
 const socket = inject("socket");
 
@@ -12,7 +12,7 @@ const cancel = () =>{
     answer: false,
   }
   hideVideoModal()
-  socket.emit(ANSWER_INVITE, msg);
+  socket.emit(SocketEvent.ANSWER_INVITE, msg);
 }
 const confirm = () =>{
     const msg = {
@@ -20,7 +20,7 @@ const confirm = () =>{
         oppositeUserId: invite_info.oppositeUserId,
         answer: true,
     }
-  socket.emit(ANSWER_INVITE, msg);
+  socket.emit(SocketEvent.ANSWER_INVITE, msg);
 }
 </script>
 

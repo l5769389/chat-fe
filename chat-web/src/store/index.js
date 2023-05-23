@@ -23,7 +23,11 @@ export default createStore({
             chatList: [],  // 用户点击通讯录产生的对话id,
             recentChatIds: [], //
             showVideoModal:false,
-            videoStatus: 'beInvited' // inviting 邀请中， beInvited 接受邀请， connecting 连接
+            /**
+             *  1. 视频发送者： '' 空, inviting 邀请中，connecting 连接中, connected 连接上
+             *  2. 视频接受者： ‘’ 空， beInvited 接受邀请，connecting 连接中， connected 连接上
+             */
+            videoStatus: ''
         }
     },
     getters: {
@@ -118,7 +122,7 @@ export default createStore({
             state.showVideoModal = payload
         },
         setVideoStatus(state,paylaod){
-            state.videoStatus = paylaod; // OFFER_INVITE  ANSWER_INVITE connecting
+            state.videoStatus = paylaod;
         }
     },
     actions: {

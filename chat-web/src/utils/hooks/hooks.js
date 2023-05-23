@@ -1,8 +1,18 @@
-import {computed, reactive, inject, onBeforeMount, onMounted, watch, ref} from "vue";
+import {computed, inject, watch} from "vue";
 import {useStore} from "vuex";
 import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
-import {JUDGE_ANSWER, OFFER_INVITE} from "@/config/config.js";
+import {JUDGE_ANSWER, SocketEvent} from "@/config/config.js";
+import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
+
+const {
+    videoOrAudioRef,
+    muteRef,
+    toggleVideoOrAudio,
+    closeRef,
+    closeConnect,
+    toggleMute,
+} = rtcModalHook();
 const {showVideoModal, setInviteVideoInfo} = modalVideoHooks()
 const getDialogInfoHook = function () {
     const store = useStore()
@@ -23,7 +33,7 @@ const getDialogInfoHook = function () {
             const friend = groupFriends.value[currentDialogInfo.value.id]
             return {
                 chatId: currentDialogInfo.value.id,
-                joinIds:currentDialogInfo?.joinIds,
+                joinIds: currentDialogInfo?.joinIds,
                 avatar: friend?.avatar || '',
                 nickname: friend?.name || '',
                 chatType: 'Multi',
@@ -63,7 +73,7 @@ const sockInitHook = function () {
                 `当前用户的userId为:${user.value.userId},socketId为：${socket.id}`
             );
             socket.emit(
-                "connected",
+                SocketEvent.CONNECTED,
                 {
                     userId: user.value.userId,
                 },
@@ -78,17 +88,17 @@ const sockInitHook = function () {
         socket.on("connect_error", () => {
             store.commit("setSocketStatus", "connect_error");
         });
-        socket.on('joinRoom',(data) => {
+        socket.on(SocketEvent.CHAT_JOIN_ROOM, (data) => {
             updateChatlist(data)
         })
-        socket.on("singleMsg", (data) => {
-            msgHandler(data,'Single')
+        socket.on(SocketEvent.CHAT_MSG_SINGLE, (data) => {
+            msgHandler(data, 'Single')
         });
 
-        socket.on('multiMsg',data => {
-            msgHandler(data,'Multi')
+        socket.on(SocketEvent.CHAT_MSG_MULTI, data => {
+            msgHandler(data, 'Multi')
         })
-        socket.on('create_invite_room',data =>{
+        socket.on(SocketEvent.CREATE_INVITE_ROOM, data => {
             console.log(`房间roomId:${data}`)
             setInviteVideoInfo({
                 videoRoomId: data,
@@ -96,20 +106,36 @@ const sockInitHook = function () {
         })
 
         // 收到视频邀请
-        socket.on(OFFER_INVITE,data => {
+        socket.on(SocketEvent.OFFER_INVITE, data => {
             const {fromUserId, msg: {roomId}} = data;
             setInviteVideoInfo({
-                videoRoomId : roomId,
+                videoRoomId: roomId,
                 oppositeUserId: fromUserId,
                 userId: user.value.userId
             })
-            console.log(`收到服务器事件：${OFFER_INVITE}`)
-            store.commit('setVideoStatus',JUDGE_ANSWER)
+            console.log(`收到服务器事件：${SocketEvent.OFFER_INVITE}`)
+            store.commit('setVideoStatus', JUDGE_ANSWER)
             showVideoModal();
         })
 
-        const msgHandler = (data,eventName) => {
-            const {fromUserId, msg: {type, content,timestamp}, chatId,joinUserIds: joinIds} = data;
+        socket.on(SocketEvent.VIDEO_ROOM_CHANGE_MSG, type => {
+            console.log(`收到事件：${SocketEvent.VIDEO_ROOM_CHANGE_MSG}`, type)
+            switch (type) {
+                case 'cancel':
+                    closeConnect();
+                    break;
+                case 'switch_video':
+                    toggleVideoOrAudio();
+                    break;
+                case 'switch_audio':
+                    toggleVideoOrAudio();
+                    break;
+
+            }
+        })
+
+        const msgHandler = (data, eventName) => {
+            const {fromUserId, msg: {type, content, timestamp}, chatId, joinUserIds: joinIds} = data;
             console.log(`收到消息:类型为：${eventName},内容为：${JSON.stringify(data)}`)
             let imgUrl;
             if (type === 'img') {
@@ -132,17 +158,17 @@ const sockInitHook = function () {
                     messageId: new Date().getTime(),
                 });
             }
-            if (eventName === 'Single'){
+            if (eventName === 'Single') {
                 store.commit('updateChatList', {
-                    type:'Single',
+                    type: 'Single',
                     id: chatId,
                 })
-            }else if (eventName === 'Multi'){
+            } else if (eventName === 'Multi') {
                 updateChatlist(data)
                 store.commit('updateChatList', {
-                    type:'Multi',
+                    type: 'Multi',
                     id: chatId,
-                    joinIds:joinIds
+                    joinIds: joinIds
                 })
             }
             store.commit("addTotalMsgMap", {
@@ -151,7 +177,7 @@ const sockInitHook = function () {
                 type: type,
                 content: type === 'img' ? imgUrl : content,
                 timestamp: getFormatTime(timestamp),
-                messageId:timestamp,
+                messageId: timestamp,
                 source: "other",
             });
         }
@@ -159,15 +185,15 @@ const sockInitHook = function () {
     };
 
     const updateChatlist = (data) => {
-        const {chatId:roomId,joinUserIds:joinIds,chatRoomName,fromUserId} = data;
-        console.log('joinRoom',JSON.stringify(data))
+        const {chatId: roomId, joinUserIds: joinIds, chatRoomName, fromUserId} = data;
+        console.log(SocketEvent.CHAT_JOIN_ROOM, JSON.stringify(data))
         store.commit('updateChatList', {
-            type:'Multi',
+            type: 'Multi',
             id: roomId,
             joinIds,
             chatRoomName
         })
-        store.dispatch('getUnfriendInfo',joinIds)
+        store.dispatch('getUnfriendInfo', joinIds)
     }
 }
 
