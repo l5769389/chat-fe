@@ -1,19 +1,10 @@
 import {computed, inject, watch} from "vue";
 import {useStore} from "vuex";
 import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
+import {SocketEvent, VIDEO_CLIENT_STATUS} from "@/config/config.js";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
-import {JUDGE_ANSWER, SocketEvent} from "@/config/config.js";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 
-const {
-    videoOrAudioRef,
-    muteRef,
-    toggleVideoOrAudio,
-    closeRef,
-    closeConnect,
-    toggleMute,
-} = rtcModalHook();
-const {showVideoModal, setInviteVideoInfo} = modalVideoHooks()
 const getDialogInfoHook = function () {
     const store = useStore()
     const friends = computed(() => store.getters.friends)
@@ -50,6 +41,11 @@ const getDialogInfoHook = function () {
 
 
 const sockInitHook = function () {
+    const {
+        toggleVideoOrAudio,
+        closeVideoConnectPositive,
+    } = rtcModalHook();
+    const {showVideoModal, setInviteVideoInfo} = modalVideoHooks()
     const socket = inject("socket");
     const store = useStore();
     const isLogin = computed(() => store.getters.isLogin);
@@ -114,24 +110,8 @@ const sockInitHook = function () {
                 userId: user.value.userId
             })
             console.log(`收到服务器事件：${SocketEvent.OFFER_INVITE}`)
-            store.commit('setVideoStatus', JUDGE_ANSWER)
+            store.commit('setVideoStatus', VIDEO_CLIENT_STATUS.BEINVITING)
             showVideoModal();
-        })
-
-        socket.on(SocketEvent.VIDEO_ROOM_CHANGE_MSG, type => {
-            console.log(`收到事件：${SocketEvent.VIDEO_ROOM_CHANGE_MSG}`, type)
-            switch (type) {
-                case 'cancel':
-                    closeConnect();
-                    break;
-                case 'switch_video':
-                    toggleVideoOrAudio();
-                    break;
-                case 'switch_audio':
-                    toggleVideoOrAudio();
-                    break;
-
-            }
         })
 
         const msgHandler = (data, eventName) => {

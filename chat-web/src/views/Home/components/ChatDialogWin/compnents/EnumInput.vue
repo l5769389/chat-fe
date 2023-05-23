@@ -48,11 +48,12 @@ import {
 import Meme from "@/common/components/Meme.vue";
 import {useStore} from "vuex";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
-import {WAITING_FOR_ANSWER} from "@/config/config.js";
+import {VIDEO_CLIENT_STATUS} from "@/config/config.js";
+
 const store= useStore()
 const {showVideoModal} = modalVideoHooks()
 const invokeRTCDialog = () => {
-    store.commit('setVideoStatus',WAITING_FOR_ANSWER)
+    store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.INVITING)
     showVideoModal()
 }
 const icons = [

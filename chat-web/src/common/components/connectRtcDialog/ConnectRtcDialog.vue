@@ -1,15 +1,11 @@
 <script setup>
 
 import WaitForConnect from "@/common/components/connectRtcDialog/components/WaitForConnect.vue";
-import {computed, inject, nextTick, onMounted, ref, watch} from "vue";
+import {computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useStore} from "vuex";
 import InviteVideo from "@/common/components/connectRtcDialog/components/inviteVideo.vue";
 import {
-
-    CONNECTING,
-    JUDGE_ANSWER,
     SocketEvent, VIDEO_CLIENT_STATUS,
-    WAITING_FOR_ANSWER
 } from "@/config/config.js";
 import Connecting from "@/common/components/connectRtcDialog/components/Connecting.vue";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
@@ -22,6 +18,7 @@ const {
     videoOrAudioRef,
     muteRef,
     closeRef,
+  closeVideoConnectPassive
 } = rtcModalHook();
 
 defineProps({
@@ -53,12 +50,25 @@ watch([videoOrAudioRef, muteRef], ([hasVideo, muteFlag]) => {
 watch(closeRef, newVal => {
     console.log('收到关闭指令');
     if (newVal) {
-        for (const track of localStream.getTracks()) {
-            track.stop()
-        }
+        closeVideo()
     }
 })
-const emitOfferInvite = () => {
+
+watch(videoStatus,newVal => {
+  // 一旦用户点击了接受，那么就要获取本地视频流
+  if (newVal === VIDEO_CLIENT_STATUS.BEINVITED){
+    console.log('点了接受，获取本地视频流')
+    localJoinStream()
+  }
+})
+
+const closeVideo = () => {
+  for (const track of localStream.getTracks()) {
+    track.stop()
+  }
+}
+
+const offerInvite = () => {
     socket.emit(SocketEvent.OFFER_INVITE, {
         userId: user.value.userId,
         oppositeId: currentDialogInfo.value.id,
@@ -67,9 +77,16 @@ const emitOfferInvite = () => {
 
 onMounted(() => {
     connectToSignalServer();
-    if (videoStatus.value !== JUDGE_ANSWER) {
-        emitOfferInvite();
+    if (videoStatus.value === VIDEO_CLIENT_STATUS.INVITING){
+      // 主动发起者
+      offerInvite();
     }
+})
+
+onBeforeUnmount(() => {
+    [SocketEvent.ANSWER_INVITE,SocketEvent.VIDEO_ROOM_MSG,SocketEvent.VIDEO_ROOM_CHANGE_MSG].forEach(item => {
+      socket.off(item)
+    })
 })
 
 
@@ -89,6 +106,7 @@ async function connectToSignalServer() {
         const {msg: {answer}} = data;
         console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
         if (answer) {
+          await localJoinStream()
             call()
         } else {
             hideVideoModal()
@@ -126,12 +144,17 @@ async function connectToSignalServer() {
                 break;
         }
     })
+    socket.on(SocketEvent.VIDEO_ROOM_CHANGE_MSG,data =>{
+      console.log(`收到：${SocketEvent.VIDEO_ROOM_CHANGE_MSG}`,JSON.stringify(data))
+      const {type} = data;
+        if (type === 'cancel'){
+          closeVideoConnectPassive()
+        }
+    })
 }
 
 
 async function createPeerConnection() {
-    const stream = await getLocalStream();
-    localStream = stream;
     pc = new RTCPeerConnection(pcConfig);
     pc.onicecandidate = (e) => {
         if (e.candidate) {
@@ -148,17 +171,23 @@ async function createPeerConnection() {
         }
     }
     pc.ontrack = async (e) => {
-        store.commit('setVideoStatus', CONNECTING)
+        console.log('收到对方的track')
+        store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.CONNECTED)
         await nextTick(() => {
             connectRef.value.$refs.oppositeRef.srcObject = e.streams[0];
-            connectRef.value.$refs.myRef.srcObject = stream;
+            connectRef.value.$refs.myRef.srcObject = localStream
         })
     }
-    // 获取本地流，发送给对方。
-    for (const track of localStream.getTracks()) {
-        pc.addTrack(track, localStream)
-    }
 }
+
+async function localJoinStream() {
+  // 获取本地流，发送给对方。
+  localStream = await getLocalStream();
+  for (const track of localStream.getTracks()) {
+    pc.addTrack(track, localStream)
+  }
+}
+
 
 function call() {
     const offerOptions = {
@@ -190,7 +219,7 @@ function call() {
             :close-on-click-modal="false"
     >
         <div class="w-full h-[600px] max-h-full">
-            <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITED"></invite-video>
+            <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITING"></invite-video>
             <wait-for-connect v-if="videoStatus ===VIDEO_CLIENT_STATUS.INVITING"></wait-for-connect>
             <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED" ref="connectRef"></connecting>
         </div>

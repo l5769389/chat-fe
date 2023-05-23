@@ -2,7 +2,7 @@
 import {CloseSmall, PhoneCall, Voice, VoiceOff, PhoneVideoCall} from "@icon-park/vue-next";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 
-const {videoOrAudioRef, muteRef, toggleVideoOrAudio, toggleMute, closeConnect} = rtcModalHook();
+const {videoOrAudioRef, muteRef, toggleVideoOrAudio, toggleMute, closeVideoConnectPositive} = rtcModalHook();
 
 </script>
 
@@ -17,11 +17,11 @@ const {videoOrAudioRef, muteRef, toggleVideoOrAudio, toggleMute, closeConnect} =
             <span v-else class="block mt-1">切到视频聊天</span>
         </div>
 
-        <div class="item" @click="closeConnect">
+        <div class="item" @click="closeVideoConnectPositive">
         <span class="w-[40px] h-[40px] bg-red rounded-full">
           <close-small theme="outline" size="40" fill="#fff"/>
         </span>
-            <span class="block mt-1" @click="">取消</span>
+            <span class="block mt-1">取消</span>
         </div>
 
         <div class="item" @click="toggleMute">

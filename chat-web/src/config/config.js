@@ -18,10 +18,8 @@ export class SocketEvent {
 export class VIDEO_CLIENT_STATUS {
     static IDLE = 'idle'
     static INVITING = 'inviting'
+    static BEINVITING = 'beInviting'
     static BEINVITED = 'beInvited'
     static CONNECTING = 'connecting'
     static CONNECTED = 'connected'
 }
-// export const WAITING_FOR_ANSWER = 'waiting_for_answer'
-// export const JUDGE_ANSWER = 'judge_answer'
-// export const CONNECTING = 'connecting'

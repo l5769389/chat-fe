@@ -1,20 +1,25 @@
 <script setup>
 import {inject} from "vue";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
-import {SocketEvent} from "@/config/config.js";
+import {SocketEvent, VIDEO_CLIENT_STATUS} from "@/config/config.js";
+import {useStore} from "vuex";
+import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 const {invite_info,hideVideoModal} = modalVideoHooks();
+const {closeVideoConnectPositive} =  rtcModalHook()
 const socket = inject("socket");
-
+const store =useStore();
 const cancel = () =>{
+  store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.IDLE)
   const msg = {
     roomId: invite_info.videoRoomId,
     oppositeUserId: invite_info.oppositeUserId,
     answer: false,
   }
-  hideVideoModal()
+  closeVideoConnectPositive()
   socket.emit(SocketEvent.ANSWER_INVITE, msg);
 }
 const confirm = () =>{
+  store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.BEINVITED)
     const msg = {
         roomId: invite_info.videoRoomId,
         oppositeUserId: invite_info.oppositeUserId,
