@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col flex-1">
-        <edit-input ref="editInputRef"></edit-input>
+        <edit-input ref="editInputRef" class="max-h-[200px] overflow-auto"></edit-input>
         <div class="w-20 h-10 self-end">
             <el-button plain class="ml" @click="sendMsg">Send</el-button>
         </div>

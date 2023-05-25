@@ -1,8 +1,10 @@
 <template>
   <div contenteditable="true"
-       class="flex-1 edit-area flex flex-wrap"
+       class="flex-1 edit-area"
        @input="handleInput"
        @paste="handlePaste"
+       @keypress="handleKeyPress"
+       @focus="handleFocus"
        ref="editRef">
   </div>
 </template>
@@ -15,20 +17,31 @@ const icon =`<svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="
 
 const imgSrcList = reactive([]);
 const {uploadFile} = uploadFileHook()
-
+onMounted(() => {
+  moveSelection()
+})
 
 watch(uploadFile,async newVal => {
-  console.log(uploadFile)
   for (let i = 0; i < newVal.length; i++) {
     const {name, id} = newVal[i].file;
+    // 需要放置的dom节点
     const dom =await createDom(name,id);
+    const br = document.createElement('br')
+
     editRef.value.append(dom)
+    // 转为canvas
     const canvas = await html2canvas(dom);
+    canvas.style.display = 'inline-block';
+    canvas.onclick =handleClick
     editRef.value.append(canvas)
+    editRef.value.append(br)
     editRef.value.removeChild(dom)
   }
   moveSelection();
 })
+const handleClick =() => {
+  console.log('canvas click')
+}
 
 const createDom = async (name,id) => {
   const notes = document.createElement('notes')
@@ -38,9 +51,21 @@ const createDom = async (name,id) => {
   const dom = document.createElement('div')
   dom.className = `w-[210px] h-[50px] ${id} bg-white border text-xs flex items-center p-2`
   dom.id = `single`
-  dom.innerHTML = icon
-  dom.append(`<span>name</span>`)
+  dom.innerHTML = icon + `<span>${name}</span>`
   return dom;
+}
+const handleKeyPress =(e) => {
+  //去除br
+  if (e.code === 'Enter' || e.code ==='Space'){
+    document.execCommand('insertHTML',false,'<br\>&zwnj;')
+    e.preventDefault()
+  }
+}
+
+const handleFocus = () => {
+  const range = document.getSelection();
+  range.selectAllChildren(editRef.value);
+  range.collapseToEnd();
 }
 
 
@@ -50,12 +75,9 @@ const socket = inject("socket");
  * @param e
  */
 const handleInput = (e) => {
-  const range = window.getSelection().getRangeAt(0)
-  const {commonAncestorContainer} = range;
-
-  if (commonAncestorContainer.parentNode.id === 'single') {
-    console.log('删除了不能删除的元素')
-    editRef.value.removeChild(dom)
+  if (e.target.lastChild.nodeName === 'BR'){
+    const last =editRef.value.lastChild;
+     editRef.value.removeChild(last)
   }
 };
 const editRef = ref(null);
