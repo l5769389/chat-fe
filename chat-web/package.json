@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@icon-park/vue-next": "^1.4.2",
+    "@vitejs/plugin-vue-jsx": "^3.0.1",
     "element-plus": "^2.3.3",
+    "html2canvas": "1.0.0-alpha.12",
     "lodash": "^4.17.21",
     "resolve": "^1.22.2",
     "socket.io-client": "^4.6.1",

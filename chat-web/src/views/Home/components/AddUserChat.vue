@@ -79,7 +79,6 @@
     </el-dialog>
 </template>
 <script setup>
-import {getDialogInfoHook} from '@/utils/hooks/hooks.js';
 import {AddThree, Right} from '@icon-park/vue-next';
 import {computed, nextTick, reactive, ref, watch} from "vue";
 import Removable from "@/common/components/Removable.vue";

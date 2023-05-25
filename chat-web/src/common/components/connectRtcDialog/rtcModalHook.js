@@ -5,11 +5,12 @@ import {useStore} from "vuex";
 
 const videoOrAudioRef = ref(true)
 const muteRef = ref(false)
-const closeRef = ref(false)
+
 
 const {invite_info,hideVideoModal} = modalVideoHooks();
-
+const closeRef = ref(false)
 export default function () {
+
     const socket = inject("socket");
     const store = useStore()
     const toggleVideoOrAudio = () => {
@@ -21,18 +22,15 @@ export default function () {
         muteRef.value = !muteRef.value
     }
 
-
     const closeVideoConnectPositive = () => {
         emitCloseMsg()
-        closeRef.value = true
-        hideVideoModal()
         store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.IDLE)
+        hideVideoModal()
     }
 
     const closeVideoConnectPassive = () => {
-        closeRef.value = true
-        hideVideoModal()
         store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.IDLE)
+        hideVideoModal()
     }
 
 

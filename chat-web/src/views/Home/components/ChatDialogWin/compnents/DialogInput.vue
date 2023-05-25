@@ -10,7 +10,7 @@
 <script setup>
 import { computed, inject, ref } from "vue";
 import { useStore } from "vuex";
-import { getFormatTime } from "../../../../../utils/utils";
+import { getFormatTime } from "@/utils/utils.js";
 import EditInput from "@/views/components/EditInput.vue";
 import {SocketEvent} from "@/config/config.js";
 const socket = inject("socket");
@@ -18,7 +18,7 @@ const store = useStore();
 const currentDialogInfo = computed(() => store.getters.currentDialogInfo);
 const user = computed(() => store.getters.user);
 const editInputRef = ref(null)
-  const sendMsg = () => {
+const sendMsg = () => {
     const msg = editInputRef.value.getEditContent()
     if (msg.length === 0) {
         return

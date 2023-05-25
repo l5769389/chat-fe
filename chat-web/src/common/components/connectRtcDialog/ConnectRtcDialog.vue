@@ -46,6 +46,7 @@ watch([videoOrAudioRef, muteRef], ([hasVideo, muteFlag]) => {
         }
     }
 })
+const testCloseRef = computed(() => closeRef.value)
 
 watch(closeRef, newVal => {
     console.log('收到关闭指令');
@@ -63,6 +64,7 @@ watch(videoStatus,newVal => {
 })
 
 const closeVideo = () => {
+  console.log('关闭音视频')
   for (const track of localStream.getTracks()) {
     track.stop()
   }
@@ -87,6 +89,7 @@ onBeforeUnmount(() => {
     [SocketEvent.ANSWER_INVITE,SocketEvent.VIDEO_ROOM_MSG,SocketEvent.VIDEO_ROOM_CHANGE_MSG].forEach(item => {
       socket.off(item)
     })
+   closeVideo()
 })
 
 

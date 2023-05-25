@@ -42,8 +42,6 @@ const getDialogInfoHook = function () {
 
 const sockInitHook = function () {
     const {
-        toggleVideoOrAudio,
-        closeVideoConnectPositive,
     } = rtcModalHook();
     const {showVideoModal, setInviteVideoInfo} = modalVideoHooks()
     const socket = inject("socket");

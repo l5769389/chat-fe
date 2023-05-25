@@ -16,7 +16,6 @@ import {Message, AddressBook, WeixinFavorites, FolderClose, FriendsCircle} from 
 import {computed, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import store from "@/store/index.js";
-
 const icons = [
     {
         type: Message,
