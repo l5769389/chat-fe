@@ -27,8 +27,19 @@ const base642File = (dataurl, filename = 'file') => {
     })
 }
 
+const formatSize = (size) => {
+    if (size < 1024){
+        return `${size}b`
+    }else if (size < 1024 * 1024){
+        return `${(size/ 1024).toFixed(1)}Kb`
+    }else if (size < 1024 * 1024 * 1024){
+        return `${(size/ (1024 * 1024)).toFixed(1)}Mb`
+    }
+}
+
 export {
     getFormatTime,
     buffer2base64,
-    base642File
+    base642File,
+    formatSize
 }

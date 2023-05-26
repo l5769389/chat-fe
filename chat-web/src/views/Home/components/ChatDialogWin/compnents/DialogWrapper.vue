@@ -16,16 +16,23 @@ import { getDialogInfoHook} from '@/utils/hooks/hooks.js';
 import {computed} from "vue";
 import {useStore} from "vuex";
 const store = useStore();
-const { currentDialogDetails } = getDialogInfoHook()
+const { currentDialogDetails, currentDialogUserInfo} = getDialogInfoHook()
 const groupFriends = computed(() => store.getters.groupFriends)
+const chatType = currentDialogUserInfo.value.chatType;
 
 const getUserInfoByUserId = (userId) => {
+  if (chatType === 'Single'){
+    return {
+      avatar: currentDialogUserInfo.value.avatar,
+      nickname: currentDialogUserInfo.value.nickname
+    }
+  }else {
     const friend = groupFriends.value[userId]
     return {
-        avatar: friend.avatar,
-        nickname: friend.nickname,
+      avatar: friend.avatar,
+      nickname: friend.nickname,
     }
-
+  }
 }
 </script>
 

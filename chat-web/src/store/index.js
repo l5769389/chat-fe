@@ -93,7 +93,6 @@ export default createStore({
         },
         addTotalMsgMap(state, {chatId,...msg}) {
             const arr = state.totalMsgMap[chatId]
-            console.log(msg)
             if (arr) {
                 state.totalMsgMap[chatId].push(msg)
             } else {

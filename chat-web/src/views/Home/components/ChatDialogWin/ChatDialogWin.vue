@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { computed, defineComponent } from "vue";
+import { computed } from "vue";
 import DialogHeader from "@/views/Home/components/ChatDialogWin/compnents/DialogHeader.vue";
 import DialogInput from "@/views/Home/components/ChatDialogWin/compnents/DialogInput.vue";
 import DialogWrapper from "@/views/Home/components/ChatDialogWin/compnents/DialogWrapper.vue";
