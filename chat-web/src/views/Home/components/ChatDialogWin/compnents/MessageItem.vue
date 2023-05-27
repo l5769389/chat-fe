@@ -6,12 +6,12 @@
     <div class="flex-1  flex flex-col justify-center" :class="selfMessageFlag ? 'order-1' : 'order-2 '">
       <div
         :class="getMsgBgClass()"
-        class="p-3 rounded-2xl flex flex-wrap">
+        class="p-3 rounded-xl flex flex-wrap">
             <span v-if="props.type === 'text'">{{ message }}</span>
             <img v-else-if="type === 'img'" :src="message"/>
             <template v-else-if="type === 'file'">
-                <div class="flex">
-                  <div class="flex flex-col mr-3">
+                <div class="flex w-[200px]">
+                  <div class="flex flex-col mr-3 w-full">
                     <span class="text-sm">{{message.file.name}}</span>
                     <span class="text-xs text-gray">{{formatSize(message.file.size)}}</span>
                   </div>

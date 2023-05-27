@@ -13,6 +13,7 @@ import {useStore} from "vuex";
 import {getFormatTime} from "@/utils/utils.js";
 import EditInput from "@/views/components/EditInput.vue";
 import {SocketEvent} from "@/config/config.js";
+import service from "@/api/index.js";
 
 const socket = inject("socket");
 const store = useStore();
@@ -107,6 +108,12 @@ const sendToServerOneMsg = (msgSingle) => {
     );
   }
 }
+
+const uploadFile =(file) => {
+    service.post()
+}
+
+
 
 </script>
 
