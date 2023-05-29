@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 /src/static/*
 /src/config/needIgnore/*
+release

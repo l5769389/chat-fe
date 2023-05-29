@@ -13,6 +13,8 @@ const storages = [sessionStorage];
 const sessionStore = engine.createStore(storages)
 const app = createApp(App)
 import {baseURL} from "@/config/needIgnore/config.js";
+import fs from 'fs'
+console.log(fs.Dir)
 install(app)
 install(app, 'i')
 app.use(router)
