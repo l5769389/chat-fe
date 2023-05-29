@@ -1,5 +1,8 @@
 <template>
-  <div>sprite实现一下</div>
+  <div>{{ emojJson.data }}</div>
 </template>
-<script setup></script>
-<style scope></style>
+<script setup>
+import emojJson from '@/asset/emoj.js'
+
+</script>
+<style scoped></style>

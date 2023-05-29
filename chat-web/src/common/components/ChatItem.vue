@@ -111,6 +111,8 @@ const msgContent = computed(() => {
         return msg.content
     } else if (msg.type === 'img') {
         return '[图片]'
+    } else if (msg.type === 'file'){
+      return '[文件]'
     }
 })
 

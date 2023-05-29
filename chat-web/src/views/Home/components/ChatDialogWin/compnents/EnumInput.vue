@@ -58,7 +58,7 @@ import {useStore} from "vuex";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import {VIDEO_CLIENT_STATUS} from "@/config/config.js";
 import {ref} from "vue";
-import uploadFileHook from "@/utils/uploadFileHook.js";
+import uploadFileHook from "@/utils/hooks/uploadFileHook.js";
 
 const {addUploadFile} = uploadFileHook()
 

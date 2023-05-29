@@ -15,12 +15,7 @@ export default defineConfig({
     vueJsx({}),
   ],
   server:{
-    // proxy:{
-    //   '/api/*':{
-    //     target: 'https://localhost:3000',
-    //     changeOrigin:true
-    //   },
-    // },
+
     host:'0.0.0.0',
     https: {
       key: readFileSync(path.resolve(path.join(__dirname,'/src/config/needIgnore/cert/localhost-key.pem'))),
@@ -32,6 +27,4 @@ export default defineConfig({
       '@': path.resolve('./src')
     }
   },
-
-
 })

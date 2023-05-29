@@ -14,6 +14,7 @@ import {getFormatTime} from "@/utils/utils.js";
 import EditInput from "@/views/components/EditInput.vue";
 import {SocketEvent} from "@/config/config.js";
 import service from "@/api/index.js";
+import API from "@/api/request.js";
 
 const socket = inject("socket");
 const store = useStore();
@@ -79,7 +80,18 @@ const sendToServer = (msg) => {
     sendToServerOneMsg(msgSingle)
   }
 };
-const sendToServerOneMsg = (msgSingle) => {
+const sendToServerOneMsg = async (msgSingle) => {
+  if (msgSingle.type === 'file') {
+    // uploadFile
+    const filePath = await API.uploadFile(msgSingle.content)
+    msgSingle.content = {
+      filePath: filePath,
+      file: {
+        name: msgSingle.content.file.name,
+        size: msgSingle.content.file.size
+      }
+    };
+  }
   if (currentDialogInfo.value.type === 'Single') {
     socket.emit(
         SocketEvent.CHAT_MSG_SINGLE,
@@ -108,12 +120,6 @@ const sendToServerOneMsg = (msgSingle) => {
     );
   }
 }
-
-const uploadFile =(file) => {
-    service.post()
-}
-
-
 
 </script>
 

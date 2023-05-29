@@ -9,7 +9,7 @@
 </template>
 <script setup>
 import {inject, onMounted, reactive, ref, watch} from "vue";
-import uploadFileHook from "@/utils/uploadFileHook.js";
+import uploadFileHook from "@/utils/hooks/uploadFileHook.js";
 import html2canvas from "html2canvas";
 import {formatSize} from "@/utils/utils.js";
 

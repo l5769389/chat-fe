@@ -113,13 +113,12 @@ const sockInitHook = function () {
         })
 
         const msgHandler = (data, eventName) => {
-            const {fromUserId, msg: {type, content, timestamp}, chatId, joinUserIds: joinIds} = data;
+            let {fromUserId, msg: {type, content, timestamp}, chatId, joinUserIds: joinIds} = data;
             console.log(`收到消息:类型为：${eventName},内容为：${JSON.stringify(data)}`)
-            let imgUrl;
             if (type === 'img') {
                 let image = buffer2base64(content)
                 const file = base642File(image)
-                imgUrl = window.URL.createObjectURL(file)
+                content = window.URL.createObjectURL(file)
             }
             // 当前窗口就在与该用户的会话窗口
             if (currentDialogInfo.value.id != chatId) {
@@ -128,7 +127,7 @@ const sockInitHook = function () {
                     chatId: chatId,
                     content: {
                         type: type,
-                        content: type === 'img' ? imgUrl : content,
+                        content: content,
                         timestamp: getFormatTime(timestamp),
                     },
                     type: type,
@@ -153,7 +152,7 @@ const sockInitHook = function () {
                 chatId: chatId,
                 userId: fromUserId,
                 type: type,
-                content: type === 'img' ? imgUrl : content,
+                content: content,
                 timestamp: getFormatTime(timestamp),
                 messageId: timestamp,
                 source: "other",
