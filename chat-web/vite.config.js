@@ -30,11 +30,12 @@ export default defineConfig({
     }
   },
   build:{
-    input: {
-      main:path.resolve(__dirname,'index.html')
+    rollupOptions: {
+      input: {
+        main:path.resolve(__dirname,'index.html'),
+        capture: path.resolve(__dirname,'pages/capture/index.html')
+      },
+      plugins: [buildPlugin()],
     },
-    // rollupOptions: {
-    //   plugins: [buildPlugin()],
-    // },
   }
 })

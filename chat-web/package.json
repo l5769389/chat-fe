@@ -14,6 +14,7 @@
     "element-plus": "^2.3.3",
     "esbuild": "^0.17.19",
     "html2canvas": "1.0.0-alpha.12",
+    "http-server": "^14.1.1",
     "lodash": "^4.17.21",
     "resolve": "^1.22.2",
     "socket.io-client": "^4.6.1",
