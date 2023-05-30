@@ -43,6 +43,7 @@
       </template>
     </div>
   </div>
+  <canvas></canvas>
 </template>
 <script setup>
 import {
@@ -59,7 +60,7 @@ import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import {VIDEO_CLIENT_STATUS} from "@/config/config.js";
 import {ref} from "vue";
 import uploadFileHook from "@/utils/hooks/uploadFileHook.js";
-
+import {ipcRenderer} from 'electron'
 const {addUploadFile} = uploadFileHook()
 
 const uploadRef = ref(null)
@@ -80,6 +81,39 @@ const handleChoose = (e) => {
     addUploadFile(files)
   }
 }
+ipcRenderer.on('SET_SOURCE', async (event, sourceId) => {
+  try {
+    console.log('ipcRender 收到 SET_SOURCE')
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: sourceId,
+          minWidth: 1280,
+          maxWidth: 1280,
+          minHeight: 720,
+          maxHeight: 720
+        }
+      }
+    })
+    handleStream(stream)
+  } catch (e) {
+    handleError(e)
+  }
+})
+
+function handleStream (stream) {
+  const canvas = document.querySelector('canvas')
+
+}
+
+function handleError (e) {
+  console.log(e)
+}
+const invokeCapture = () => {
+  ipcRenderer.send('capture', 123)
+}
 
 const icons = [
   {
@@ -93,6 +127,7 @@ const icons = [
   },
   {
     icon: Screenshot,
+    handler: invokeCapture
   },
   {
     icon: Message,

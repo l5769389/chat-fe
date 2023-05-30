@@ -6,7 +6,7 @@ export let viteElectronPlugin = () => {
         name: "vite-electron-plugin",
         configureServer(server) {
             esbuild.buildSync({
-                entryPoints: ["./main/mainElectronEntry.ts",],
+                entryPoints: ["./main/mainElectronEntry.ts"],
                 bundle: true,
                 platform: "node",
                 outfile: "./dist/mainElectronEntry.cjs",

@@ -1,14 +1,16 @@
 import engine from 'store/src/store-engine';
 
 import sessionStorage from 'store/storages/sessionStorage';
+import localStorage from 'store/storages/localStorage'
 // import cookieStorage from 'store/storages/cookieStorage';
 
 import defaultPlugin from 'store/plugins/defaults';
 // import expiredPlugin from 'store/plugins/expire';
 // import eventsPlugin from 'store/plugins/events';
 
+// 切换存储方式
 // const storages = [sessionStorage, cookieStorage];
-const storages = [sessionStorage];
+const storages = [localStorage];
 const plugins = [defaultPlugin];
 
 const sessionStore = engine.createStore(storages, plugins);

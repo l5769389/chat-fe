@@ -2,8 +2,8 @@
 import {sockInitHook} from '@/utils/hooks/hooks.js'
 import ConnectRtcDialog from "@/common/components/connectRtcDialog/ConnectRtcDialog.vue";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
-
 sockInitHook()
+
 
 const {videoModalFlag} = modalVideoHooks()
 

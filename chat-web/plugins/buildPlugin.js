@@ -8,7 +8,6 @@ export const buildPlugin = () => {
             buildObj.buildMain();
             buildObj.preparePackageJson();
             buildObj.buildInstaller();
-            console.log(buildObj)
         },
     };
 }
