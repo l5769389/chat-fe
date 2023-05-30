@@ -1,10 +1,12 @@
 import { app, BrowserWindow } from "electron";
+import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
 let mainWindow
 // 关闭 electron Security Warning (Insecure Content-Security-Policy) This renderer process has either no Content Security
 // 警告
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 app.whenReady().then(() => {
-    let config = {
+    let config: BrowserWindowConstructorOptions = {
+        fullscreen:true,
         webPreferences: {
             nodeIntegration: true,
             webSecurity: false,

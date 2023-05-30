@@ -23,3 +23,5 @@ export class VIDEO_CLIENT_STATUS {
     static CONNECTING = 'connecting'
     static CONNECTED = 'connected'
 }
+
+export const baseURL = 'https://localhost:3000'

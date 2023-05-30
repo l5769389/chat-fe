@@ -6,7 +6,7 @@ export class BuildObj {
     //编译主进程代码
     buildMain() {
         esbuild.buildSync({
-            entryPoints: ["./src/mainElectronEntry.cjs"],
+            entryPoints: ["./src/mainElectronEntry.ts"],
             bundle: true,
             platform: "node",
             minify: true,

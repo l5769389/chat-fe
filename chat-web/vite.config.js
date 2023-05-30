@@ -7,7 +7,6 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import {getReplacer, viteElectronPlugin} from "./plugins/viteElectronPlugin.js";
 import optimizer from "vite-plugin-optimizer";
 import {buildPlugin} from "./plugins/buildPlugin.js";
-
 export default defineConfig({
   plugins: [
     vue(),

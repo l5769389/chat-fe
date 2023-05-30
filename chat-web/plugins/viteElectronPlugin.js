@@ -6,7 +6,7 @@ export let viteElectronPlugin = () => {
         name: "vite-electron-plugin",
         configureServer(server) {
             esbuild.buildSync({
-                entryPoints: ["./src/mainElectronEntry.cjs"],
+                entryPoints: ["./main/mainElectronEntry.ts",],
                 bundle: true,
                 platform: "node",
                 outfile: "./dist/mainElectronEntry.cjs",
@@ -14,7 +14,6 @@ export let viteElectronPlugin = () => {
             });
             server.httpServer.once("listening", () => {
                 let addressInfo = server.httpServer.address();
-                console.log(addressInfo)
                 let httpAddress = `https://localhost:${addressInfo.port}`;
                 let electronProcess = spawn(electron.toString(), ["./dist/mainElectronEntry.cjs", httpAddress], {
                     cwd: process.cwd(),
