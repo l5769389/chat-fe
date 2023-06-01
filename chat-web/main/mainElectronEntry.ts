@@ -1,16 +1,23 @@
-import {app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut} from "electron";
+import {app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, session} from "electron";
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
 import * as path from "path";
-
+const vueDevToolsPath = path.resolve(__dirname, '../extension/vue-devtools')
 let mainWindow
 let captureWindow
 // 关闭 electron Security Warning (Insecure Content-Security-Policy) This renderer process has either no Content Security
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+    await loadVueTools()
     listenEvent()
     createMainWin()
     registerShortcut()
 });
+
+const loadVueTools =async () => {
+    if (process.env.NODE_ENV === 'development') {
+        await session.defaultSession.loadExtension(vueDevToolsPath)
+    }
+}
 
 const createMainWin = () => {
 
@@ -27,8 +34,7 @@ const createMainWin = () => {
             disableHtmlFullscreenWindowResize: true,
         },
     };
-    let extensionPath = path.resolve('C:\\Users\\57693\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\nhdogjmejiglipccpnnnanhbledajbpd\\6.5.0_0')
-    BrowserWindow.addDevToolsExtension(extensionPath)
+
     mainWindow = new BrowserWindow(config);
 
     mainWindow.webContents.openDevTools()
@@ -79,7 +85,6 @@ const createCaptureWin = () => {
         .then(() => {
             getCapturerImg(width,height,scaleFactor)
         })
-
 }
 const destroyCaptureWindow = () => {
     if (captureWindow) {
