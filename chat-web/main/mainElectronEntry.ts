@@ -57,7 +57,7 @@ const createCaptureWin = () => {
             scaleFactor: display.scaleFactor
         }
     })
-    const {width, height,scaleFactor} = displayInfo[1];
+    const {width, height,scaleFactor} = displayInfo[0];
     console.log({width, height,scaleFactor})
     captureWindow = new BrowserWindow({
         width,
@@ -73,7 +73,7 @@ const createCaptureWin = () => {
             spellcheck: false,
             disableHtmlFullscreenWindowResize: true,
         },
-        transparent: false,
+        transparent: true,
         frame: false,
         skipTaskbar: true,
         autoHideMenuBar: true,
