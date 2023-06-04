@@ -1,18 +1,29 @@
 <script setup>
 import _ from "lodash";
-import {Check, Close} from '@icon-park/vue-next'
+import {Check, Close, RectangleOne} from '@icon-park/vue-next'
 import {ipcRenderer} from "electron";
 
 const canvasRef = ref(null);
 const canvasWrapperRef = ref(null);
 const canvasSizeRef = inject('screenSize')
 const showIconsRef = ref(false)
+const showIcons = () => {
+  showIconsRef.value = true
+}
+const hideIcons = () => {
+  showIconsRef.value = false
+}
+
+const cursorStatusRef = ref('')
+
 
 class CaptureCanvas {
   ctx = null;
   width = 0
   height = 0;
-  isDown = false;
+  isDown = false; // 鼠标是否按下
+  isMoved = false; //是否拖动过，用来辅助判断是否有绘制出的图形
+  isDrawed = false; // 是否已经有绘制出来的图形。那么再次按下就是拖动。
   startPoint = {
     x: 0,
     y: 0,
@@ -90,7 +101,13 @@ class CaptureCanvas {
       this.startPoint.y = e.clientY
     })
     canvasWrapperRef.value.addEventListener('mousemove', _.throttle(e => {
-      showIconsRef.value = false
+      hideIcons()
+      // 要修改框选区域的位置
+      if (this.isDrawed) {
+        console.log(this.confirmCursorPosition(e.clientX, e.clientY))
+        return;
+      }
+      // 第一次拖动中
       if (!this.isDown) {
         return;
       }
@@ -104,6 +121,7 @@ class CaptureCanvas {
       }
       this.clearRect()
       this.drawBg(canvasSizeRef.value.width, canvasSizeRef.value.height)
+      this.isMoved = true;
       this.drawRect({
         lt: this.startPoint,
         rb: this.endPoint,
@@ -112,11 +130,10 @@ class CaptureCanvas {
       })
     }, 16.6))
     canvasWrapperRef.value.addEventListener('mouseup', e => {
-      showIconsRef.value = true;
-      this.startPoint = {
-        x: 0,
-        y: 0,
+      if (this.isMoved) {
+        this.isDrawed = true
       }
+      showIcons()
       this.isDown = false;
     })
   }
@@ -127,6 +144,16 @@ class CaptureCanvas {
       rb: {x: width, y: height},
       needFill: true
     });
+  }
+
+  confirmCursorPosition(x, y) {
+    const flag = (this.startPoint.x - x) * (this.endPoint.x - x) <= 0 && (this.startPoint.y - y) * (this.endPoint.y - y) <= 0;
+    if (flag) {
+      cursorStatusRef.value = 'move'
+    } else {
+      cursorStatusRef.value = ''
+    }
+    return flag;
   }
 }
 
@@ -139,13 +166,16 @@ onMounted(() => {
 })
 
 const cancelCapture = () => {
-  console.log('cancel')
   ipcRenderer.send('capture-cancel')
 }
 const saveCapture = () => {
 }
 
 const icons = [
+  {
+    icon: RectangleOne,
+    handler: cancelCapture
+  },
   {
     icon: Close,
     handler: cancelCapture
@@ -164,10 +194,10 @@ const iconsPositionRef = ref({
 
 <template>
   <div class="w-full h-full relative" ref="canvasWrapperRef">
-    <canvas class="w-full h-full bg-transparent" ref="canvasRef"></canvas>
+    <canvas class="w-full h-full bg-transparent test" ref="canvasRef"></canvas>
     <div class="absolute bg-white -z-1" :style="iconsPositionRef">
       <n-button-group>
-        <n-button ghost v-for="item in icons" :key="item.icon"  @click="item.handler">
+        <n-button ghost v-for="item in icons" :key="item.icon" @click="item.handler">
           <template #icon>
             <component :is="item.icon" theme="outline" size="24" fill="#333"></component>
           </template>
@@ -179,5 +209,7 @@ const iconsPositionRef = ref({
 </template>
 
 <style scoped>
-
+  .test{
+    @apply cursor-move;
+  }
 </style>

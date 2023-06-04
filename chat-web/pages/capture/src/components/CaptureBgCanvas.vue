@@ -22,7 +22,6 @@ class CaptureBgCanvas {
 }
 let captureBgCanvas = ref(null);
 const setBgImg = () => {
-  // imgRef.value.style.backgroundImage = `url(${bgImg})`
   const img = new Image()
   captureBgCanvas.value = new CaptureBgCanvas()
   img.src = bgImgDataUrl.value
