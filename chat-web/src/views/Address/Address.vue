@@ -1,6 +1,6 @@
 <template>
     
-  <div class="w-52 bg-gray-100 h-100 overflow-auto relative border border-solid border-black">
+  <div class="w-[230px] bg-gray-100 h-100 overflow-auto relative border-r-2 border-solid border-black">
         <div class="overflow-hidden bg-dark-200 h-full">
             <address-list-wrapper/>
         </div>

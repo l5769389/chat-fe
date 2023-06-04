@@ -22,8 +22,10 @@ const loadVueTools =async () => {
 const createMainWin = () => {
 
     let config: BrowserWindowConstructorOptions = {
-        width: 1000,
-        height: 1000,
+        width: 800,
+        height: 700,
+        minWidth:800,
+        minHeight:700,
         webPreferences: {
             nodeIntegration: true,
             webSecurity: false,
@@ -33,6 +35,8 @@ const createMainWin = () => {
             spellcheck: false,
             disableHtmlFullscreenWindowResize: true,
         },
+        frame:false,
+
     };
 
     mainWindow = new BrowserWindow(config);
@@ -82,6 +86,9 @@ const createCaptureWin = () => {
         hasShadow: false
     });
     captureWindow.webContents.openDevTools()
+    ipcMain.once('capture-cancel', () => {
+        destroyCaptureWindow()
+    })
     captureWindow.loadURL(path.join(process.argv[2], '/pages/capture/index.html'))
         .then(() => {
             getCapturerImg(width,height,scaleFactor)

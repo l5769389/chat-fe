@@ -1,6 +1,8 @@
 <script setup>
 import _ from "lodash";
 import {Check, Close} from '@icon-park/vue-next'
+import {ipcRenderer} from "electron";
+
 const canvasRef = ref(null);
 const canvasWrapperRef = ref(null);
 const canvasSizeRef = inject('screenSize')
@@ -96,9 +98,9 @@ class CaptureCanvas {
         x: e.clientX,
         y: e.clientY
       }
-      iconsPositionRef.value ={
-        left: `${e.clientX}px`,
-        top: `${e.clientY}px`
+      iconsPositionRef.value = {
+        left: `${e.clientX - 100}px`,
+        top: `${e.clientY + 10}px`
       }
       this.clearRect()
       this.drawBg(canvasSizeRef.value.width, canvasSizeRef.value.height)
@@ -127,6 +129,7 @@ class CaptureCanvas {
     });
   }
 }
+
 const initCaptureCanvas = (screenWidth = canvasSizeRef.value.width, screenHeight = canvasSizeRef.value.height) => {
   const captureCanvas = new CaptureCanvas(screenWidth, screenHeight)
   captureCanvas.drawBg(screenWidth, screenHeight)
@@ -135,18 +138,27 @@ onMounted(() => {
   initCaptureCanvas()
 })
 
+const cancelCapture = () => {
+  console.log('cancel')
+  ipcRenderer.send('capture-cancel')
+}
+const saveCapture = () => {
+}
+
 const icons = [
   {
-    icon: Check,
+    icon: Close,
+    handler: cancelCapture
   },
   {
-    icon: Close,
+    icon: Check,
+    handler: saveCapture
   },
 ];
 
 const iconsPositionRef = ref({
-    left: 0,
-    top: 0
+  left: 0,
+  top: 0
 })
 </script>
 
@@ -155,7 +167,7 @@ const iconsPositionRef = ref({
     <canvas class="w-full h-full bg-transparent" ref="canvasRef"></canvas>
     <div class="absolute bg-white -z-1" :style="iconsPositionRef">
       <n-button-group>
-        <n-button ghost v-for="item in icons" :key="item.icon">
+        <n-button ghost v-for="item in icons" :key="item.icon"  @click="item.handler">
           <template #icon>
             <component :is="item.icon" theme="outline" size="24" fill="#333"></component>
           </template>
