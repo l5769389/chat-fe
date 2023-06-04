@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/**
+ tailwindcss 自定义类
+ */
+@layer components {
+    .draggable {
+        -webkit-app-region: drag
+    }
+}
+
+@layer components {
+    .no-draggable {
+        -webkit-app-region: no-drag
+    }
+}
+

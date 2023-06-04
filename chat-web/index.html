@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-dark-100  w-screen h-screen">
+<html lang="en" class="bg-dark-100 w-full h-full">
 
 <head>
   <meta charset="UTF-8" />
@@ -7,24 +7,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vite + Vue</title>
     <style>
-//        添加全屏状态下的拖动区域
-        header {
-            -webkit-app-region:drag;
-        }
-        #app{
-            -webkit-app-region:no-drag;
-        }
-
+    body{
+        -webkit-user-select: none;
+    }
     </style>
 </head>
 
-<body class="w-full h-full flex flex-col  items-center relative bg-white">
-  <header class="w-full h-[20px] flex">
-      <div class="w-[50px] bg-dark"></div>
-      <div class="w-[230px] bg-dark-100 border-r-2 border-solid border-black"></div>
-      <div class="flex-1 bg-dark-100"></div>
-  </header>
-  <div id="app" class="relative w-full" style="height: calc(100% - 20px)">
+<body class="w-full h-full  relative bg-white">
+  <div id="app" class="relative w-full h-full flex flex-col  items-center">
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>
