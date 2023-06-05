@@ -4,7 +4,6 @@ import {ipcRenderer} from 'electron'
 import DragOpCanvas from "./components/DragOpCanvas.vue";
 import AmplifyCrossCanvas from "./components/AmplifyCrossCanvas.vue";
 import CaptureBgCanvas from "./components/CaptureBgCanvas.vue";
-
 const canvasWrapperRef = ref(null);
 const canvasSizeRef = ref({
   width: 0,
@@ -20,10 +19,12 @@ const showDragOpCanvasRef = ref(false)
 const bgImgDataUrlRef = ref(null);
 const scaleFactorRef = ref(1)
 const captureBgCanvasRef = ref(null);
+const showIconsAndAmplifyRef = ref(false);
 
 provide('screenSize', canvasSizeRef)
 provide('bgImgDataUrl', bgImgDataUrlRef)
 provide('scaleFactor',scaleFactorRef)
+provide('showIconsAndAmplify',showIconsAndAmplifyRef)
 
 const showCaptureInfoRef = ref(false)
 ipcRenderer.on('capture', (event, args) => {
@@ -63,6 +64,15 @@ const handleMousemove = _.throttle((e) => {
   }
 }, 20)
 
+onMounted(() => {
+  const body = document.querySelector('body')
+  body.addEventListener('mouseleave', () => {
+    showIconsAndAmplifyRef.value =false
+  })
+  body.addEventListener('mouseenter',() => {
+    showIconsAndAmplifyRef.value = true
+  })
+})
 
 </script>
 <template>
@@ -78,7 +88,7 @@ const handleMousemove = _.throttle((e) => {
             <capture-bg-canvas ref="captureBgCanvasRef"></capture-bg-canvas>
           </div>
           <!--        放大区域的十字区域-->
-          <div class="amplify-canvas-wrapper">
+          <div class="amplify-canvas-wrapper" v-show="showIconsAndAmplifyRef">
             <amplify-cross-canvas/>
           </div>
         </div>

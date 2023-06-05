@@ -1,5 +1,7 @@
 <script setup>
 const amplifyCrossCanvasRef = ref();
+const showIconsAndAmplifyRef = inject('showIconsAndAmplify')
+
 let amplifyCanvas
 
 class AmplifyCanvas {
@@ -40,7 +42,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas class="absolute z-20" ref="amplifyCrossCanvasRef"></canvas>
+  <canvas  class="absolute z-20" ref="amplifyCrossCanvasRef"></canvas>
 
 </template>
 

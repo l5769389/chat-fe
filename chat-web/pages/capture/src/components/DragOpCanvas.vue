@@ -5,10 +5,19 @@ import {ipcRenderer} from "electron";
 
 const bgImgDataUrl = inject('bgImgDataUrl')
 const scaleFactor = inject('scaleFactor')
+const showIconsAndAmplifyRef = inject('showIconsAndAmplify')
 const canvasRef = ref(null);
 const canvasWrapperRef = ref(null);
 const canvasSizeRef = inject('screenSize')
 const showIconsRef = ref(false)
+
+watch(showIconsAndAmplifyRef,(newVal) => {
+    if (newVal){
+      showIcons()
+    }else {
+      hideIcons()
+    }
+})
 const showIcons = () => {
   showIconsRef.value = true
 }
