@@ -3,6 +3,8 @@ import _ from "lodash";
 import {Check, Close, RectangleOne} from '@icon-park/vue-next'
 import {ipcRenderer} from "electron";
 
+const bgImgDataUrl = inject('bgImgDataUrl')
+
 const canvasRef = ref(null);
 const canvasWrapperRef = ref(null);
 const canvasSizeRef = inject('screenSize')
@@ -15,22 +17,30 @@ const hideIcons = () => {
 }
 
 const cursorStatusRef = ref('')
-
+let iconsPosition = {
+  x: 0,
+  y: 0
+}
+let captureCanvas = null;
 
 class CaptureCanvas {
   ctx = null;
   width = 0
   height = 0;
   isDown = false; // 鼠标是否按下
-  isMoved = false; //是否拖动过，用来辅助判断是否有绘制出的图形
+  isMoving = false; //是否拖动过，用来辅助判断是否有绘制出的图形
   isDrawed = false; // 是否已经有绘制出来的图形。那么再次按下就是拖动。
-  startPoint = {
+  dragStartPoint = {
     x: 0,
     y: 0,
   }
-  endPoint = {
+  dragEndPoint = {
     x: 0,
     y: 0,
+  }
+  prePosition = {
+    x: 0,
+    y: 0
   }
 
   constructor(canvasWidth, canvasHeight) {
@@ -97,44 +107,95 @@ class CaptureCanvas {
   addListener = () => {
     canvasWrapperRef.value.addEventListener('mousedown', e => {
       this.isDown = true
-      this.startPoint.x = e.clientX
-      this.startPoint.y = e.clientY
+      if (this.isDrawed) {
+        this.prePosition = {
+          x: e.clientX,
+          y: e.clientY
+        }
+      } else {
+        this.dragStartPoint.x = e.clientX
+        this.dragStartPoint.y = e.clientY
+      }
     })
     canvasWrapperRef.value.addEventListener('mousemove', _.throttle(e => {
       hideIcons()
-      // 要修改框选区域的位置
-      if (this.isDrawed) {
-        console.log(this.confirmCursorPosition(e.clientX, e.clientY))
-        return;
-      }
-      // 第一次拖动中
+      this.confirmCursorPosition(e.clientX, e.clientY)
       if (!this.isDown) {
         return;
       }
-      this.endPoint = {
-        x: e.clientX,
-        y: e.clientY
+      // 要修改框选区域的位置
+      if (this.isDrawed) {
+        this.moveRect(e)
+        return;
       }
-      iconsPositionRef.value = {
-        left: `${e.clientX - 100}px`,
-        top: `${e.clientY + 10}px`
-      }
-      this.clearRect()
-      this.drawBg(canvasSizeRef.value.width, canvasSizeRef.value.height)
-      this.isMoved = true;
-      this.drawRect({
-        lt: this.startPoint,
-        rb: this.endPoint,
-        strokeStyle: 'blue',
-        needClear: true
-      })
+      this.dragRect(e)
     }, 16.6))
     canvasWrapperRef.value.addEventListener('mouseup', e => {
-      if (this.isMoved) {
+      if (this.isMoving) {
+        this.isMoving = false
         this.isDrawed = true
       }
       showIcons()
       this.isDown = false;
+    })
+  }
+
+  dragRect(e) {
+    this.dragEndPoint = {
+      x: e.clientX,
+      y: e.clientY
+    }
+
+    this.moveIcons(e.clientX, e.clientY)
+    this.clearRect()
+    this.drawBg(canvasSizeRef.value.width, canvasSizeRef.value.height)
+    this.isMoving = true;
+    this.drawRect({
+      lt: this.dragStartPoint,
+      rb: this.dragEndPoint,
+      strokeStyle: 'blue',
+      needClear: true
+    })
+  }
+
+  moveIcons(x, y) {
+    const left = x - 100;
+    const top = y + 10;
+    iconsPosition = {
+      x: x,
+      y: y
+    }
+    iconsPositionRef.value = {
+      left: `${left}px`,
+      top: `${top}px`
+    }
+  }
+
+  moveRect(e) {
+    const moveDelta = {
+      x: e.clientX - this.prePosition.x,
+      y: e.clientY - this.prePosition.y,
+    }
+    this.dragStartPoint = {
+      x: this.dragStartPoint.x + moveDelta.x,
+      y: this.dragStartPoint.y + moveDelta.y
+    }
+    this.dragEndPoint = {
+      x: this.dragEndPoint.x + moveDelta.x,
+      y: this.dragEndPoint.y + moveDelta.y
+    }
+    this.moveIcons(iconsPosition.x + moveDelta.x, iconsPosition.y + moveDelta.y)
+    this.prePosition = {
+      x: e.clientX,
+      y: e.clientY
+    }
+    this.clearRect()
+    this.drawBg(canvasSizeRef.value.width, canvasSizeRef.value.height)
+    this.drawRect({
+      lt: this.dragStartPoint,
+      rb: this.dragEndPoint,
+      strokeStyle: 'blue',
+      needClear: true
     })
   }
 
@@ -147,7 +208,7 @@ class CaptureCanvas {
   }
 
   confirmCursorPosition(x, y) {
-    const flag = (this.startPoint.x - x) * (this.endPoint.x - x) <= 0 && (this.startPoint.y - y) * (this.endPoint.y - y) <= 0;
+    const flag = (this.dragStartPoint.x - x) * (this.dragEndPoint.x - x) <= 0 && (this.dragStartPoint.y - y) * (this.dragEndPoint.y - y) <= 0;
     if (flag) {
       cursorStatusRef.value = 'move'
     } else {
@@ -157,8 +218,10 @@ class CaptureCanvas {
   }
 }
 
+const imgShow =ref()
+
 const initCaptureCanvas = (screenWidth = canvasSizeRef.value.width, screenHeight = canvasSizeRef.value.height) => {
-  const captureCanvas = new CaptureCanvas(screenWidth, screenHeight)
+  captureCanvas = new CaptureCanvas(screenWidth, screenHeight)
   captureCanvas.drawBg(screenWidth, screenHeight)
 }
 onMounted(() => {
@@ -168,8 +231,53 @@ onMounted(() => {
 const cancelCapture = () => {
   ipcRenderer.send('capture-cancel')
 }
+
 const saveCapture = () => {
+  const img = new Image()
+  img.src = bgImgDataUrl.value;
+  img.onload = () => {
+    const canvas1 = document.createElement('canvas')
+    const ctx1 = canvas1.getContext('2d')
+    canvas1.width = img.width / 2;
+    canvas1.height = img.height / 2;
+    console.log(canvas1.width, canvas1.height)
+    ctx1.drawImage(img, 0, 0)
+
+    const dragStartX = Math.abs(captureCanvas.dragStartPoint.x)
+    const dragStartY = Math.abs(captureCanvas.dragStartPoint.y)
+    const dragEndX = Math.abs(captureCanvas.dragEndPoint.x)
+    const dragEndY = Math.abs(captureCanvas.dragEndPoint.y)
+    console.log(captureCanvas.dragStartPoint, captureCanvas.dragEndPoint)
+    let startX, startY, endX, endY
+    if (dragStartX < dragEndX) {
+      startX = dragStartX
+      endX = dragEndX
+    } else {
+      startX = dragEndX
+      endX = dragStartX
+    }
+    if (dragStartY < dragEndY) {
+      startY = dragStartY
+      endY = dragEndY
+    } else {
+      startY = dragEndY
+      endY = dragStartY
+    }
+    const width = Math.abs(dragEndX - dragStartX)
+    const height = Math.abs(dragEndY - dragStartY)
+    const captureImg = ctx1.getImageData(startX * 2, startY * 2, width * 2, height * 2)
+    const canvas2 = document.createElement('canvas')
+    const ctx2 = canvas2.getContext('2d')
+    canvas2.width = width * 2;
+    canvas2.height = height * 2;
+    ctx2.putImageData(captureImg, 0, 0)
+    const imgSrc = canvas2.toDataURL()
+    imgShow.value.src = imgSrc;
+    imgShow.value.style.transform = 'scale(0.5)'
+  }
 }
+
+
 
 const icons = [
   {
@@ -194,7 +302,8 @@ const iconsPositionRef = ref({
 
 <template>
   <div class="w-full h-full relative" ref="canvasWrapperRef">
-    <canvas class="w-full h-full bg-transparent test" ref="canvasRef"></canvas>
+    <canvas class="w-full h-full bg-transparent" :class="cursorStatusRef === 'move' ? 'move': ''"
+            ref="canvasRef"></canvas>
     <div class="absolute bg-white -z-1" :style="iconsPositionRef">
       <n-button-group>
         <n-button ghost v-for="item in icons" :key="item.icon" @click="item.handler">
@@ -204,12 +313,14 @@ const iconsPositionRef = ref({
         </n-button>
       </n-button-group>
     </div>
+    <img id="test" ref="imgShow" class="absolute" style="bottom: 20px; right: 20px">
   </div>
 
 </template>
 
 <style scoped>
-  .test{
-    @apply cursor-move;
-  }
+.move {
+  @apply cursor-move;
+}
+
 </style>
