@@ -239,9 +239,8 @@ const saveCapture = () => {
   img.onload = () => {
     const canvas1 = document.createElement('canvas')
     const ctx1 = canvas1.getContext('2d')
-    canvas1.width = img.width / scaleFactor.value;
-    canvas1.height = img.height / scaleFactor.value;
-    console.log(canvas1.width, canvas1.height)
+    canvas1.width = img.width;
+    canvas1.height = img.height;
     ctx1.drawImage(img, 0, 0)
 
     const dragStartX = Math.abs(captureCanvas.dragStartPoint.x)
@@ -262,14 +261,17 @@ const saveCapture = () => {
     }
     const width = Math.abs(dragEndX - dragStartX)
     const height = Math.abs(dragEndY - dragStartY)
+    console.log(`截图尺寸为：width:${width}, height: ${height}`)
     const captureImg = ctx1.getImageData(startX * scaleFactor.value, startY * scaleFactor.value, width * scaleFactor.value, height * scaleFactor.value)
     const canvas2 = document.createElement('canvas')
     const ctx2 = canvas2.getContext('2d')
     canvas2.width = width * scaleFactor.value;
     canvas2.height = height * scaleFactor.value;
     ctx2.putImageData(captureImg, 0, 0)
+    imgShow.value.style.width = `${width}px`;
+    imgShow.value.style.height = `${height}px`;
     imgShow.value.src = canvas2.toDataURL()
-    imgShow.value.style.transform = `scale(${1 / scaleFactor.value})`
+    // imgShow.value.style.transform = `scale(${1 / scaleFactor.value})`
   }
 }
 
