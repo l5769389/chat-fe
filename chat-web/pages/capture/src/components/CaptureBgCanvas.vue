@@ -1,11 +1,12 @@
 <script setup>
 const canvasSizeRef = inject('screenSize')
 const bgImgDataUrl = inject('bgImgDataUrl')
+const scaleFactor = inject('scaleFactor')
 const captureBgCanvasRef = ref()
 
 class CaptureBgCanvas {
   ctx = null
-  constructor(width = canvasSizeRef.value.width * 2, height = canvasSizeRef.value.height * 2) {
+  constructor(width = canvasSizeRef.value.width * scaleFactor, height = canvasSizeRef.value.height * scaleFactor) {
     this.ctx = captureBgCanvasRef.value.getContext('2d')
     captureBgCanvasRef.value.width = width
     captureBgCanvasRef.value.height = height

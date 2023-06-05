@@ -62,7 +62,10 @@ export class CaptureWindow{
                 height: height * scaleFactor,
             }
         }).then(async sources => {
-            CaptureWindow.instance.webContents.send('capture', sources[0].thumbnail.toDataURL())
+            CaptureWindow.instance.webContents.send('capture', {
+                img: sources[0].thumbnail.toDataURL(),
+                scaleFactor: scaleFactor
+            })
         })
     }
 

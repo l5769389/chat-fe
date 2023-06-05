@@ -24,7 +24,4 @@ const {videoModalFlag} = modalVideoHooks()
 
 <style lang="css" scoped>
 
-main{
-  @apply no-draggable
-}
 </style>

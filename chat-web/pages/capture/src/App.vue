@@ -18,16 +18,20 @@ const bgStyleRef = computed(() => {
 })
 const showDragOpCanvasRef = ref(false)
 const bgImgDataUrlRef = ref(null);
+const scaleFactorRef = ref(1)
 const captureBgCanvasRef = ref(null);
+
 provide('screenSize', canvasSizeRef)
 provide('bgImgDataUrl', bgImgDataUrlRef)
+provide('scaleFactor',scaleFactorRef)
 
 const showCaptureInfoRef = ref(false)
 ipcRenderer.on('capture', (event, args) => {
   // 初始化全屏的拖拽区域
   initDragOpCanvas()
   // 初始化 放大区域的图像。
-  setBgImg(args)
+  const { img, scaleFactor } = args;
+  setBgImg(img,scaleFactor)
   showCaptureInfoRef.value = true;
 })
 const initDragOpCanvas = () => {
@@ -39,8 +43,9 @@ const initDragOpCanvas = () => {
   showDragOpCanvasRef.value = true
 }
 
-const setBgImg = (imgDataUrl) => {
+const setBgImg = (imgDataUrl,scaleFactor) => {
   bgImgDataUrlRef.value = imgDataUrl
+  scaleFactorRef.value = scaleFactor
 }
 
 const currentColor = ref('')

@@ -4,7 +4,7 @@ import {Check, Close, RectangleOne} from '@icon-park/vue-next'
 import {ipcRenderer} from "electron";
 
 const bgImgDataUrl = inject('bgImgDataUrl')
-
+const scaleFactor = inject('scaleFactor')
 const canvasRef = ref(null);
 const canvasWrapperRef = ref(null);
 const canvasSizeRef = inject('screenSize')
@@ -218,12 +218,13 @@ class CaptureCanvas {
   }
 }
 
-const imgShow =ref()
+const imgShow = ref()
 
 const initCaptureCanvas = (screenWidth = canvasSizeRef.value.width, screenHeight = canvasSizeRef.value.height) => {
   captureCanvas = new CaptureCanvas(screenWidth, screenHeight)
   captureCanvas.drawBg(screenWidth, screenHeight)
 }
+
 onMounted(() => {
   initCaptureCanvas()
 })
@@ -238,8 +239,8 @@ const saveCapture = () => {
   img.onload = () => {
     const canvas1 = document.createElement('canvas')
     const ctx1 = canvas1.getContext('2d')
-    canvas1.width = img.width / 2;
-    canvas1.height = img.height / 2;
+    canvas1.width = img.width / scaleFactor.value;
+    canvas1.height = img.height / scaleFactor.value;
     console.log(canvas1.width, canvas1.height)
     ctx1.drawImage(img, 0, 0)
 
@@ -248,35 +249,29 @@ const saveCapture = () => {
     const dragEndX = Math.abs(captureCanvas.dragEndPoint.x)
     const dragEndY = Math.abs(captureCanvas.dragEndPoint.y)
     console.log(captureCanvas.dragStartPoint, captureCanvas.dragEndPoint)
-    let startX, startY, endX, endY
+    let startX, startY
     if (dragStartX < dragEndX) {
       startX = dragStartX
-      endX = dragEndX
     } else {
       startX = dragEndX
-      endX = dragStartX
     }
     if (dragStartY < dragEndY) {
       startY = dragStartY
-      endY = dragEndY
     } else {
       startY = dragEndY
-      endY = dragStartY
     }
     const width = Math.abs(dragEndX - dragStartX)
     const height = Math.abs(dragEndY - dragStartY)
-    const captureImg = ctx1.getImageData(startX * 2, startY * 2, width * 2, height * 2)
+    const captureImg = ctx1.getImageData(startX * scaleFactor.value, startY * scaleFactor.value, width * scaleFactor.value, height * scaleFactor.value)
     const canvas2 = document.createElement('canvas')
     const ctx2 = canvas2.getContext('2d')
-    canvas2.width = width * 2;
-    canvas2.height = height * 2;
+    canvas2.width = width * scaleFactor.value;
+    canvas2.height = height * scaleFactor.value;
     ctx2.putImageData(captureImg, 0, 0)
-    const imgSrc = canvas2.toDataURL()
-    imgShow.value.src = imgSrc;
-    imgShow.value.style.transform = 'scale(0.5)'
+    imgShow.value.src = canvas2.toDataURL()
+    imgShow.value.style.transform = `scale(${1 / scaleFactor.value})`
   }
 }
-
 
 
 const icons = [
@@ -322,5 +317,4 @@ const iconsPositionRef = ref({
 .move {
   @apply cursor-move;
 }
-
 </style>
