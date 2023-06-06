@@ -24,4 +24,5 @@ export class VIDEO_CLIENT_STATUS {
     static CONNECTED = 'connected'
 }
 
-export const baseURL = 'https://localhost:3000'
+export const baseURL = 'http://localhost:3000'
+export const baseSocketIOURL = 'http://localhost:3001'

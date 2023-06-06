@@ -12,7 +12,7 @@ import engine from 'store/src/store-engine';
 const storages = [sessionStorage];
 const sessionStore = engine.createStore(storages)
 const app = createApp(App)
-import {baseURL} from "@/config/config.js";
+import {baseSocketIOURL} from "@/config/config.js";
 install(app)
 install(app, 'i')
 app.use(router)
@@ -20,7 +20,7 @@ app.use(store)
 app.use(ElementPlus)
 app.use(sessionStore)
 app.use(SocketIo, {
-    connection: baseURL,
+    connection: baseSocketIOURL,
     options: {
         autoConnect: false  //自动链接
     }

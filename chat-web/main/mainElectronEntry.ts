@@ -3,6 +3,18 @@ import * as path from "path";
 import {MainEvent, Shortcut} from "./types";
 import {MainWindow} from "./MainWindow";
 import {CaptureWindow} from "./CaptureWindow";
+const io = require('socket.io-client');
+const socket = io('http://localhost:3001');
+
+// connection
+socket.on("connect", () => {
+    console.log(1234)
+});
+
+socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+});
+
 
 const vueDevToolsPath = path.resolve(__dirname, '../extension/vue-devtools')
 let mainWindow
