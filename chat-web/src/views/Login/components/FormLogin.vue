@@ -23,7 +23,7 @@ import {useRouter} from "vue-router";
 const router = useRouter()
 const loginForm = reactive({
     username:'',
-    password:''
+    password:'123456'
 })
 
 const login =async () => {

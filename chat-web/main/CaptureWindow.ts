@@ -24,7 +24,6 @@ export class CaptureWindow {
                 y: display.bounds.y
             }
         })
-
         const captureWindows = displays.map(display => {
             const {id, width, height, scaleFactor, x, y} = display
             const captureWindow = new BrowserWindow({

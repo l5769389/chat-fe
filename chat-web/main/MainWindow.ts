@@ -28,12 +28,15 @@ export class MainWindow {
                 disableHtmlFullscreenWindowResize: true,
             },
             frame: false,
-
         };
         const instance = new BrowserWindow(config);
         instance.webContents.openDevTools()
         this.addIpcListen()
         instance.loadURL(process.argv[2]);
+
+        const instance1 = new BrowserWindow(config);
+        instance1.webContents.openDevTools()
+        instance1.loadURL(process.argv[2]);
         return instance;
     }
 
