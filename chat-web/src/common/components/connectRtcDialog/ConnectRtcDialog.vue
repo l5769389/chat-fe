@@ -11,6 +11,7 @@ import Connecting from "@/common/components/connectRtcDialog/components/Connecti
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 import {ElMessage} from "element-plus";
+import {sendIpcMsg} from "@/utils/hooks/hooks.js";
 
 const store = useStore()
 const {invite_info, hideVideoModal} = modalVideoHooks();
@@ -71,10 +72,15 @@ const closeVideo = () => {
 }
 
 const offerInvite = () => {
-    socket.emit(SocketEvent.OFFER_INVITE, {
-        userId: user.value.userId,
-        oppositeId: currentDialogInfo.value.id,
-    });
+    sendIpcMsg({
+      msg: {
+        type: SocketEvent.OFFER_INVITE,
+        data: {
+          userId: user.value.userId,
+          oppositeId: currentDialogInfo.value.id,
+        }
+      }
+    })
 }
 
 onMounted(() => {
@@ -125,9 +131,14 @@ async function connectToSignalServer() {
                     .then(desc => {
                         pc.setLocalDescription(desc)
                         console.log(`收到offer,roomId为：${invite_info.videoRoomId}`)
-                        socket.emit(SocketEvent.VIDEO_ROOM_MSG, {
-                            roomId: invite_info.videoRoomId,
-                            content: desc
+                        sendIpcMsg({
+                          msg: {
+                            type:SocketEvent.VIDEO_ROOM_MSG,
+                            data:{
+                              roomId: invite_info.videoRoomId,
+                              content: desc
+                            }
+                          }
                         })
                     })
                 break;
@@ -170,7 +181,12 @@ async function createPeerConnection() {
                     candidate: e.candidate.candidate
                 }
             }
-            socket.emit(SocketEvent.VIDEO_ROOM_MSG, msg)
+            sendIpcMsg({
+              msg: {
+                type: SocketEvent.VIDEO_ROOM_MSG,
+                data: msg
+              }
+            })
         }
     }
     pc.ontrack = async (e) => {
@@ -201,9 +217,14 @@ function call() {
         .then(desc => {
             pc.setLocalDescription(desc);
             console.log(`发出：${SocketEvent.VIDEO_ROOM_MSG}`)
-            socket.emit(SocketEvent.VIDEO_ROOM_MSG, {
-                roomId: invite_info.videoRoomId,
-                content: desc
+            sendIpcMsg({
+              msg: {
+                type:SocketEvent.VIDEO_ROOM_MSG,
+                data: {
+                  roomId: invite_info.videoRoomId,
+                  content: desc
+                }
+              }
             })
         })
         .catch(e => {

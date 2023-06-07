@@ -4,6 +4,7 @@ import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import {SocketEvent, VIDEO_CLIENT_STATUS} from "@/config/config.js";
 import {useStore} from "vuex";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
+import {sendIpcMsg} from "@/utils/hooks/hooks.js";
 const {invite_info,hideVideoModal} = modalVideoHooks();
 const {closeVideoConnectPositive} =  rtcModalHook()
 const socket = inject("socket");
@@ -16,7 +17,12 @@ const cancel = () =>{
     answer: false,
   }
   closeVideoConnectPositive()
-  socket.emit(SocketEvent.ANSWER_INVITE, msg);
+  sendIpcMsg({
+    msg: {
+      type: SocketEvent.ANSWER_INVITE,
+      data: msg
+    }
+  })
 }
 const confirm = () =>{
   store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.BEINVITED)
@@ -25,7 +31,12 @@ const confirm = () =>{
         oppositeUserId: invite_info.oppositeUserId,
         answer: true,
     }
-  socket.emit(SocketEvent.ANSWER_INVITE, msg);
+    sendIpcMsg({
+      msg: {
+        type: SocketEvent.ANSWER_INVITE,
+        data: msg
+      }
+    })
 }
 </script>
 

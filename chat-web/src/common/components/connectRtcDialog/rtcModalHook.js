@@ -2,12 +2,13 @@ import {inject, ref} from "vue";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import {SocketEvent, VIDEO_CLIENT_STATUS} from "@/config/config.js";
 import {useStore} from "vuex";
+import {sendIpcMsg} from "@/utils/hooks/hooks.js";
 
 const videoOrAudioRef = ref(true)
 const muteRef = ref(false)
 
 
-const {invite_info,hideVideoModal} = modalVideoHooks();
+const {invite_info, hideVideoModal} = modalVideoHooks();
 const closeRef = ref(false)
 export default function () {
 
@@ -24,23 +25,28 @@ export default function () {
 
     const closeVideoConnectPositive = () => {
         emitCloseMsg()
-        store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.IDLE)
+        store.commit('setVideoStatus', VIDEO_CLIENT_STATUS.IDLE)
         hideVideoModal()
     }
 
     const closeVideoConnectPassive = () => {
-        store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.IDLE)
+        store.commit('setVideoStatus', VIDEO_CLIENT_STATUS.IDLE)
         hideVideoModal()
     }
 
 
-    const emitCloseMsg =() => {
+    const emitCloseMsg = () => {
         const msg = {
             roomId: invite_info.videoRoomId,
             type: 'cancel'
         }
         console.log(`向对方发出取消视频:${JSON.stringify(msg)}`)
-        socket.emit(SocketEvent.VIDEO_ROOM_CHANGE_MSG, msg)
+        sendIpcMsg({
+            msg: {
+                type: SocketEvent.VIDEO_ROOM_CHANGE_MSG,
+                data: msg
+            }
+        })
     }
     return {
         videoOrAudioRef,

@@ -1,18 +1,16 @@
-import {app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, session} from "electron";
+import {BrowserWindow, ipcMain,} from "electron";
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
 import {MainEvent} from "./types";
+import {SocketEvents} from "../common/types";
 
 export class MainWindow {
-    static instance = null;
+    win = null;
 
     constructor() {
-        if (!MainWindow.instance) {
-            MainWindow.instance = this.getInstance()
-        }
-        return MainWindow.instance
+        this.win = this.getWinInstance()
     }
 
-    getInstance() {
+    getWinInstance() {
         let config: BrowserWindowConstructorOptions = {
             width: 800,
             height: 700,
@@ -29,39 +27,44 @@ export class MainWindow {
             },
             frame: false,
         };
-        const instance = new BrowserWindow(config);
-        instance.webContents.openDevTools()
+        const win = new BrowserWindow(config);
+        win.webContents.openDevTools()
         this.addIpcListen()
-        instance.loadURL(process.argv[2]);
+        win.loadURL(process.argv[2]);
 
-        const instance1 = new BrowserWindow(config);
-        instance1.webContents.openDevTools()
-        instance1.loadURL(process.argv[2]);
-        return instance;
+        return win;
     }
 
     destroy() {
-        if (MainWindow.instance) {
-            MainWindow.instance.close()
-            MainWindow.instance = null;
+        if (this.win) {
+            this.win.close()
+            this.win = null;
         }
     }
-    addIpcListen(){
+
+    addIpcListen() {
         ipcMain.on(MainEvent.window_pin, (event, args) => {
-            MainWindow.instance.setAlwaysOnTop(args)
+            this.win.setAlwaysOnTop(args)
         })
         ipcMain.on(MainEvent.window_minimize, () => {
-            MainWindow.instance.minimize()
+            this.win.minimize()
         })
         ipcMain.on(MainEvent.window_full, () => {
-            if (MainWindow.instance.isMaximized()){
-                MainWindow.instance.restore()
-            }else {
-                MainWindow.instance.maximize()
+            if (this.win.isMaximized()) {
+                this.win.restore()
+            } else {
+                this.win.maximize()
             }
         })
         ipcMain.once(MainEvent.window_close, () => {
             this.destroy()
         })
+    }
+
+    sendToRender({
+                     eventName = SocketEvents.from_socket_server_msg, msg
+                 }) {
+        console.log(`向ipcRender发出：${eventName},${JSON.stringify(msg)}`)
+        this.win.webContents.send(eventName, msg)
     }
 }

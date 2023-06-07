@@ -1,34 +1,40 @@
-import {app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, session} from "electron";
+import {app, ipcMain, globalShortcut, session, BrowserWindow} from "electron";
 import * as path from "path";
 import {MainEvent, Shortcut} from "./types";
 import {MainWindow} from "./MainWindow";
 import {CaptureWindow} from "./CaptureWindow";
-const io = require('socket.io-client');
-const socket = io('http://localhost:3001');
-
-// connection
-socket.on("connect", () => {
-    console.log(1234)
-});
-
-socket.on('disconnect', () => {
-    console.log('Disconnected from server');
-});
-
+import {SocketIoClient} from "./SocketIoClient";
+import {SocketEvents} from "../common/types";
 
 const vueDevToolsPath = path.resolve(__dirname, '../extension/vue-devtools')
-let mainWindow
+let mainWindow: MainWindow
 let captureWindow
+let socketIoClient
 // 关闭 electron Security Warning (Insecure Content-Security-Policy) This renderer process has either no Content Security
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 app.whenReady().then(async () => {
     await loadVueTools()
     createMainWin()
+    registerSocketIo()
     registerShortcut()
 });
+
+const registerSocketIo = () => {
+    socketIoClient = new SocketIoClient(mainWindow)
+}
+ipcMain.on(SocketEvents.start_connect, () => {
+    socketIoClient.connect()
+})
+
+ipcMain.on(SocketEvents.to_socket_server_msg, (event, args) => {
+    console.log('ipcMain收到', args)
+    socketIoClient.sendToSocketServer(args)
+})
+
 ipcMain.on(MainEvent.capture, () => {
     createCaptureWin()
 })
+
 const loadVueTools = async () => {
     if (process.env.NODE_ENV === 'development') {
         await session.defaultSession.loadExtension(vueDevToolsPath)

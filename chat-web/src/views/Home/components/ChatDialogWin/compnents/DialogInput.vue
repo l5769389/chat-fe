@@ -15,6 +15,7 @@ import EditInput from "@/views/components/EditInput.vue";
 import {SocketEvent} from "@/config/config.js";
 import service from "@/api/index.js";
 import API from "@/api/request.js";
+import {sendIpcMsg} from "@/utils/hooks/hooks.js";
 
 const socket = inject("socket");
 const store = useStore();
@@ -93,31 +94,29 @@ const sendToServerOneMsg = async (msgSingle) => {
     };
   }
   if (currentDialogInfo.value.type === 'Single') {
-    socket.emit(
-        SocketEvent.CHAT_MSG_SINGLE,
-        {
+    sendIpcMsg({
+      msg: {
+        type: SocketEvent.CHAT_MSG_SINGLE,
+        data: {
           toUserId: Number.parseInt(currentDialogInfo.value.id),
           fromUserId: user.value.userId,
           msg: msgSingle,
           msgType: msgSingle.type,
-        },
-        () => {
-          console.log("发送成功");
         }
-    );
+      }
+    })
   } else if (currentDialogInfo.value.type === 'Multi') {
-    socket.emit(
-        SocketEvent.CHAT_MSG_MULTI,
-        {
+    sendIpcMsg({
+      msg:{
+        type: SocketEvent.CHAT_MSG_MULTI,
+        data : {
           toChatRoomId: currentDialogInfo.value.id,
           fromUserId: user.value.userId,
           msg: msgSingle,
           joinUserIds: currentDialogInfo.value.joinIds,
-        },
-        () => {
-          console.log("发送成功");
         }
-    );
+      },
+    })
   }
 }
 
