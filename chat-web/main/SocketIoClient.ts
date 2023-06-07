@@ -22,10 +22,11 @@ export class SocketIoClient {
         ["connect", 'disconnect', 'singleMsg', 'multiMsg', 'joinRoom', 'connected',
             'offer_invite', 'answer_invite', 'create_invite_room', 'video_room_message', 'video_room_change_msg'].forEach(eventName => {
             this.socket.on(eventName, (data) => {
+                console.log(`socket client 收到消息:${JSON.stringify(data)}`)
                 this.mainWindow.sendToRender({
                     msg: {
-                        eventType: eventName,
-                        data: data || ''
+                        eventName,
+                        data: data
                     }
                 })
             })

@@ -5,28 +5,30 @@ import {computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch} from
 import {useStore} from "vuex";
 import InviteVideo from "@/common/components/connectRtcDialog/components/inviteVideo.vue";
 import {
-    SocketEvent, VIDEO_CLIENT_STATUS,
+  SocketEvent, VIDEO_CLIENT_STATUS,
 } from "@/config/config.js";
 import Connecting from "@/common/components/connectRtcDialog/components/Connecting.vue";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 import {ElMessage} from "element-plus";
 import {sendIpcMsg} from "@/utils/hooks/hooks.js";
+import {ipcRenderer} from "electron";
+import {SocketEvents} from "../../../../common/types.ts";
 
 const store = useStore()
 const {invite_info, hideVideoModal} = modalVideoHooks();
 const {
-    videoOrAudioRef,
-    muteRef,
-    closeRef,
+  videoOrAudioRef,
+  muteRef,
+  closeRef,
   closeVideoConnectPassive
 } = rtcModalHook();
 
 defineProps({
-    showConnect: {
-        type: Boolean,
-        default: false
-    }
+  showConnect: {
+    type: Boolean,
+    default: false
+  }
 })
 const videoStatus = computed(() => store.state.videoStatus)
 const socket = inject("socket");
@@ -38,27 +40,27 @@ let pc = null;
 const pcConfig = {};
 
 watch([videoOrAudioRef, muteRef], ([hasVideo, muteFlag]) => {
-    console.log('change',[hasVideo,muteFlag])
-    for (const track of localStream.getTracks()) {
-        if (track.kind === 'audio') {
-            track.enabled = !muteFlag
-        } else if (track.kind === 'video') {
-            track.enabled = hasVideo
-        }
+  console.log('change', [hasVideo, muteFlag])
+  for (const track of localStream.getTracks()) {
+    if (track.kind === 'audio') {
+      track.enabled = !muteFlag
+    } else if (track.kind === 'video') {
+      track.enabled = hasVideo
     }
+  }
 })
 const testCloseRef = computed(() => closeRef.value)
 
 watch(closeRef, newVal => {
-    console.log('收到关闭指令');
-    if (newVal) {
-        closeVideo()
-    }
+  console.log('收到关闭指令');
+  if (newVal) {
+    closeVideo()
+  }
 })
 
-watch(videoStatus,newVal => {
+watch(videoStatus, newVal => {
   // 一旦用户点击了接受，那么就要获取本地视频流
-  if (newVal === VIDEO_CLIENT_STATUS.BEINVITED){
+  if (newVal === VIDEO_CLIENT_STATUS.BEINVITED) {
     console.log('点了接受，获取本地视频流')
     localJoinStream()
   }
@@ -66,198 +68,216 @@ watch(videoStatus,newVal => {
 
 const closeVideo = () => {
   console.log('关闭音视频')
-  for (const track of localStream.getTracks()) {
-    track.stop()
+  if (localStream) {
+    for (const track of localStream.getTracks()) {
+      track.stop()
+    }
   }
+
 }
 
 const offerInvite = () => {
-    sendIpcMsg({
-      msg: {
-        type: SocketEvent.OFFER_INVITE,
-        data: {
-          userId: user.value.userId,
-          oppositeId: currentDialogInfo.value.id,
-        }
+  sendIpcMsg({
+    msg: {
+      type: SocketEvent.OFFER_INVITE,
+      data: {
+        userId: user.value.userId,
+        oppositeId: currentDialogInfo.value.id,
       }
-    })
+    }
+  })
 }
 
 onMounted(() => {
-    connectToSignalServer();
-    if (videoStatus.value === VIDEO_CLIENT_STATUS.INVITING){
-      // 主动发起者
-      offerInvite();
-    }
+  connectToSignalServer();
+  if (videoStatus.value === VIDEO_CLIENT_STATUS.INVITING) {
+    // 主动发起者
+    offerInvite();
+  }
 })
 
 onBeforeUnmount(() => {
-    [SocketEvent.ANSWER_INVITE,SocketEvent.VIDEO_ROOM_MSG,SocketEvent.VIDEO_ROOM_CHANGE_MSG].forEach(item => {
-      socket.off(item)
-    })
-   closeVideo()
+  closeVideo()
 })
 
 
 function getLocalStream() {
-    // 获取本地流
-    const constraints = {
-        video: true,
-        audio: true,
-    }
-    return navigator.mediaDevices.getUserMedia(constraints)
+  // 获取本地流
+  const constraints = {
+    video: true,
+    audio: true,
+  }
+  return navigator.mediaDevices.getUserMedia(constraints)
 }
 
 
 async function connectToSignalServer() {
-    await createPeerConnection();
-    socket.on(SocketEvent.ANSWER_INVITE, async (data) => {
-        const {msg: {answer}} = data;
-        console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
-        if (answer) {
-          await localJoinStream()
-            call()
-        } else {
-            hideVideoModal()
-            ElMessage('对方拒绝了你')
-        }
-    })
-    socket.on(SocketEvent.VIDEO_ROOM_MSG, (data) => {
-        console.log(`收到:${SocketEvent.VIDEO_ROOM_MSG}`)
-        switch (data.type) {
-            case 'offer':
-                pc.setRemoteDescription(new RTCSessionDescription(data))
-                pc.createAnswer()
-                    .then(desc => {
-                        pc.setLocalDescription(desc)
-                        console.log(`收到offer,roomId为：${invite_info.videoRoomId}`)
-                        sendIpcMsg({
-                          msg: {
-                            type:SocketEvent.VIDEO_ROOM_MSG,
-                            data:{
-                              roomId: invite_info.videoRoomId,
-                              content: desc
-                            }
-                          }
-                        })
-                    })
-                break;
-            case 'answer':
-                console.log('收到answer')
-                pc.setRemoteDescription(new RTCSessionDescription(data))
-                break;
-            case 'candidate':
-                console.log('收到candidate')
-                const candidate = new RTCIceCandidate({
-                    sdpMLineIndex: data.label,
-                    candidate: data.candidate
-                })
-                pc.addIceCandidate(candidate)
-                break;
-            default:
-                break;
-        }
-    })
-    socket.on(SocketEvent.VIDEO_ROOM_CHANGE_MSG,data =>{
-      console.log(`收到：${SocketEvent.VIDEO_ROOM_CHANGE_MSG}`,JSON.stringify(data))
-      const {type} = data;
-        if (type === 'cancel'){
-          closeVideoConnectPassive()
-        }
-    })
+  await createPeerConnection();
+  ipcRenderer.on(SocketEvents.from_socket_server_msg, (event, args) => {
+    console.log('视频modal收到ipcMain消息', JSON.stringify(args));
+    const {eventName, data} = args;
+    if (eventName === SocketEvent.ANSWER_INVITE) {
+      handle_Answer_Invite(data)
+    } else if (eventName === SocketEvent.VIDEO_ROOM_MSG) {
+      handle_Video_room_msg(data)
+    } else if (eventName === SocketEvent.VIDEO_ROOM_CHANGE_MSG) {
+      handle_Video_room_change(data)
+    }
+  })
+
+  const handle_Answer_Invite = async (data) => {
+    const {msg: {answer}} = data;
+    console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
+    if (answer) {
+      await localJoinStream()
+      call()
+    } else {
+      hideVideoModal()
+      ElMessage('对方拒绝了你')
+    }
+  }
+
+  const handle_Video_room_msg = async (data) => {
+    console.log(`收到:${SocketEvent.VIDEO_ROOM_MSG}`)
+    switch (data.type) {
+      case 'offer':
+        pc.setRemoteDescription(new RTCSessionDescription(data))
+        pc.createAnswer()
+            .then(desc => {
+              pc.setLocalDescription(desc)
+              console.log(`收到offer,roomId为：${invite_info.videoRoomId}`)
+              sendIpcMsg({
+                msg: {
+                  type: SocketEvent.VIDEO_ROOM_MSG,
+                  data: {
+                    roomId: invite_info.videoRoomId,
+                    content: desc
+                  }
+                }
+              })
+            })
+        break;
+      case 'answer':
+        console.log('收到answer')
+        pc.setRemoteDescription(new RTCSessionDescription(data))
+        break;
+      case 'candidate':
+        console.log('收到candidate')
+        const candidate = new RTCIceCandidate({
+          sdpMLineIndex: data.label,
+          candidate: data.candidate
+        })
+        pc.addIceCandidate(candidate)
+        break;
+      default:
+        break;
+    }
+  }
+  const handle_Video_room_change = async (data) => {
+    console.log(`收到：${SocketEvent.VIDEO_ROOM_CHANGE_MSG}`, JSON.stringify(data))
+    const {type} = data;
+    if (type === 'cancel') {
+      closeVideoConnectPassive()
+    }
+  }
 }
 
 
 async function createPeerConnection() {
-    pc = new RTCPeerConnection(pcConfig);
-    pc.onicecandidate = (e) => {
-        if (e.candidate) {
-            const msg = {
-                roomId: invite_info.videoRoomId,
-                content: {
-                    type: 'candidate',
-                    label: e.candidate.sdpMLineIndex,
-                    id: e.candidate.sdpMid,
-                    candidate: e.candidate.candidate
-                }
-            }
-            sendIpcMsg({
-              msg: {
-                type: SocketEvent.VIDEO_ROOM_MSG,
-                data: msg
-              }
-            })
+  pc = new RTCPeerConnection(pcConfig);
+  pc.onicecandidate = (e) => {
+    if (e.candidate) {
+      const msg = {
+        roomId: invite_info.videoRoomId,
+        content: {
+          type: 'candidate',
+          label: e.candidate.sdpMLineIndex,
+          id: e.candidate.sdpMid,
+          candidate: e.candidate.candidate
         }
+      }
+      sendIpcMsg({
+        msg: {
+          type: SocketEvent.VIDEO_ROOM_MSG,
+          data: msg
+        }
+      })
     }
-    pc.ontrack = async (e) => {
-        console.log('收到对方的track')
-        store.commit('setVideoStatus',VIDEO_CLIENT_STATUS.CONNECTED)
-        await nextTick(() => {
-            connectRef.value.$refs.oppositeRef.srcObject = e.streams[0];
-            connectRef.value.$refs.myRef.srcObject = localStream
-        })
-    }
+  }
+  pc.ontrack = async (e) => {
+    console.log('收到对方的track')
+    store.commit('setVideoStatus', VIDEO_CLIENT_STATUS.CONNECTED)
+    await nextTick(() => {
+      connectRef.value.$refs.oppositeRef.srcObject = e.streams[0];
+      connectRef.value.$refs.myRef.srcObject = localStream
+    })
+  }
 }
 
 async function localJoinStream() {
   // 获取本地流，发送给对方。
-  localStream = await getLocalStream();
-  for (const track of localStream.getTracks()) {
-    pc.addTrack(track, localStream)
+  try {
+    localStream = await getLocalStream();
+    for (const track of localStream.getTracks()) {
+      pc.addTrack(track, localStream)
+    }
+  } catch (e) {
+    console.log('获取本地视频流出错')
+    console.error(e)
   }
 }
 
 
 function call() {
-    const offerOptions = {
-        offerToReceiveVideo: 1,
-        offerToReceiveAudio: 0,
-    }
-    pc.createOffer(offerOptions)
-        .then(desc => {
-            pc.setLocalDescription(desc);
-            console.log(`发出：${SocketEvent.VIDEO_ROOM_MSG}`)
-            sendIpcMsg({
-              msg: {
-                type:SocketEvent.VIDEO_ROOM_MSG,
-                data: {
-                  roomId: invite_info.videoRoomId,
-                  content: desc
-                }
-              }
-            })
+  const offerOptions = {
+    offerToReceiveVideo: 1,
+    offerToReceiveAudio: 0,
+  }
+  pc.createOffer(offerOptions)
+      .then(desc => {
+        pc.setLocalDescription(desc);
+        console.log(`发出：${SocketEvent.VIDEO_ROOM_MSG}`)
+        sendIpcMsg({
+          msg: {
+            type: SocketEvent.VIDEO_ROOM_MSG,
+            data: {
+              roomId: invite_info.videoRoomId,
+              content: desc
+            }
+          }
         })
-        .catch(e => {
-            console.log(e)
-        })
+      })
+      .catch(e => {
+        console.log(e)
+      })
 }
 
 </script>
 
 <template>
-    <el-dialog
-            :model-value="showConnect"
-            width="100%"
-            class="max-w-[350px] no-header"
-            :show-close="false"
-            :close-on-click-modal="false"
-    >
-        <div class="w-full h-[600px] max-h-full">
-            <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITING"></invite-video>
-            <wait-for-connect v-if="videoStatus ===VIDEO_CLIENT_STATUS.INVITING"></wait-for-connect>
-            <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED" ref="connectRef"></connecting>
-        </div>
-    </el-dialog>
+  <el-dialog
+      :model-value="showConnect"
+      width="100%"
+      class="max-w-[350px] no-header"
+      :show-close="false"
+      :close-on-click-modal="false"
+  >
+    <div class="w-full h-[600px] max-h-full">
+      <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITING"></invite-video>
+      <wait-for-connect v-if="videoStatus ===VIDEO_CLIENT_STATUS.INVITING"></wait-for-connect>
+      <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED" ref="connectRef"></connecting>
+    </div>
+  </el-dialog>
 </template>
 
 <style>
 
 .no-header .el-dialog__header {
-    padding: 0;
+  padding: 0;
 }
 
 .no-header .el-dialog__body {
-    padding: 0;
+  padding: 0;
 }
 
 </style>

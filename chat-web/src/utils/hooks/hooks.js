@@ -168,10 +168,12 @@ const sockInitHook = function () {
 
     const initSocket = () => {
         ipcRenderer.on(SocketEvents.from_socket_server_msg, (event, args) => {
-            console.log(args);
+            console.log('收到ipcMain消息', JSON.stringify(args));
             const {eventName, data} = args;
             const handler = EventMap[eventName]
-            handler(data)
+            if (handler){
+                handler(data)
+            }
         })
         sendIpcMsg({type: SocketEvents.start_connect})
     };
@@ -190,6 +192,7 @@ const sockInitHook = function () {
 }
 
 const sendIpcMsg = ({type = SocketEvents.to_socket_server_msg, msg}) => {
+    console.log(`ipcRender发出:${JSON.stringify(msg)}`)
     ipcRenderer.send(type, msg)
 }
 
