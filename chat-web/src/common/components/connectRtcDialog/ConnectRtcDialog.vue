@@ -1,5 +1,4 @@
 <script setup>
-
 import WaitForConnect from "@/common/components/connectRtcDialog/components/WaitForConnect.vue";
 import {computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useStore} from "vuex";
@@ -101,13 +100,13 @@ onBeforeUnmount(() => {
 })
 
 
-function getLocalStream() {
+async function getLocalStream() {
   // 获取本地流
   const constraints = {
     video: true,
     audio: true,
   }
-  return navigator.mediaDevices.getUserMedia(constraints)
+  return await navigator.mediaDevices.getUserMedia(constraints)
 }
 
 
@@ -151,7 +150,7 @@ async function connectToSignalServer() {
                   type: SocketEvent.VIDEO_ROOM_MSG,
                   data: {
                     roomId: invite_info.videoRoomId,
-                    content: desc
+                    content: desc.toJSON()
                   }
                 }
               })
@@ -242,7 +241,7 @@ function call() {
             type: SocketEvent.VIDEO_ROOM_MSG,
             data: {
               roomId: invite_info.videoRoomId,
-              content: desc
+              content: desc.toJSON()
             }
           }
         })
