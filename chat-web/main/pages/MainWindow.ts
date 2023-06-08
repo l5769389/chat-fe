@@ -1,7 +1,6 @@
 import {BrowserWindow, ipcMain,} from "electron";
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
-import {MainEvent} from "../types";
-import {Socket_Main_Render_Events} from "../../common/types";
+import {Socket_Main_Render_Events,MainEvent} from "../../common/types";
 
 export class MainWindow {
     win = null;

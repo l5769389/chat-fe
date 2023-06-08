@@ -1,8 +1,19 @@
 export const Socket_Main_Render_Events = {
+    // 开启socket连接
     start_connect: 'to_socket_server_start',
+
+    // 分发给聊天主界面的消息类型
     to_socket_server_msg: 'to_socket_server_msg',
-    from_socket_server_msg: 'from_socket_server_msg'
+    from_socket_server_msg: 'from_socket_server_msg',
+
 }
+
+export const Main_Between_Events = {
+    // 负责分发给视频页面的消息类型
+    to_video_msg: 'to_video_msg',
+    from_video_msg: 'from_video_msg'
+}
+
 
 export class SocketEvent {
     // 聊天相关的事件
@@ -29,3 +40,18 @@ export class VIDEO_CLIENT_STATUS {
     static CONNECTED = 'connected'   // 视频连接成功
 }
 
+// 快捷键
+export enum Shortcut {
+    capture = 'Ctrl+Alt+A',
+    esc = 'Esc'
+}
+
+// ipcRender与ipcMain的事件，无需转发给socketIo
+export enum MainEvent {
+    capture = 'capture',
+    open_video_page = 'open_video_page',
+    window_pin = 'window_pin',
+    window_minimize = 'window_minimize',
+    window_full = 'window_full',
+    window_close = 'window_close',
+}

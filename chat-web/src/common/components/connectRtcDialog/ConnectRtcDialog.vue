@@ -122,7 +122,7 @@ async function connectToSignalServer() {
       handle_Video_room_change(data)
     }
   })
-
+}
   const handle_Answer_Invite = async (data) => {
     const {msg: {answer}} = data;
     console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
@@ -178,7 +178,7 @@ async function connectToSignalServer() {
       closeVideoConnectPassive()
     }
   }
-}
+
 
 
 async function createPeerConnection() {

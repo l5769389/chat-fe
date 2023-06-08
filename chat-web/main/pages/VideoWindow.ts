@@ -3,16 +3,13 @@ import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOption
 import path from "path";
 
 export class VideoWindow {
-    static instance = null;
+    win = null;
 
     constructor() {
-        if (!VideoWindow.instance) {
-            VideoWindow.instance = this.getInstance()
-        }
-        return VideoWindow.instance
+        this.win = this.getWinInstance()
     }
 
-    getInstance() {
+    getWinInstance() {
         let config: BrowserWindowConstructorOptions = {
             width: 500,
             height: 700,
@@ -27,7 +24,7 @@ export class VideoWindow {
                 spellcheck: false,
                 disableHtmlFullscreenWindowResize: true,
             },
-            frame: false,
+            frame: true,
         };
         const win = new BrowserWindow(config);
         win.webContents.openDevTools()
@@ -35,12 +32,14 @@ export class VideoWindow {
         return win;
     }
 
+    sendToRender(msg) {
+        this.win.webContents.send('video-info', msg)
+    }
+
     destroyVideoWindow = () => {
-        if (VideoWindow.instance) {
-            VideoWindow.instance.forEach(item => {
-                item.close()
-            })
-            VideoWindow.instance = null;
+        if (this.win) {
+            this.win.close()
+            this.win = null;
         }
     }
 

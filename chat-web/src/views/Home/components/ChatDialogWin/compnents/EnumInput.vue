@@ -56,10 +56,10 @@ import {
 import Meme from "@/common/components/Meme.vue";
 import {useStore} from "vuex";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import uploadFileHook from "@/utils/hooks/uploadFileHook.js";
 import {ipcRenderer} from 'electron'
-import {MainEvent} from "../../../../../../main/types.ts";
+import {SocketEvent, MainEvent, Socket_Main_Render_Events} from "/common/types.ts";
 
 const {addUploadFile} = uploadFileHook()
 
@@ -67,8 +67,26 @@ const uploadRef = ref(null)
 
 const store = useStore()
 const {showVideoModal} = modalVideoHooks()
+const user = computed(() => store.getters.user)
+const currentDialogInfo = computed(() => store.getters.currentDialogInfo)
+
+/**
+ * 1. 向ipcMain发起视频，携带信息
+ * 2. ipcMain 收到后：
+ *    2.1  创建视频页面并要把用户信息传递过去
+ *    2.2  发起视频请求
+ */
 const invokeRTCDialog = () => {
-  ipcRenderer.send(MainEvent.open_video_page, '');
+  const msg =  {
+    msg: {
+      type: SocketEvent.OFFER_INVITE,
+      data: {
+        userId: user.value.userId,
+        oppositeId: currentDialogInfo.value.id,
+      }
+    }
+  }
+  ipcRenderer.send(Socket_Main_Render_Events.to_socket_server_msg, msg);
   // store.commit('setVideoStatus', VIDEO_CLIENT_STATUS.INVITING)
   // showVideoModal()
 }

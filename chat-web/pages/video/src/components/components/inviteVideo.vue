@@ -40,6 +40,7 @@ const confirm = () => {
     }
   })
 }
+
 </script>
 
 <template>
