@@ -1,7 +1,7 @@
 import {BrowserWindow, ipcMain,} from "electron";
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
-import {MainEvent} from "./types";
-import {SocketEvents} from "../common/types";
+import {MainEvent} from "../types";
+import {Socket_Main_Render_Events} from "../../common/types";
 
 export class MainWindow {
     win = null;
@@ -29,9 +29,7 @@ export class MainWindow {
         };
         const win = new BrowserWindow(config);
         win.webContents.openDevTools()
-        this.addIpcListen()
         win.loadURL(process.argv[2]);
-
         return win;
     }
 
@@ -62,7 +60,7 @@ export class MainWindow {
     }
 
     sendToRender({
-                     eventName = SocketEvents.from_socket_server_msg, msg
+                     eventName = Socket_Main_Render_Events.from_socket_server_msg, msg
                  }) {
         console.log(`向ipcRender发出：${eventName},${JSON.stringify(msg)}`)
         this.win.webContents.send(eventName, msg)

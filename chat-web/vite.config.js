@@ -43,13 +43,15 @@ export default defineConfig({
     alias: {
       '@': path.resolve('./src'),
       '@capture': path.resolve('./pages/capture/src'),
+      '@video': path.resolve('./pages/video/src'),
     }
   },
   build:{
     rollupOptions: {
       input: {
         main:path.resolve(__dirname,'index.html'),
-        capture: path.resolve(__dirname,'pages/capture/index.html')
+        capture: path.resolve(__dirname,'pages/capture/index.html'),
+        video: path.resolve(__dirname,'pages/video/index.html')
       },
       plugins: [buildPlugin()],
     },

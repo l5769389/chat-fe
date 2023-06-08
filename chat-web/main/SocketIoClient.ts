@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import {MainWindow} from "./MainWindow";
+import {MainWindow} from "./pages/MainWindow";
 
 export class SocketIoClient {
     socket = null;

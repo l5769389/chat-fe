@@ -1,6 +1,6 @@
 import path from "path";
 import {app, BrowserWindow, ipcMain, desktopCapturer, screen, globalShortcut, session} from "electron";
-import {Shortcut} from "./types";
+import {Shortcut} from "../types";
 
 export class CaptureWindow {
     static instance = null;

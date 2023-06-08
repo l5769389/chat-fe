@@ -4,15 +4,14 @@ import {computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch} from
 import {useStore} from "vuex";
 import InviteVideo from "@/common/components/connectRtcDialog/components/inviteVideo.vue";
 import {
-  SocketEvent, VIDEO_CLIENT_STATUS,
-} from "@/config/config.js";
+  SocketEvent, VIDEO_CLIENT_STATUS,Socket_Main_Render_Events
+} from "/common/types.ts";
 import Connecting from "@/common/components/connectRtcDialog/components/Connecting.vue";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 import {ElMessage} from "element-plus";
 import {sendIpcMsg} from "@/utils/hooks/hooks.js";
 import {ipcRenderer} from "electron";
-import {SocketEvents} from "../../../../common/types.ts";
 
 const store = useStore()
 const {invite_info, hideVideoModal} = modalVideoHooks();
@@ -48,7 +47,6 @@ watch([videoOrAudioRef, muteRef], ([hasVideo, muteFlag]) => {
     }
   }
 })
-const testCloseRef = computed(() => closeRef.value)
 
 watch(closeRef, newVal => {
   console.log('收到关闭指令');
@@ -72,7 +70,6 @@ const closeVideo = () => {
       track.stop()
     }
   }
-
 }
 
 const offerInvite = () => {
@@ -103,7 +100,9 @@ onBeforeUnmount(() => {
 async function getLocalStream() {
   // 获取本地流
   const constraints = {
-    video: true,
+    video: {
+      deviceId: '6b312b21d41b769695c22e454e5243013af0acd08a3f89e4053f1a41f5ce8ed1'
+    },
     audio: true,
   }
   return await navigator.mediaDevices.getUserMedia(constraints)
@@ -112,7 +111,7 @@ async function getLocalStream() {
 
 async function connectToSignalServer() {
   await createPeerConnection();
-  ipcRenderer.on(SocketEvents.from_socket_server_msg, (event, args) => {
+  ipcRenderer.on(Socket_Main_Render_Events.from_socket_server_msg, (event, args) => {
     console.log('视频modal收到ipcMain消息', JSON.stringify(args));
     const {eventName, data} = args;
     if (eventName === SocketEvent.ANSWER_INVITE) {

@@ -1,6 +1,6 @@
 import {inject, ref} from "vue";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
-import {SocketEvent, VIDEO_CLIENT_STATUS} from "@/config/config.js";
+import {SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
 import {useStore} from "vuex";
 import {sendIpcMsg} from "@/utils/hooks/hooks.js";
 

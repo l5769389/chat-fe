@@ -12,7 +12,7 @@ import {computed, inject, ref} from "vue";
 import {useStore} from "vuex";
 import {getFormatTime} from "@/utils/utils.js";
 import EditInput from "@/views/components/EditInput.vue";
-import {SocketEvent} from "@/config/config.js";
+import {SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
 import service from "@/api/index.js";
 import API from "@/api/request.js";
 import {sendIpcMsg} from "@/utils/hooks/hooks.js";

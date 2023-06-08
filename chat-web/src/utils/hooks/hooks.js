@@ -1,11 +1,11 @@
 import {computed, inject, watch} from "vue";
 import {useStore} from "vuex";
 import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
-import {SocketEvent, VIDEO_CLIENT_STATUS} from "@/config/config.js";
+import {SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 import {ipcRenderer} from "electron";
-import {SocketEvents} from "../../../common/types.ts";
+import {Socket_Main_Render_Events} from "../../../common/types.ts";
 
 const getDialogInfoHook = function () {
     const store = useStore()
@@ -167,7 +167,7 @@ const sockInitHook = function () {
 
 
     const initSocket = () => {
-        ipcRenderer.on(SocketEvents.from_socket_server_msg, (event, args) => {
+        ipcRenderer.on(Socket_Main_Render_Events.from_socket_server_msg, (event, args) => {
             console.log('收到ipcMain消息', JSON.stringify(args));
             const {eventName, data} = args;
             const handler = EventMap[eventName]
@@ -175,7 +175,7 @@ const sockInitHook = function () {
                 handler(data)
             }
         })
-        sendIpcMsg({type: SocketEvents.start_connect})
+        sendIpcMsg({type: Socket_Main_Render_Events.start_connect})
     };
 
     const updateChatlist = (data) => {
@@ -191,7 +191,7 @@ const sockInitHook = function () {
     }
 }
 
-const sendIpcMsg = ({type = SocketEvents.to_socket_server_msg, msg}) => {
+const sendIpcMsg = ({type = Socket_Main_Render_Events.to_socket_server_msg, msg}) => {
     console.log(`ipcRender发出:${JSON.stringify(msg)}`)
     ipcRenderer.send(type, msg)
 }
