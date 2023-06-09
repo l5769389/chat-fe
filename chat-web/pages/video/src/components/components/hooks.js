@@ -91,6 +91,5 @@ export default function () {
         toggleMute,
         closeVideoConnectPositive,
         closeVideoConnectPassive
-
     }
 }

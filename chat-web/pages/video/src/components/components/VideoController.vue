@@ -1,13 +1,14 @@
 <script setup>
 import {CloseSmall, PhoneCall, Voice, VoiceOff, PhoneVideoCall} from "@icon-park/vue-next";
-import {
+import hooks from './hooks'
+
+const {
   videoOrAudioRef,
   muteRef,
   toggleVideoOrAudio,
   toggleMute,
   closeVideoConnectPositive,
-} from './hooks'
-
+} = hooks()
 
 </script>
 

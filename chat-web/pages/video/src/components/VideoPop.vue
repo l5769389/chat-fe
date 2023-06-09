@@ -12,11 +12,14 @@ import hooks from "./components/hooks.js";
 import InviteVideo from "./components/inviteVideo.vue";
 import WaitForConnect from "./components/WaitForConnect.vue";
 import Connecting from "./components/Connecting.vue";
+import {getUsableDevice} from "../util/util.js";
 
 const {
   userInfo,
   videoStatus,
   invite_info,
+  videoOrAudioRef,
+  muteRef,
   setInviteInfo,
   setVideoStatus,
   sendIpcMsg,
@@ -55,6 +58,7 @@ watch(videoStatus, newVal => {
   }
 })
 
+
 const closeVideo = () => {
   console.log('关闭音视频')
   if (localStream) {
@@ -74,11 +78,14 @@ onBeforeUnmount(() => {
 
 
 async function getLocalStream() {
+  const deviceId = await getUsableDevice();
+  if (!deviceId) {
+    throw new Error('not exist device')
+  }
+  console.log(`设置视频设备ID为：${deviceId}`)
   // 获取本地流
   const constraints = {
-    video: {
-      deviceId: '6b312b21d41b769695c22e454e5243013af0acd08a3f89e4053f1a41f5ce8ed1'
-    },
+    video: true,
     audio: true,
   }
   return await navigator.mediaDevices.getUserMedia(constraints)
@@ -104,7 +111,9 @@ const handle_Answer_Invite = async (data) => {
   const {msg: {answer}} = data;
   console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
   if (answer) {
-    await localJoinStream()
+    setTimeout(async () => {
+      await localJoinStream()
+    }, 5000)
     call()
   } else {
   }

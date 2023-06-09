@@ -7,10 +7,6 @@ import OperateHeader from "@/layout/OperateHeader.vue";
 sockInitHook()
 
 const {videoModalFlag} = modalVideoHooks()
-// navigator.mediaDevices.enumerateDevices()
-//     .then(devices => {
-//       console.log(devices)
-//     })
 </script>
 
 <template>
