@@ -1,68 +1,44 @@
 <script setup>
-import {Socket_Main_Render_Events, SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
+import {
+  Between_Main_Render_Events,
+  Socket_Main_Render_Events,
+  SocketEvent,
+  VIDEO_CLIENT_STATUS
+} from "/common/types.ts";
 
 import {ipcRenderer} from "electron";
 import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import hooks from "./components/hooks.js";
+import InviteVideo from "./components/inviteVideo.vue";
+import WaitForConnect from "./components/WaitForConnect.vue";
+import Connecting from "./components/Connecting.vue";
 
 const {
-  user,
+  userInfo,
   videoStatus,
   invite_info,
   setInviteInfo,
   setVideoStatus,
   sendIpcMsg,
+  closeVideoConnectPassive
 } = hooks();
 
-const initSocket = () => {
-  ipcRenderer.on(Socket_Main_Render_Events.from_socket_server_msg, (event, args) => {
-    console.log('收到ipcMain消息', JSON.stringify(args));
-    const {eventName, data} = args;
-    const handler = EventMap[eventName]
-    if (handler) {
-      handler(data)
-    }
-  })
-};
-initSocket()
-
-
-const handleCreateInviteRoom = data => {
-  console.log(`房间roomId:${data}`)
-  invite_info.value.videoRoomId = data;
-}
-
-const handleOfferInvite = data => {
-  const {fromUserId, msg: {roomId}} = data;
-  setInviteInfo({
-    videoRoomId: roomId,
-    oppositeUserId: fromUserId,
-    userId: user.value.userId
-  })
-  console.log(`收到服务器事件：${SocketEvent.OFFER_INVITE}`)
-  setVideoStatus(VIDEO_CLIENT_STATUS.BEINVITING)
-}
-
-const EventMap = {
-  [SocketEvent.CREATE_INVITE_ROOM]: handleCreateInviteRoom,
-  [SocketEvent.OFFER_INVITE]: handleOfferInvite
-}
 
 let localStream = null;
 const connectRef = ref(null);
 let pc = null;
 const pcConfig = {};
 
-// watch([videoOrAudioRef, muteRef], ([hasVideo, muteFlag]) => {
-//   console.log('change', [hasVideo, muteFlag])
-//   for (const track of localStream.getTracks()) {
-//     if (track.kind === 'audio') {
-//       track.enabled = !muteFlag
-//     } else if (track.kind === 'video') {
-//       track.enabled = hasVideo
-//     }
-//   }
-// })
+watch([videoOrAudioRef, muteRef], ([hasVideo, muteFlag]) => {
+  console.log('change', [hasVideo, muteFlag])
+  for (const track of localStream.getTracks()) {
+    if (track.kind === 'audio') {
+      track.enabled = !muteFlag
+    } else if (track.kind === 'video') {
+      track.enabled = hasVideo
+    }
+  }
+})
 
 // watch(closeRef, newVal => {
 //   console.log('收到关闭指令');
@@ -88,24 +64,8 @@ const closeVideo = () => {
   }
 }
 
-const offerInvite = () => {
-  sendIpcMsg({
-    msg: {
-      type: SocketEvent.OFFER_INVITE,
-      data: {
-        userId: user.value.userId,
-        oppositeId: user.value.oppositeId,
-      }
-    }
-  })
-}
-
 onMounted(() => {
   connectToSignalServer();
-  if (videoStatus.value === VIDEO_CLIENT_STATUS.INVITING) {
-    // 主动发起者
-    offerInvite();
-  }
 })
 
 onBeforeUnmount(() => {
@@ -127,7 +87,7 @@ async function getLocalStream() {
 
 async function connectToSignalServer() {
   await createPeerConnection();
-  ipcRenderer.on(Socket_Main_Render_Events.from_socket_server_msg, (event, args) => {
+  ipcRenderer.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
     console.log('视频modal收到ipcMain消息', JSON.stringify(args));
     const {eventName, data} = args;
     if (eventName === SocketEvent.ANSWER_INVITE) {
@@ -190,7 +150,7 @@ const handle_Video_room_change = async (data) => {
   console.log(`收到：${SocketEvent.VIDEO_ROOM_CHANGE_MSG}`, JSON.stringify(data))
   const {type} = data;
   if (type === 'cancel') {
-    // closeVideoConnectPassive()
+    closeVideoConnectPassive()
   }
 }
 
@@ -269,9 +229,9 @@ function call() {
 
 <template>
   <div class="w-full h-full">
-    <!--        <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITING"></invite-video>-->
-    <!--        <wait-for-connect v-if="videoStatus ===VIDEO_CLIENT_STATUS.INVITING"></wait-for-connect>-->
-    <!--        <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED" ref="connectRef"></connecting>-->
+    <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITING"></invite-video>
+    <wait-for-connect v-if="videoStatus ===VIDEO_CLIENT_STATUS.INVITING"></wait-for-connect>
+    <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED" ref="connectRef"></connecting>
   </div>
 </template>
 

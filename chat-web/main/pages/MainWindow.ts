@@ -11,7 +11,7 @@ export class MainWindow {
 
     getWinInstance() {
         let config: BrowserWindowConstructorOptions = {
-            width: 800,
+            width: 1200,
             height: 700,
             minWidth: 800,
             minHeight: 700,

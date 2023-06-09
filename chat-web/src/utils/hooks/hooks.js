@@ -1,7 +1,7 @@
 import {computed, inject, watch} from "vue";
 import {useStore} from "vuex";
 import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
-import {SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
+import {Between_Main_Render_Events, SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 import {ipcRenderer} from "electron";
@@ -143,15 +143,13 @@ const sockInitHook = function () {
     }
 
     const handleOfferInvite = data => {
-        const {fromUserId, msg: {roomId}} = data;
-        setInviteVideoInfo({
-            videoRoomId: roomId,
-            oppositeUserId: fromUserId,
-            userId: user.value.userId
-        })
-        console.log(`收到服务器事件：${SocketEvent.OFFER_INVITE}`)
-        store.commit('setVideoStatus', VIDEO_CLIENT_STATUS.BEINVITING)
-        showVideoModal();
+        const invokePageInfo = {
+            eventName: 'video-info',
+            data: {
+                user: user.value,
+            }
+        }
+        ipcRenderer.send(Between_Main_Render_Events.transfer_video_msg, JSON.stringify(invokePageInfo));
     }
 
     const EventMap = {
@@ -171,7 +169,7 @@ const sockInitHook = function () {
             console.log('收到ipcMain消息', JSON.stringify(args));
             const {eventName, data} = args;
             const handler = EventMap[eventName]
-            if (handler){
+            if (handler) {
                 handler(data)
             }
         })

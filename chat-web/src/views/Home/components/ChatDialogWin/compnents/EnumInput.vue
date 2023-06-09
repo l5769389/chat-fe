@@ -56,10 +56,10 @@ import {
 import Meme from "@/common/components/Meme.vue";
 import {useStore} from "vuex";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
-import {computed, ref} from "vue";
+import {computed, ref, toValue} from "vue";
 import uploadFileHook from "@/utils/hooks/uploadFileHook.js";
 import {ipcRenderer} from 'electron'
-import {SocketEvent, MainEvent, Socket_Main_Render_Events} from "/common/types.ts";
+import {SocketEvent, MainEvent, Socket_Main_Render_Events, Between_Main_Render_Events} from "/common/types.ts";
 
 const {addUploadFile} = uploadFileHook()
 
@@ -77,18 +77,23 @@ const currentDialogInfo = computed(() => store.getters.currentDialogInfo)
  *    2.2  发起视频请求
  */
 const invokeRTCDialog = () => {
-  const msg =  {
-    msg: {
-      type: SocketEvent.OFFER_INVITE,
-      data: {
-        userId: user.value.userId,
-        oppositeId: currentDialogInfo.value.id,
-      }
+  const invokePageInfo = {
+    eventName: 'video-info',
+    data: {
+      user: user.value,
+      oppositeUser: currentDialogInfo.value,
     }
   }
-  ipcRenderer.send(Socket_Main_Render_Events.to_socket_server_msg, msg);
-  // store.commit('setVideoStatus', VIDEO_CLIENT_STATUS.INVITING)
-  // showVideoModal()
+  ipcRenderer.send(Between_Main_Render_Events.transfer_video_msg, JSON.stringify(invokePageInfo));
+
+  const msg = {
+    type: SocketEvent.OFFER_INVITE,
+    data: {
+      userId: user.value.userId,
+      oppositeId: currentDialogInfo.value.id,
+    }
+  }
+  ipcRenderer.send(Socket_Main_Render_Events.to_socket_server_msg, msg)
 }
 const invokeUpload = () => {
   uploadRef.value[0].dispatchEvent(new MouseEvent('click'))

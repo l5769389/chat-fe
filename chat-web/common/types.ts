@@ -5,13 +5,16 @@ export const Socket_Main_Render_Events = {
     // 分发给聊天主界面的消息类型
     to_socket_server_msg: 'to_socket_server_msg',
     from_socket_server_msg: 'from_socket_server_msg',
-
 }
 
-export const Main_Between_Events = {
-    // 负责分发给视频页面的消息类型
-    to_video_msg: 'to_video_msg',
-    from_video_msg: 'from_video_msg'
+export const Within_Main_Events = {
+    transfer_main_msg: 'transfer_main_msg'
+}
+
+
+// 负责分发给视频页面的消息类型
+export const Between_Main_Render_Events = {
+    transfer_video_msg: 'transfer_video_msg',
 }
 
 

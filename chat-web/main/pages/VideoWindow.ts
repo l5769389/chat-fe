@@ -1,12 +1,17 @@
 import {BrowserWindow, ipcMain,} from "electron";
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
 import path from "path";
+import {Between_Main_Render_Events} from "../../common/types";
 
 export class VideoWindow {
-    win = null;
+    static win = null;
+    static ready = false;
 
     constructor() {
-        this.win = this.getWinInstance()
+        if (!VideoWindow.win) {
+            VideoWindow.win = this.getWinInstance()
+            this.addListen()
+        }
     }
 
     getWinInstance() {
@@ -29,22 +34,36 @@ export class VideoWindow {
         const win = new BrowserWindow(config);
         win.webContents.openDevTools()
         win.loadURL(path.join(process.argv[2], '/pages/video/index.html'));
+        win.on('ready-to-show', () => {
+            VideoWindow.ready = true
+        })
         return win;
     }
 
     sendToRender(msg) {
-        this.win.webContents.send('video-info', msg)
-    }
-
-    destroyVideoWindow = () => {
-        if (this.win) {
-            this.win.close()
-            this.win = null;
+        // 解决发消息的时候如果窗口没有就绪的问题。
+        if (VideoWindow.ready) {
+            console.log(`窗口已经就绪，向video_window 窗口发出`, msg)
+            VideoWindow.win.webContents.send(Between_Main_Render_Events.transfer_video_msg, msg)
+        } else {
+            VideoWindow.win.on('ready-to-show', () => {
+                VideoWindow.ready = true
+                console.log(`等待窗口就绪,向video_window 窗口发出`, msg)
+                VideoWindow.win.webContents.send(Between_Main_Render_Events.transfer_video_msg, msg)
+            })
         }
     }
 
-    addIpcListen() {
-        ipcMain.once('video-cancel', () => {
+    destroyVideoWindow = () => {
+        if (VideoWindow.win) {
+            VideoWindow.win = null;
+            VideoWindow.ready = false;
+        }
+    }
+
+    addListen() {
+        VideoWindow.win.once('closed', () => {
+            console.log('closed')
             this.destroyVideoWindow()
         })
     }

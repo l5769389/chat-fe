@@ -1,10 +1,15 @@
 import {app, ipcMain, globalShortcut, session, BrowserWindow} from "electron";
 import * as path from "path";
-import {Main_Between_Events, MainEvent, Shortcut} from "../common/types";
+import {
+    Between_Main_Render_Events,
+    MainEvent,
+    Shortcut,
+    Socket_Main_Render_Events,
+    Within_Main_Events
+} from "../common/types";
 import {MainWindow} from "./pages/MainWindow";
 import {CaptureWindow} from "./pages/CaptureWindow";
 import {SocketIoClient} from "./SocketIoClient";
-import {Socket_Main_Render_Events} from "../common/types";
 import {VideoWindow} from "./pages/VideoWindow";
 
 const vueDevToolsPath = path.resolve(__dirname, '../extension/vue-devtools')
@@ -45,12 +50,19 @@ ipcMain.on(Socket_Main_Render_Events.to_socket_server_msg, (event, args) => {
 /**
  * 用于转发 socket.io发来的 视频消息给 video 页面。
  */
-ipcMain.on(Main_Between_Events.to_video_msg, (event, args) => {
+ipcMain.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
+    console.log(`收到：${Between_Main_Render_Events.transfer_video_msg},${args}`)
     sendMsgToVideoWindow(args)
 })
 
+ipcMain.on(Within_Main_Events.transfer_main_msg, data => {
+    console.log(`收到：${Within_Main_Events.transfer_main_msg},${data}`)
+    sendMsgToVideoWindow(data)
+})
+
+
 const sendMsgToVideoWindow = (msg) => {
-    if (!videoWindow) {
+    if (!VideoWindow?.win) {
         createVideoPage();
     }
     videoWindow.sendToRender(msg)

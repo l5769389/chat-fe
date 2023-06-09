@@ -42,10 +42,8 @@ export default function () {
         }
         console.log(`向对方发出取消视频:${JSON.stringify(msg)}`)
         sendIpcMsg({
-            msg: {
-                type: SocketEvent.VIDEO_ROOM_CHANGE_MSG,
-                data: msg
-            }
+            type: SocketEvent.VIDEO_ROOM_CHANGE_MSG,
+            data: msg
         })
     }
     return {
