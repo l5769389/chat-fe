@@ -111,9 +111,7 @@ const handle_Answer_Invite = async (data) => {
   const {msg: {answer}} = data;
   console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
   if (answer) {
-    setTimeout(async () => {
-      await localJoinStream()
-    }, 5000)
+    await localJoinStream()
     call()
   } else {
   }

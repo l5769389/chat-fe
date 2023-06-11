@@ -2,7 +2,6 @@ let video_deviceId;
 
 const getAllVideoInput = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices()
-    console.log(devices)
     const video_devices = devices.filter(device => {
         return device.kind === 'videoinput'
     }).map(item => item.deviceId)
