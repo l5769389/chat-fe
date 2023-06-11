@@ -12,7 +12,6 @@ import hooks from "./components/hooks.js";
 import InviteVideo from "./components/inviteVideo.vue";
 import WaitForConnect from "./components/WaitForConnect.vue";
 import Connecting from "./components/Connecting.vue";
-import {getUsableDevice} from "../util/util.js";
 
 const {
   userInfo,
@@ -20,7 +19,6 @@ const {
   invite_info,
   videoOrAudioRef,
   muteRef,
-  setInviteInfo,
   setVideoStatus,
   sendIpcMsg,
   closeVideoConnectPassive
@@ -42,13 +40,6 @@ watch([videoOrAudioRef, muteRef], ([hasVideo, muteFlag]) => {
     }
   }
 })
-
-// watch(closeRef, newVal => {
-//   console.log('收到关闭指令');
-//   if (newVal) {
-//     closeVideo()
-//   }
-// })
 
 watch(videoStatus, async newVal => {
   // 一旦用户点击了接受，那么就要获取本地视频流
@@ -77,18 +68,12 @@ onBeforeUnmount(() => {
 })
 
 
-async function getLocalStream() {
-  // const deviceId = await getUsableDevice();
-  // if (!deviceId) {
-  //   throw new Error('not exist device')
-  // }
-  // console.log(`设置视频设备ID为：${deviceId}`)
-  // 获取本地流
+function getLocalStream() {
   const constraints = {
     video: true,
     audio: true,
   }
-  return await navigator.mediaDevices.getUserMedia(constraints)
+  return navigator.mediaDevices.getUserMedia(constraints)
 }
 
 
@@ -111,8 +96,11 @@ const handle_Answer_Invite = async (data) => {
   const {msg: {answer}} = data;
   console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
   if (answer) {
-   await localJoinStream()
-    call()
+    await localJoinStream()
+    // 不知道为啥不延迟不行。
+    setTimeout(() => {
+      call()
+    },500)
   } else {
   }
 }
@@ -196,6 +184,7 @@ async function localJoinStream() {
     for (const track of localStream.getTracks()) {
       pc.addTrack(track, localStream)
     }
+    console.log('获取本地视频成功')
   } catch (e) {
     console.log('获取本地视频流出错')
     console.error(e)
@@ -204,7 +193,6 @@ async function localJoinStream() {
 
 
 function call() {
-  console.log('call')
   const offerOptions = {
     offerToReceiveVideo: 1,
     offerToReceiveAudio: 0,
