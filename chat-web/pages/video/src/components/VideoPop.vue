@@ -129,13 +129,11 @@ const handle_Video_room_msg = async (data) => {
             pc.setLocalDescription(desc)
             console.log(`收到offer,roomId为：${invite_info.value.videoRoomId}`)
             sendIpcMsg({
-              msg: {
                 type: SocketEvent.VIDEO_ROOM_MSG,
                 data: {
                   roomId: invite_info.value.videoRoomId,
                   content: desc.toJSON()
                 }
-              }
             })
           })
       break;
@@ -178,10 +176,8 @@ async function createPeerConnection() {
         }
       }
       sendIpcMsg({
-        msg: {
           type: SocketEvent.VIDEO_ROOM_MSG,
           data: msg
-        }
       })
     }
   }
@@ -219,13 +215,11 @@ function call() {
         pc.setLocalDescription(desc);
         console.log(`发出：${SocketEvent.VIDEO_ROOM_MSG}`)
         sendIpcMsg({
-          msg: {
             type: SocketEvent.VIDEO_ROOM_MSG,
             data: {
               roomId: invite_info.value.videoRoomId,
               content: desc.toJSON()
             }
-          }
         })
       })
       .catch(e => {

@@ -1,5 +1,5 @@
 import service from "@/api/index.js";
-import {baseURL} from "@/config/config.js";
+import {baseURL} from "/common/config.ts";
 
 const API = {
     uploadFile: async (file) => {

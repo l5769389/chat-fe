@@ -32,7 +32,6 @@ const getLocalStreamByDeviceId = async (deviceId) => {
 
 
 export const getUsableDevice = async () => {
-    console.log('check usable time:'+new Date().getTime())
     if (video_deviceId) {
         return video_deviceId;
     }

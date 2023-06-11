@@ -2,13 +2,14 @@ import io from "socket.io-client";
 import {MainWindow} from "./pages/MainWindow";
 import {ipcMain} from "electron";
 import {Between_Main_Render_Events, Within_Main_Events} from "../common/types";
+import {baseSocketIOURL} from "../common/config";
 
 export class SocketIoClient {
     socket = null;
     mainWindow: MainWindow
 
     constructor(mainWindow) {
-        this.socket = io('http://localhost:3001', {
+        this.socket = io(baseSocketIOURL, {
             autoConnect: false
         })
         this.mainWindow = mainWindow;
