@@ -50,11 +50,11 @@ watch([videoOrAudioRef, muteRef], ([hasVideo, muteFlag]) => {
 //   }
 // })
 
-watch(videoStatus, newVal => {
+watch(videoStatus, async newVal => {
   // 一旦用户点击了接受，那么就要获取本地视频流
   if (newVal === VIDEO_CLIENT_STATUS.BEINVITED) {
     console.log('点了接受，获取本地视频流')
-    localJoinStream()
+    await localJoinStream()
   }
 })
 
@@ -78,11 +78,11 @@ onBeforeUnmount(() => {
 
 
 async function getLocalStream() {
-  const deviceId = await getUsableDevice();
-  if (!deviceId) {
-    throw new Error('not exist device')
-  }
-  console.log(`设置视频设备ID为：${deviceId}`)
+  // const deviceId = await getUsableDevice();
+  // if (!deviceId) {
+  //   throw new Error('not exist device')
+  // }
+  // console.log(`设置视频设备ID为：${deviceId}`)
   // 获取本地流
   const constraints = {
     video: true,
@@ -111,7 +111,7 @@ const handle_Answer_Invite = async (data) => {
   const {msg: {answer}} = data;
   console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
   if (answer) {
-    await localJoinStream()
+   await localJoinStream()
     call()
   } else {
   }
@@ -127,11 +127,11 @@ const handle_Video_room_msg = async (data) => {
             pc.setLocalDescription(desc)
             console.log(`收到offer,roomId为：${invite_info.value.videoRoomId}`)
             sendIpcMsg({
-                type: SocketEvent.VIDEO_ROOM_MSG,
-                data: {
-                  roomId: invite_info.value.videoRoomId,
-                  content: desc.toJSON()
-                }
+              type: SocketEvent.VIDEO_ROOM_MSG,
+              data: {
+                roomId: invite_info.value.videoRoomId,
+                content: desc.toJSON()
+              }
             })
           })
       break;
@@ -174,8 +174,8 @@ async function createPeerConnection() {
         }
       }
       sendIpcMsg({
-          type: SocketEvent.VIDEO_ROOM_MSG,
-          data: msg
+        type: SocketEvent.VIDEO_ROOM_MSG,
+        data: msg
       })
     }
   }
@@ -204,6 +204,7 @@ async function localJoinStream() {
 
 
 function call() {
+  console.log('call')
   const offerOptions = {
     offerToReceiveVideo: 1,
     offerToReceiveAudio: 0,
@@ -213,11 +214,11 @@ function call() {
         pc.setLocalDescription(desc);
         console.log(`发出：${SocketEvent.VIDEO_ROOM_MSG}`)
         sendIpcMsg({
-            type: SocketEvent.VIDEO_ROOM_MSG,
-            data: {
-              roomId: invite_info.value.videoRoomId,
-              content: desc.toJSON()
-            }
+          type: SocketEvent.VIDEO_ROOM_MSG,
+          data: {
+            roomId: invite_info.value.videoRoomId,
+            content: desc.toJSON()
+          }
         })
       })
       .catch(e => {
