@@ -174,10 +174,19 @@ export default createStore({
 
 
         async update_db_chatList({state}) {
+            // 查询用户的所有最近聊天联系人
             await db.put('chatList', {
                 id: 1,
                 recent: JSON.stringify(state.chatList)
             })
+        },
+        async update_db_unread_msg({state, commit, dispatch}, payload) {
+            // 收到未读消息的时候放入db
+            await db.add('unreadMsg', payload)
+        },
+        async update_db_total_msg({state, commit, dispatch}, payload) {
+            // 同时更新用户的所有消息进入db
+            await db.add('totalMsg', payload)
         },
         async get_db_chatList({state, commit, dispatch}) {
             const chatList = await db.queryOne('chatList')
@@ -188,21 +197,23 @@ export default createStore({
             }
         },
 
-        async update_db_unread_msg({state, commit, dispatch}, payload) {
-            await db.add('unreadMsg', payload)
+        async get_db_unread_msg({state, commit, dispatch}, chatId) {
+            state.unreadMsgMap[chatId] = await db.query({
+                schema: 'unreadMsg', chatId, limit: 99
+            }) || [];
         },
 
-        async get_db_unread_msg() {
-
+        async get_db_total_msg({state, commit, dispatch}, chatId) {
+            state.totalMsgMap[chatId] = await db.query({
+                schema: 'totalMsg', chatId
+            }) || [];
         },
-
-        async update_db_total_msg({state, commit, dispatch}, payload) {
-            const {chatId, ...msg} = payload;
-            await db.add('totalMsg',payload)
-        },
-        async get_db_total_msg({state, commit, dispatch}, payload) {
-            const ans = await db.query('totalMsg', payload)
-            console.log(ans)
+        async get_db_info({state, commit, dispatch}) {
+            await dispatch('get_db_chatList')
+            for (const chatItem of state.chatList) {
+                await dispatch('get_db_total_msg', chatItem.id)
+                await dispatch('get_db_unread_msg', chatItem.id)
+            }
         }
     }
 })

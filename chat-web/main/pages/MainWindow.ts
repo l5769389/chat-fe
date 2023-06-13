@@ -1,6 +1,6 @@
 import {BrowserWindow, ipcMain,} from "electron";
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
-import {Socket_Main_Render_Events,MainEvent} from "../../common/types";
+import {Socket_Main_Render_Events, MainEvent} from "../../common/types";
 
 export class MainWindow {
     win = null;
@@ -10,6 +10,7 @@ export class MainWindow {
     }
 
     getWinInstance() {
+        const pid = this.getAppPid()
         let config: BrowserWindowConstructorOptions = {
             width: 1200,
             height: 700,
@@ -23,12 +24,14 @@ export class MainWindow {
                 webviewTag: true,
                 spellcheck: false,
                 disableHtmlFullscreenWindowResize: true,
+                partition: `${pid}`
             },
             frame: false,
         };
         const win = new BrowserWindow(config);
         win.webContents.openDevTools()
         win.loadURL(process.argv[2]);
+
         return win;
     }
 
@@ -63,5 +66,9 @@ export class MainWindow {
                  }) {
         console.log(`向ipcRender发出：${eventName},${JSON.stringify(msg)}`)
         this.win.webContents.send(eventName, msg)
+    }
+
+    getAppPid() {
+        return process.pid
     }
 }

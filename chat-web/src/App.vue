@@ -8,8 +8,8 @@ import {useStore} from "vuex";
 sockInitHook()
 const store = useStore()
 
-store.dispatch('get_db_chatList')
-store.dispatch('get_db_total_msg')
+store.dispatch('get_db_info')
+
 
 const {videoModalFlag} = modalVideoHooks()
 
