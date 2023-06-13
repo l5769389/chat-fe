@@ -3,10 +3,16 @@ import {sockInitHook} from '@/utils/hooks/hooks.js'
 import ConnectRtcDialog from "@/common/components/connectRtcDialog/ConnectRtcDialog.vue";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import OperateHeader from "@/layout/OperateHeader.vue";
+import {useStore} from "vuex";
 
 sockInitHook()
+const store = useStore()
+
+store.dispatch('get_db_chatList')
+store.dispatch('get_db_total_msg')
 
 const {videoModalFlag} = modalVideoHooks()
+
 </script>
 
 <template>

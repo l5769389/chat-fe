@@ -1,8 +1,9 @@
 import {createStore} from "vuex";
 import service from "@/api/index.js";
 import sessionStore from "../utils/sessionStore";
-import _ from 'lodash'
+import Db from '@/plugin/db/Db.js'
 
+const db = new Db()
 export default createStore({
     state() {
         return {
@@ -13,16 +14,15 @@ export default createStore({
             currentDialogInfo: {
                 type: 'Single', //Single or Multi
                 id: '', //Single为 userId
-                nickname:'',
+                nickname: '',
                 avatar: '',
-                joinIds:[],
+                joinIds: [],
             }, //chatList中当前位于的聊天，可能是群聊、单个用户
             socketStatus: 'close',  // 与服务器socket通讯的状态
             unreadMsgMap: {}, //未读消息
             totalMsgMap: {},  //所有消息
             chatList: [],  // 用户点击通讯录产生的对话id,
-            recentChatIds: [], //
-            showVideoModal:false,
+            showVideoModal: false,
             /**
              *  1. 视频发送者： '' 空, inviting 邀请中，connecting 连接中, connected 连接上
              *  2. 视频接受者： ‘’ 空， beInvited 接受邀请，connecting 连接中， connected 连接上
@@ -46,13 +46,11 @@ export default createStore({
             const d = state.totalMsgMap[state.currentDialogInfo.id] || []
             return d
         },
-        recentChatIds: state => {
-            return state.recentChatIds
-        },
+
         groupFriends: state => {
             return state.groupFriends
         },
-        chatList:state => {
+        chatList: state => {
             return state.chatList
         }
     },
@@ -77,7 +75,8 @@ export default createStore({
             state.socketStatus = payload
         },
         addUnreadMsgMap(state, {...params}) {
-            const {chatId,userId} = params;
+            // chatId fromUserId
+            const {chatId, userId} = params;
             const arr = state.unreadMsgMap[chatId]
             if (arr) {
                 state.unreadMsgMap[chatId].push({
@@ -90,39 +89,40 @@ export default createStore({
                     }
                 ]
             }
+            this.dispatch('update_db_unread_msg', params)
+
         },
-        addTotalMsgMap(state, {chatId,...msg}) {
+        addTotalMsgMap(state, params) {
+            const {chatId, ...msg} = params;
             const arr = state.totalMsgMap[chatId]
             if (arr) {
                 state.totalMsgMap[chatId].push(msg)
             } else {
                 state.totalMsgMap[chatId] = [msg]
             }
+            this.dispatch('update_db_total_msg', params)
+
         },
-        addChatList(state, newUserId) {
-            state.chatList.unshift(newUserId)
-        },
-        updateChatList(state, {...newChat}) {
+        async updateChatList(state, {...newChat}) {
             const index = state.chatList.findIndex(item => item.id === newChat.id)
-            if (index === -1){
+            if (index === -1) {
                 state.chatList.unshift(newChat)
-            }else {
+            } else {
                 state.chatList.splice(index, 1)
                 state.chatList = [newChat, ...state.chatList]
             }
+            await this.dispatch('update_db_chatList')
         },
-        setRecentChatIds(state, payload) {
-            state.recentChatIds = payload
-        },
+
         setGroupFriends(state, payload) {
             state.groupFriends = payload
         },
-        setShowVideoModal(state,payload){
+        setShowVideoModal(state, payload) {
             state.showVideoModal = payload
         },
-        setVideoStatus(state,paylaod){
+        setVideoStatus(state, paylaod) {
             state.videoStatus = paylaod;
-        }
+        },
     },
     actions: {
         async login({commit, state, dispatch}, {username, password}) {
@@ -145,7 +145,7 @@ export default createStore({
                 return false
             }
         },
-        async getUnfriendInfo({state,commit}, userIds) {
+        async getUnfriendInfo({state, commit}, userIds) {
             if (userIds?.length === 0) {
                 return;
             }
@@ -160,7 +160,7 @@ export default createStore({
         },
         async createRoom({state}, joinIds) {
             const createUserId = state.user.userId;
-            const joinIds_str = joinIds.map(item=>Number.parseInt(item)).join(',')
+            const joinIds_str = joinIds.map(item => Number.parseInt(item)).join(',')
             const res = await service.post('/chat-room', {
                 createUserId: createUserId,
                 joinUserId: joinIds_str,
@@ -168,8 +168,41 @@ export default createStore({
             })
             return res.data
         },
-        async updateRecentChat({state,commit, dispatch}, payload) {
-            commit('updateChatList',payload)
+        async updateRecentChat({state, commit, dispatch}, payload) {
+            commit('updateChatList', payload)
+        },
+
+
+        async update_db_chatList({state}) {
+            await db.put('chatList', {
+                id: 1,
+                recent: JSON.stringify(state.chatList)
+            })
+        },
+        async get_db_chatList({state, commit, dispatch}) {
+            const chatList = await db.queryOne('chatList')
+            try {
+                state.chatList = JSON.parse(chatList.recent)
+            } catch (e) {
+                state.chatList = []
+            }
+        },
+
+        async update_db_unread_msg({state, commit, dispatch}, payload) {
+            await db.add('unreadMsg', payload)
+        },
+
+        async get_db_unread_msg() {
+
+        },
+
+        async update_db_total_msg({state, commit, dispatch}, payload) {
+            const {chatId, ...msg} = payload;
+            await db.add('totalMsg',payload)
+        },
+        async get_db_total_msg({state, commit, dispatch}, payload) {
+            const ans = await db.query('totalMsg', payload)
+            console.log(ans)
         }
     }
 })

@@ -7,6 +7,7 @@ import '@icon-park/vue-next/styles/index.css';
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import SocketIo from '@/plugin/socket/socket.js'
+import Db from '@/plugin/db/dbPlugin.js'
 import store from '@/store/index.js'
 import engine from 'store/src/store-engine';
 
@@ -27,4 +28,5 @@ app.use(SocketIo, {
         autoConnect: false  //自动链接
     }
 })
+app.use(Db)
 app.mount('#app')

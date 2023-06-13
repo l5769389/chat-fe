@@ -17,6 +17,7 @@ let mainWindow: MainWindow
 let captureWindow
 let socketIoClient
 let videoWindow: VideoWindow
+
 // 关闭 electron Security Warning (Insecure Content-Security-Policy) This renderer process has either no Content Security
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 app.whenReady().then(async () => {
