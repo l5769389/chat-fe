@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 import {MainWindow} from "./pages/MainWindow";
 import {ipcMain} from "electron";
-import {Between_Main_Render_Events, Within_Main_Events} from "../common/types";
+import {Within_Main_Events} from "../common/types";
 import {baseSocketIOURL} from "../common/config";
 
 export class SocketIoClient {
@@ -22,7 +22,7 @@ export class SocketIoClient {
 
     listenInit() {
         // connection
-        ["connect", 'disconnect', 'singleMsg', 'multiMsg', 'joinRoom', 'connected','offer_invite'].forEach(eventName => {
+        ["connect", 'disconnect', 'singleMsg', 'multiMsg', 'joinRoom', 'connected', 'offer_invite'].forEach(eventName => {
             this.socket.on(eventName, (data) => {
                 console.log(`socket client 收到消息:${eventName},${JSON.stringify(data)}`)
                 // 发给主渲染进程
@@ -35,7 +35,7 @@ export class SocketIoClient {
             })
         });
         // 发给视频进程
-        ['offer_invite','answer_invite', 'create_invite_room', 'video_room_message', 'video_room_change_msg'].forEach(eventName => {
+        ['offer_invite', 'answer_invite', 'create_invite_room', 'video_room_message', 'video_room_change_msg'].forEach(eventName => {
             this.socket.on(eventName, (data) => {
                 console.log(`socket client 收到消息:${eventName},${JSON.stringify(data)}`)
                 ipcMain.emit(Within_Main_Events.transfer_main_msg, {

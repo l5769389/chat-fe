@@ -28,6 +28,13 @@ export default class Db {
     }
 
     async query({schema, chatId, offset = 0, limit = 10}) {
+        console.log(`query db :${schema},${chatId}`)
         return await this.db[schema].where('chatId').equals(chatId).offset(offset).limit(limit).toArray()
+    }
+
+    async delete({scheme}) {
+        if (this.db[scheme]) {
+            await this.db[scheme].delete()
+        }
     }
 }

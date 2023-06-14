@@ -68,8 +68,12 @@ export default createStore({
         setCurrentDialog(state, payload) {
             // 设置当前激活的会话框。需要将该id未读的消息清空。
             state.currentDialogInfo = payload
-            state.unreadMsgMap[state.currentDialogInfo.id] = []
+            this.commit('clearUnreadMsg', state.currentDialogInfo.id)
 
+            this.dispatch('get_db_total_msg', {
+                chatId:payload.id,
+                limit: 20
+            })
         },
         setSocketStatus(state, payload) {
             state.socketStatus = payload
@@ -90,7 +94,10 @@ export default createStore({
                 ]
             }
             this.dispatch('update_db_unread_msg', params)
-
+        },
+        clearUnreadMsg(state, chatId) {
+            state.unreadMsgMap[chatId] = [];
+            this.dispatch('clear_db_unread_msg')
         },
         addTotalMsgMap(state, params) {
             const {chatId, ...msg} = params;
@@ -180,6 +187,9 @@ export default createStore({
                 recent: JSON.stringify(state.chatList)
             })
         },
+        async clear_db_unread_msg({state, commit, dispatch}, payload) {
+            await db.delete('unreadMsg');
+        },
         async update_db_unread_msg({state, commit, dispatch}, payload) {
             // 收到未读消息的时候放入db
             await db.add('unreadMsg', payload)
@@ -203,15 +213,15 @@ export default createStore({
             }) || [];
         },
 
-        async get_db_total_msg({state, commit, dispatch}, chatId) {
+        async get_db_total_msg({state, commit, dispatch}, {chatId, limit = 1}) {
             state.totalMsgMap[chatId] = await db.query({
-                schema: 'totalMsg', chatId
+                schema: 'totalMsg', limit, chatId,
             }) || [];
         },
         async get_db_info({state, commit, dispatch}) {
             await dispatch('get_db_chatList')
             for (const chatItem of state.chatList) {
-                await dispatch('get_db_total_msg', chatItem.id)
+                await dispatch('get_db_total_msg', {chatId: chatItem.id, limit: 1})
                 await dispatch('get_db_unread_msg', chatItem.id)
             }
         }

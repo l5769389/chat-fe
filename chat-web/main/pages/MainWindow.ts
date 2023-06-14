@@ -24,14 +24,14 @@ export class MainWindow {
                 webviewTag: true,
                 spellcheck: false,
                 disableHtmlFullscreenWindowResize: true,
-                partition: `${pid}`
+                // partition: `${pid}`
             },
             frame: false,
         };
         const win = new BrowserWindow(config);
         win.webContents.openDevTools()
         win.loadURL(process.argv[2]);
-
+        this.addIpcListen()
         return win;
     }
 
