@@ -25,7 +25,7 @@ export class MainWindow {
                 webviewTag: true,
                 spellcheck: false,
                 disableHtmlFullscreenWindowResize: true,
-                partition: `${pid}`,
+                // partition: `${pid}`,
             },
             frame: false,
         };

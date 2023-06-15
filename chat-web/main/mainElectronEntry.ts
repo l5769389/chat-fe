@@ -25,11 +25,14 @@ app.whenReady().then(async () => {
     createMainWin()
     registerSocketIo()
     registerShortcut()
+});
+
+const getShareWinInfo = () => {
     desktopCapturer.getSources({ types: ['window', 'screen'] }).then(
         sources=>{
             console.log(sources) // sources就是获取到的窗口和桌面数组
         })
-});
+}
 
 const registerSocketIo = () => {
     socketIoClient = new SocketIoClient(mainWindow)

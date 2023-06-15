@@ -25,7 +25,6 @@ const getUnreadMsg = (item) => {
   const {type: chatType, id: chatId, joinIds, chatRoomName} = item
   const arr = totalMsgMap.value[chatId] || []
   const unreadmsg = unreadMsgMap.value[chatId] || []
-
   if (chatType === 'Single') {
     const friendInfo = friends.value.find(item => item.userId == chatId)
     return {
@@ -58,6 +57,36 @@ const getUnreadMsg = (item) => {
   }
 }
 
+const getClickedUserInfo = (item) => {
+  const {type: chatType, id: chatId, joinIds, chatRoomName} = item
+  if (chatType === 'Single') {
+    const friendInfo = friends.value.find(item => item.userId == chatId)
+    return {
+      avatar: friendInfo?.avatar,
+      nickname: friendInfo?.nickname,
+      group: null,
+      id: chatId,
+      type: chatType,
+    }
+  } else if (chatType === 'Multi') {
+    const friends = joinIds.map(item => {
+      const info = groundFriends.value[item]
+      return {
+        avatar: info?.avatar,
+        nickname: info?.nickname,
+        userId: info?.userId
+      }
+    })
+    return {
+      avatar: '',
+      nickname: chatRoomName,
+      group: friends,
+      id: chatId,
+      type: chatType,
+    }
+  }
+}
+
 const getUnreadMsg1 = (id) => {
   const arr = totalMsgMap.value[id] || []
   let msg = {
@@ -71,7 +100,8 @@ const getUnreadMsg1 = (id) => {
 }
 
 const chooseDialog = (item) => {
-  store.commit('setCurrentDialog', item)
+  const res = getClickedUserInfo(item)
+  store.commit('setCurrentDialog',res)
 }
 </script>
 

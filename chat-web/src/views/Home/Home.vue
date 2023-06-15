@@ -10,12 +10,13 @@
   <div class="flex-1 bg-dark-200 w-0 z-10">
     <chat-dialog-win/>
   </div>
-  <Transition name="slide">
-    <div v-if="showAddMore" ref="addMoreRef"
-         class="absolute right-[-211px] w-[210px] h-[700px] bg-dark-200  border-box border border-black border-l-0">
-      <add-user-chat></add-user-chat>
-    </div>
-  </Transition>
+  <el-dialog
+      v-model="showAddMore"
+      :show-close="false"
+      class="addMoreDialog"
+  >
+    <add-user-chat @hide-modal="showAddMore = false"></add-user-chat>
+  </el-dialog>
 </template>
 <script setup>
 import ChatList from './components/ChatList.vue'
@@ -27,28 +28,9 @@ import {computed} from "vue";
 import {useStore} from "vuex";
 
 const store = useStore()
-const activeDialogId = computed(() => store.getters.currentDialogInfo);
-
-const addMoreRef = ref()
-
-
 </script>
-<style scoped>
-.slide-enter-active {
-  animation: slide 0.5s;
+<style>
+.addMoreDialog .el-dialog__header {
+  display: none;
 }
-
-.slide-leave-active {
-  animation: slide 0.5s reverse;
-}
-
-@keyframes slide {
-  0% {
-    transform: translateX(-210px);
-  }
-  100% {
-    transform: translateX(0px);
-  }
-}
-
 </style>
