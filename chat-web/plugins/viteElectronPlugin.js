@@ -9,7 +9,8 @@ export let viteElectronPlugin = () => {
                 entryPoints: ["./main/mainElectronEntry.ts"],
                 bundle: true,
                 platform: "node",
-                outfile: "./dist/mainElectronEntry.cjs",
+                outdir: "./dist",
+                outExtension:{'.js':'.cjs'},
                 external: ["electron"],
             });
             server.httpServer.once("listening", () => {
@@ -38,7 +39,7 @@ export let getReplacer = () => {
         });
     }
     result["electron"] = () => {
-        let electronModules = ["clipboard", "ipcRenderer", "nativeImage", "shell", "webFrame"].join(",");
+        let electronModules = ["clipboard", "ipcRenderer", "nativeImage", "shell", "webFrame","desktopCapturer"].join(",");
         return {
             find: new RegExp(`^electron$`),
             code: `const {${electronModules}} = require('electron');export {${electronModules}}`,

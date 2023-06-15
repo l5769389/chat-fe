@@ -64,11 +64,26 @@ export class WebRtc {
     }
 
     async getLocalStream() {
-        const constraints = {
-            video: true,
-            audio: true,
-        }
+
         try {
+            // const constraints = {
+            //     video: true,
+            //     audio: true,
+            // }
+            // this.localStream = await navigator.mediaDevices.getUserMedia(constraints)
+            const constraints = {
+                audio: {
+                    mandatory: {
+                        chromeMediaSource: 'desktop'
+                    }
+                },
+                video: {
+                    mandatory: {
+                        chromeMediaSource: 'desktop',
+                        chromeMediaSourceId: 'window:264452:0',
+                    }
+                }
+            }
             this.localStream = await navigator.mediaDevices.getUserMedia(constraints)
             for (const track of this.localStream.getTracks()) {
                 this.pc.addTrack(track, this.localStream)
@@ -79,6 +94,7 @@ export class WebRtc {
         }
         return this.localStream
     }
+
 
     handleAnswer = async (data) => {
         const desc = new RTCSessionDescription(data)

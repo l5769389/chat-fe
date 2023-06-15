@@ -1,4 +1,4 @@
-import {app, ipcMain, globalShortcut, session, BrowserWindow} from "electron";
+import {app, ipcMain, globalShortcut, session, desktopCapturer, screen} from "electron";
 import * as path from "path";
 import {
     Between_Main_Render_Events,
@@ -25,6 +25,10 @@ app.whenReady().then(async () => {
     createMainWin()
     registerSocketIo()
     registerShortcut()
+    desktopCapturer.getSources({ types: ['window', 'screen'] }).then(
+        sources=>{
+            console.log(sources) // sources就是获取到的窗口和桌面数组
+        })
 });
 
 const registerSocketIo = () => {
@@ -60,6 +64,15 @@ ipcMain.on(Within_Main_Events.transfer_main_msg, data => {
     console.log(`收到：${Within_Main_Events.transfer_main_msg},${data}`)
     sendMsgToVideoWindow(data)
 })
+
+ipcMain.on('desk', data => {
+    desktopCapturer.getSources({types: ['window', 'screen']}).then(async sources => {
+        for (const source of sources) {
+            console.log(source)
+        }
+    })
+})
+
 
 
 const sendMsgToVideoWindow = (msg) => {

@@ -1,6 +1,7 @@
 import {BrowserWindow, ipcMain,} from "electron";
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
 import {Socket_Main_Render_Events, MainEvent} from "../../common/types";
+import path from "path";
 
 export class MainWindow {
     win = null;
@@ -24,7 +25,7 @@ export class MainWindow {
                 webviewTag: true,
                 spellcheck: false,
                 disableHtmlFullscreenWindowResize: true,
-                // partition: `${pid}`
+                partition: `${pid}`,
             },
             frame: false,
         };
