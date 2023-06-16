@@ -28,8 +28,8 @@ app.whenReady().then(async () => {
 });
 
 const getShareWinInfo = () => {
-    desktopCapturer.getSources({ types: ['window', 'screen'] }).then(
-        sources=>{
+    desktopCapturer.getSources({types: ['window', 'screen']}).then(
+        sources => {
             console.log(sources) // sources就是获取到的窗口和桌面数组
         })
 }
@@ -44,6 +44,7 @@ const createVideoPage = () => {
  * socket.io开启连接
  */
 ipcMain.on(Socket_Main_Render_Events.start_connect, () => {
+    console.log('ipcMain 收到渲染进程的：连接socketIo服务器请求')
     socketIoClient.connect()
 })
 
@@ -75,7 +76,6 @@ ipcMain.on('desk', data => {
         }
     })
 })
-
 
 
 const sendMsgToVideoWindow = (msg) => {

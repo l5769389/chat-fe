@@ -80,7 +80,6 @@ export class WebRtc {
                 video: {
                     mandatory: {
                         chromeMediaSource: 'desktop',
-                        chromeMediaSourceId: 'window:264452:0',
                     }
                 }
             }

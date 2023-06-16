@@ -44,6 +44,9 @@ export class SocketIoClient {
                 })
             })
         })
+        this.socket.on('error', () => {
+            console.log('connect error')
+        })
     }
 
     sendToSocketServer(msg) {

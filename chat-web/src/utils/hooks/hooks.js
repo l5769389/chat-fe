@@ -1,4 +1,4 @@
-import {computed, inject, watch} from "vue";
+import {computed} from "vue";
 import {useStore} from "vuex";
 import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
 import {Between_Main_Render_Events, SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
@@ -44,7 +44,6 @@ const getDialogInfoHook = function () {
 const sockInitHook = function () {
     const {} = rtcModalHook();
     const {showVideoModal, setInviteVideoInfo} = modalVideoHooks()
-    const socket = inject("socket");
     const store = useStore();
     const isLogin = computed(() => store.getters.isLogin);
     const user = computed(() => store.getters.user);
@@ -55,7 +54,7 @@ const sockInitHook = function () {
             if (newVal) {
                 initSocket();
             } else {
-                socket.disconnect();
+                // socket.disconnect();
             }
         }
     );
@@ -108,9 +107,6 @@ const sockInitHook = function () {
     }
     const handleConnect = () => {
         store.commit("setSocketStatus", "connect");
-        console.log(
-            `当前用户的userId为:${user.value.userId},socketId为：${socket.id}`
-        );
         sendIpcMsg({
             msg: {
                 type: SocketEvent.CONNECTED,
@@ -190,7 +186,7 @@ const sockInitHook = function () {
 }
 
 const sendIpcMsg = ({type = Socket_Main_Render_Events.to_socket_server_msg, msg}) => {
-    console.log(`ipcRender发出:${JSON.stringify(msg)}`)
+    console.log(`ipcRender发出:类型：${type},内容：${JSON.stringify(msg)}`)
     ipcRenderer.send(type, msg)
 }
 

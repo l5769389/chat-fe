@@ -12,7 +12,6 @@ const {invite_info, hideVideoModal} = modalVideoHooks();
 const closeRef = ref(false)
 export default function () {
 
-    const socket = inject("socket");
     const store = useStore()
     const toggleVideoOrAudio = () => {
         console.log('切换音视频');
