@@ -47,6 +47,9 @@ export class SocketEvent {
     static CREATE_INVITE_ROOM = 'create_invite_room'
     static VIDEO_ROOM_MSG = 'video_room_message'
     static VIDEO_ROOM_CHANGE_MSG = 'video_room_change_msg' //关闭，切换语音、视频等
+
+
+    static REMOTE_CONTROL = 'remote_control'
 }
 
 // 当前视频窗口的状态

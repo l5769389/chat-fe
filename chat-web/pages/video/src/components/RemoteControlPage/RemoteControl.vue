@@ -158,7 +158,7 @@ const ontrack = async (e) => {
   setVideoStatus(VIDEO_CLIENT_STATUS.CONNECTED)
   await nextTick(() => {
     connectRef.value.$refs.oppositeRef.srcObject = e.streams[0];
-    connectRef.value.$refs.myRef.srcObject = localStream
+    // connectRef.value.$refs.myRef.srcObject = localStream
   })
 }
 
