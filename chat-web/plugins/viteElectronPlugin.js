@@ -1,6 +1,7 @@
 import esbuild from 'esbuild'
 import {spawn} from 'child_process'
 import electron from 'electron'
+import { protocol,host } from '../common/config.ts';
 export let viteElectronPlugin = () => {
     return {
         name: "vite-electron-plugin",
@@ -15,7 +16,7 @@ export let viteElectronPlugin = () => {
             });
             server.httpServer.once("listening", () => {
                 let addressInfo = server.httpServer.address();
-                let httpAddress = `https://localhost:${addressInfo.port}`;
+                let httpAddress = `${protocol}://${host}:${addressInfo.port}`;
                 let electronProcess = spawn(electron.toString(), ["./dist/mainElectronEntry.cjs", httpAddress], {
                     cwd: process.cwd(),
                     stdio: "inherit",

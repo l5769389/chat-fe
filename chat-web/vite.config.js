@@ -10,6 +10,11 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import {getReplacer, viteElectronPlugin} from "./plugins/viteElectronPlugin.js";
 import optimizer from "vite-plugin-optimizer";
 import {buildPlugin} from "./plugins/buildPlugin.js";
+import {isHttps} from './common/config.ts'
+const httpsConfig = {
+    key: readFileSync(path.resolve(path.join(__dirname, '/src/config/needIgnore/cert/key.pem'))),
+    cert: readFileSync(path.resolve(path.join(__dirname, '/src/config/needIgnore/cert/cert.pem')))
+}
 
 export default defineConfig({
     plugins: [
@@ -35,10 +40,7 @@ export default defineConfig({
     ],
     server: {
         host: '0.0.0.0',
-        https: {
-            key: readFileSync(path.resolve(path.join(__dirname, '/src/config/needIgnore/cert/localhost-key.pem'))),
-            cert: readFileSync(path.resolve(path.join(__dirname, '/src/config/needIgnore/cert/localhost.pem')))
-        }
+        https: isHttps ? httpsConfig : null
     },
     resolve: {
         alias: {

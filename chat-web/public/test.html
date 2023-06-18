@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+
+    <video style="width: 400px;height: 400px" id="video"></video>
+    <script>
+        const video = document.getElementById('video')
+
+        // const constraints ={
+        //             audio: false,
+        //             video: {
+        //                 mandatory: {
+        //                     chromeMediaSource: 'desktop',
+        //                 }
+        //             }
+        //         }
+
+        const constraints = {
+            audio: false,
+            video: true,
+        }
+        async function test() {
+            navigator.mediaDevices.getDisplayMedia(constraints)
+                .then(stream => {
+                    // video.src = window.URL.createObjectURL(stream);
+                    video.srcObject = stream;
+                    video.onloadedmetadata = function (e) {
+                        video.play();
+                    };
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+
+        }
+
+        setTimeout(() => test(), 1000)
+
+    </script>
+</body>
+
+</html>
