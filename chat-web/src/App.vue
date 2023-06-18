@@ -6,7 +6,7 @@ import {useStore} from "vuex";
 sockInitHook()
 const store = useStore()
 
-store.dispatch('get_db_info')
+
 
 
 </script>

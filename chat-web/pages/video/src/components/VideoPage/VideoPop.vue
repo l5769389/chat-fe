@@ -8,7 +8,7 @@ import {
 
 import {ipcRenderer} from "electron";
 import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import hooks from "./components/hooks.js";
+import hooks from "../../hook/hooks.js";
 import InviteVideo from "./components/inviteVideo.vue";
 import WaitForConnect from "./components/WaitForConnect.vue";
 import Connecting from "./components/Connecting.vue";

@@ -1,6 +1,6 @@
 <script setup>
 import VideoController from "./VideoController.vue";
-import hooks from './hooks.js'
+import hooks from "@video/hook/hooks.js";
 
 const {userInfo} = hooks();
 const currentDialogInfo = computed(() => userInfo.oppositeUser)

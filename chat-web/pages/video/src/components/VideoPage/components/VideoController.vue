@@ -1,6 +1,6 @@
 <script setup>
 import {CloseSmall, PhoneCall, Voice, VoiceOff, PhoneVideoCall} from "@icon-park/vue-next";
-import hooks from './hooks.js'
+import hooks from '../../../hook/hooks.js'
 
 const {
   videoOrAudioRef,

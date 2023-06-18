@@ -1,6 +1,6 @@
 <script setup>
 import {SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
-import hooks from './hooks.js'
+import hooks from '../../../hook/hooks.js'
 
 const {invite_info, sendIpcMsg, setVideoStatus} = hooks();
 const cancel = () => {

@@ -1,7 +1,7 @@
 <script setup>
 import {ipcRenderer} from 'electron'
 import VideoPop from "./components/VideoPage/VideoPop.vue";
-import hooks from './components/VideoPage/components/hooks.js'
+import hooks from './hook/hooks.js'
 import {
   Between_Main_Render_Events,
   Render_Render_Events,

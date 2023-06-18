@@ -59,6 +59,7 @@ const sockInitHook = function () {
         (newVal, oldValue) => {
             if (newVal) {
                 initSocket();
+                store.dispatch('get_db_info')
             } else {
                 // socket.disconnect();
             }
