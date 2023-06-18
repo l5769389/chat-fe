@@ -1,10 +1,13 @@
+import {Video_Info_Type} from "../../../../common/types.js";
+
 export class WebRtc {
     localStream;
     pc = null;
     pcConfig = {};
+    video_type
 
-    constructor() {
-
+    constructor(type = Video_Info_Type.video) {
+        this.video_type = type
     }
 
     createPeerConnection = (onicecandidate, ontrack) => {
@@ -64,25 +67,8 @@ export class WebRtc {
     }
 
     async getLocalStream() {
-
         try {
-            // const constraints = {
-            //     video: true,
-            //     audio: true,
-            // }
-            // this.localStream = await navigator.mediaDevices.getUserMedia(constraints)
-            const constraints = {
-                audio: {
-                    mandatory: {
-                        chromeMediaSource: 'desktop'
-                    }
-                },
-                video: {
-                    mandatory: {
-                        chromeMediaSource: 'desktop',
-                    }
-                }
-            }
+            const constraints = this.getConstraints();
             this.localStream = await navigator.mediaDevices.getUserMedia(constraints)
             for (const track of this.localStream.getTracks()) {
                 this.pc.addTrack(track, this.localStream)
@@ -94,6 +80,23 @@ export class WebRtc {
         return this.localStream
     }
 
+    getConstraints() {
+        if (this.video_type === Video_Info_Type.video) {
+            return {
+                video: true,
+                audio: false,
+            };
+        } else if (this.video_type === Video_Info_Type.remote_desktop) {
+            return {
+                video: {
+                    mandatory: {
+                        chromeMediaSource: 'desktop',
+                    }
+                },
+                audio: false,
+            }
+        }
+    }
 
     handleAnswer = async (data) => {
         const desc = new RTCSessionDescription(data)

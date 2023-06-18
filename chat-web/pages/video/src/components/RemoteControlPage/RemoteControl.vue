@@ -3,7 +3,7 @@ import {
   Between_Main_Render_Events,
   Socket_Main_Render_Events,
   SocketEvent,
-  VIDEO_CLIENT_STATUS
+  VIDEO_CLIENT_STATUS, Video_Info_Type
 } from "/common/types.ts";
 
 import {ipcRenderer} from "electron";
@@ -24,7 +24,7 @@ const {
   closeVideoConnectPassive
 } = hooks();
 
-const rtcInstance = new WebRtc()
+const rtcInstance = new WebRtc(Video_Info_Type.remote_desktop)
 let localStream = null;
 const connectRef = ref(null);
 let pc = null;
