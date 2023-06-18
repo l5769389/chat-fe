@@ -1,3 +1,6 @@
+/**
+ * 渲染进程和socketIo之间的消息。
+ */
 export const Socket_Main_Render_Events = {
     // 开启socket连接
     start_connect: 'to_socket_server_start',
@@ -7,12 +10,24 @@ export const Socket_Main_Render_Events = {
     from_socket_server_msg: 'from_socket_server_msg',
 }
 
+export const Render_Render_Events = {
+    video_info: 'video_info'
+}
+
+export enum Video_Info_Type {
+    video = 'video',
+    remote_desktop = 'remote_desktop'
+}
+
+
+
+// 只在electron main线程中的事件
 export const Within_Main_Events = {
     transfer_main_msg: 'transfer_main_msg'
 }
 
 
-// 负责分发给视频页面的消息类型
+// 负责分发给视频页面的消息类型， 在主线程和渲染进程之间
 export const Between_Main_Render_Events = {
     transfer_video_msg: 'transfer_video_msg',
 }

@@ -1,7 +1,13 @@
 import {computed} from "vue";
 import {useStore} from "vuex";
 import {getFormatTime, buffer2base64, base642File} from "@/utils/utils.js";
-import {Between_Main_Render_Events, SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
+import {
+    Between_Main_Render_Events,
+    Render_Render_Events,
+    SocketEvent,
+    VIDEO_CLIENT_STATUS,
+    Video_Info_Type
+} from "/common/types.ts";
 import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import rtcModalHook from "@/common/components/connectRtcDialog/rtcModalHook.js";
 import {ipcRenderer} from "electron";
@@ -140,9 +146,10 @@ const sockInitHook = function () {
 
     const handleOfferInvite = data => {
         const invokePageInfo = {
-            eventName: 'video-info',
+            eventName: Render_Render_Events.video_info,
             data: {
                 user: user.value,
+                video_info_type: Video_Info_Type.video
             }
         }
         ipcRenderer.send(Between_Main_Render_Events.transfer_video_msg, JSON.stringify(invokePageInfo));

@@ -52,6 +52,7 @@ import {
   Message,
   PhoneTelephone,
   VideoOne,
+  RemoteControl
 } from "@icon-park/vue-next";
 import Meme from "@/common/components/Meme.vue";
 import {useStore} from "vuex";
@@ -59,7 +60,13 @@ import modalVideoHooks from "@/utils/hooks/modalVideoHooks.js";
 import {computed, ref,} from "vue";
 import uploadFileHook from "@/utils/hooks/uploadFileHook.js";
 import {ipcRenderer} from 'electron'
-import {SocketEvent, MainEvent, Socket_Main_Render_Events, Between_Main_Render_Events} from "/common/types.ts";
+import {
+  SocketEvent,
+  MainEvent,
+  Socket_Main_Render_Events,
+  Between_Main_Render_Events,
+  Render_Render_Events, Video_Info_Type
+} from "/common/types.ts";
 
 const {addUploadFile} = uploadFileHook()
 
@@ -78,10 +85,11 @@ const currentDialogInfo = computed(() => store.getters.currentDialogInfo)
  */
 const invokeRTCDialog = () => {
   const invokePageInfo = {
-    eventName: 'video-info',
+    eventName: Render_Render_Events.video_info,
     data: {
       user: user.value,
       oppositeUser: currentDialogInfo.value,
+      video_info_type: Video_Info_Type.video
     }
   }
   ipcRenderer.send(Between_Main_Render_Events.transfer_video_msg, JSON.stringify(invokePageInfo));
@@ -95,6 +103,29 @@ const invokeRTCDialog = () => {
   }
   ipcRenderer.send(Socket_Main_Render_Events.to_socket_server_msg, msg)
 }
+
+
+const invokeRemoteDesk = () => {
+  const invokePageInfo = {
+    eventName: Render_Render_Events.video_info,
+    data: {
+      user: user.value,
+      oppositeUser: currentDialogInfo.value,
+      video_info_type: Video_Info_Type.remote_desktop
+    }
+  }
+  ipcRenderer.send(Between_Main_Render_Events.transfer_video_msg, JSON.stringify(invokePageInfo));
+
+  const msg = {
+    type: SocketEvent.OFFER_INVITE,
+    data: {
+      userId: user.value.userId,
+      oppositeId: currentDialogInfo.value.id,
+    }
+  }
+  ipcRenderer.send(Socket_Main_Render_Events.to_socket_server_msg, msg)
+}
+
 const invokeUpload = () => {
   uploadRef.value[0].dispatchEvent(new MouseEvent('click'))
 }
@@ -128,6 +159,10 @@ const icons = [
   },
   {
     icon: Message,
+  },
+  {
+    icon: RemoteControl,
+    handler: invokeRemoteDesk
   },
   {
     icon: PhoneTelephone,

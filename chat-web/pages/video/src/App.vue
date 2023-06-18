@@ -1,8 +1,14 @@
 <script setup>
 import {ipcRenderer} from 'electron'
-import VideoPop from "./components/VideoPop.vue";
-import hooks from './components/components/hooks.js'
-import {Between_Main_Render_Events, SocketEvent, VIDEO_CLIENT_STATUS} from "../../../common/types.ts";
+import VideoPop from "./components/VideoPage/VideoPop.vue";
+import hooks from './components/VideoPage/components/hooks.js'
+import {
+  Between_Main_Render_Events,
+  Render_Render_Events,
+  SocketEvent,
+  VIDEO_CLIENT_STATUS, Video_Info_Type
+} from "../../../common/types.ts";
+import RemoteControl from "./components/RemoteControlPage/RemoteControl.vue";
 
 const {userInfo, invite_info, setUser, setInviteInfo, setVideoStatus} = hooks();
 const handleCreateInviteRoom = data => {
@@ -19,18 +25,21 @@ const handleOfferInvite = data => {
   })
   console.log(`收到服务器事件：${SocketEvent.OFFER_INVITE}`)
 }
+const videoInfoTypeRef = ref('')
+
 const setUserInfo = data => {
-  const {user, oppositeUser} = data;
+  const {user, oppositeUser, video_info_type} = data;
+  videoInfoTypeRef.value = video_info_type;
   setUser(data)
-  if (user && oppositeUser){
+  if (user && oppositeUser) {
     setVideoStatus(VIDEO_CLIENT_STATUS.INVITING)
-  }else if (user){
+  } else if (user) {
     setVideoStatus(VIDEO_CLIENT_STATUS.BEINVITING)
   }
 }
 
 const EventMap = {
-  'video-info': setUserInfo,
+  [Render_Render_Events.video_info]: setUserInfo,
   [SocketEvent.CREATE_INVITE_ROOM]: handleCreateInviteRoom,
   [SocketEvent.OFFER_INVITE]: handleOfferInvite
 }
@@ -50,7 +59,8 @@ ipcRenderer.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
 </script>
 
 <template>
-  <video-pop></video-pop>
+  <video-pop v-if="videoInfoTypeRef === Video_Info_Type.video"></video-pop>
+  <remote-control v-else-if="videoInfoTypeRef ===Video_Info_Type.remote_desktop "></remote-control>
 </template>
 
 <style scoped>

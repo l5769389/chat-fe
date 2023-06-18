@@ -12,7 +12,7 @@ import hooks from "./components/hooks.js";
 import InviteVideo from "./components/inviteVideo.vue";
 import WaitForConnect from "./components/WaitForConnect.vue";
 import Connecting from "./components/Connecting.vue";
-import {WebRtc} from "../util/WebRtc.js";
+import {WebRtc} from "../../util/WebRtc.js";
 
 const {
   userInfo,
