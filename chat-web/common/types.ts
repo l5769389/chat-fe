@@ -23,7 +23,8 @@ export enum Video_Info_Type {
 
 // 只在electron main线程中的事件
 export const Within_Main_Events = {
-    transfer_main_msg: 'transfer_main_msg'
+    transfer_main_msg: 'transfer_main_msg',
+    operator_compute: 'operator_compute'
 }
 
 
