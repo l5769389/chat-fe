@@ -9,6 +9,7 @@ import {
   VIDEO_CLIENT_STATUS, Video_Info_Type
 } from "../../../common/types.ts";
 import RemoteControl from "./components/RemoteControlPage/RemoteControl.vue";
+import TestRemoteControl from "@video/components/TestRemoteControl.vue";
 
 const {userInfo, invite_info, setUser, setInviteInfo, setVideoStatus} = hooks();
 const handleCreateInviteRoom = data => {
@@ -60,8 +61,9 @@ ipcRenderer.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
 </script>
 
 <template>
-  <video-pop v-if="videoInfoTypeRef === Video_Info_Type.video"></video-pop>
-  <remote-control v-else-if="videoInfoTypeRef ===Video_Info_Type.remote_desktop "></remote-control>
+<!--  <video-pop v-if="videoInfoTypeRef === Video_Info_Type.video"></video-pop>-->
+<!--  <remote-control v-else-if="videoInfoTypeRef ===Video_Info_Type.remote_desktop "></remote-control>-->
+  <test-remote-control></test-remote-control>
 </template>
 
 <style scoped>

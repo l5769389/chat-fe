@@ -150,7 +150,7 @@ const sockInitHook = function () {
             eventName: Render_Render_Events.video_info,
             data: {
                 user: user.value,
-                video_info_type: Video_Info_Type.video
+                video_info_type: data.video_info_type
             }
         }
         ipcRenderer.send(Between_Main_Render_Events.transfer_video_msg, JSON.stringify(invokePageInfo));
@@ -164,7 +164,7 @@ const sockInitHook = function () {
         [SocketEvent.CHAT_MSG_SINGLE]: handleSingleMsg,
         [SocketEvent.CHAT_MSG_MULTI]: handleMultiMsg,
         [SocketEvent.CREATE_INVITE_ROOM]: handleCreateInviteRoom,
-        // [SocketEvent.OFFER_INVITE]: handleOfferInvite
+        [SocketEvent.OFFER_INVITE]: handleOfferInvite
     }
 
 
