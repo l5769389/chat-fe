@@ -18,7 +18,8 @@ const handleCreateInviteRoom = data => {
   })
 }
 const handleOfferInvite = data => {
-  const {fromUserId, msg: {roomId}} = data;
+  const {fromUserId, msg: {roomId}, video_info_type} = data;
+  videoInfoTypeRef.value = video_info_type;
   setInviteInfo({
     videoRoomId: roomId,
     oppositeUserId: fromUserId,

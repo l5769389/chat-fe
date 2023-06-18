@@ -1,4 +1,4 @@
-import {Video_Info_Type} from "../../../../common/types.js";
+import {Video_Info_Type} from "/common/types.ts";
 
 export class WebRtc {
     localStream;

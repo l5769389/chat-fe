@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "chcp 65001 && vite",
+    "mac dev": "vite",
+    "win dev": "chcp 65001 && vite",
     "build": "vite build",
     "preview": "vite preview"
   },

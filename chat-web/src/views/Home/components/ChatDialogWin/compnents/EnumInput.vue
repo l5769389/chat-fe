@@ -99,6 +99,7 @@ const invokeRTCDialog = () => {
     data: {
       userId: user.value.userId,
       oppositeId: currentDialogInfo.value.id,
+      video_info_type: Video_Info_Type.video
     }
   }
   ipcRenderer.send(Socket_Main_Render_Events.to_socket_server_msg, msg)
@@ -121,6 +122,7 @@ const invokeRemoteDesk = () => {
     data: {
       userId: user.value.userId,
       oppositeId: currentDialogInfo.value.id,
+      video_info_type: Video_Info_Type.remote_desktop
     }
   }
   ipcRenderer.send(Socket_Main_Render_Events.to_socket_server_msg, msg)

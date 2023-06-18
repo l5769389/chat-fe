@@ -164,7 +164,7 @@ const sockInitHook = function () {
         [SocketEvent.CHAT_MSG_SINGLE]: handleSingleMsg,
         [SocketEvent.CHAT_MSG_MULTI]: handleMultiMsg,
         [SocketEvent.CREATE_INVITE_ROOM]: handleCreateInviteRoom,
-        [SocketEvent.OFFER_INVITE]: handleOfferInvite
+        // [SocketEvent.OFFER_INVITE]: handleOfferInvite
     }
 
 
