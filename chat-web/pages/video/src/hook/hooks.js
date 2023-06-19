@@ -10,7 +10,7 @@ const userInfo = reactive({
 })
 
 
-const videoInfoTypeRef = ref(Video_Info_Type.video)
+const videoInfoTypeRef = ref('')
 const remoteDesktopRoleRef = ref('')
 
 const invite_info = ref({
@@ -82,10 +82,12 @@ export default function () {
     }
 
     const setVideoInfoType = (type) => {
+        console.log(`设置当前视频页面类型为:${type}`)
         videoInfoTypeRef.value = type;
     }
 
     const setRemoteDesktopRole = type => {
+        console.log(`设置当前视频页面类型为:${type}`)
         remoteDesktopRoleRef.value = type
     }
 

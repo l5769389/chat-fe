@@ -18,8 +18,6 @@ const {
   userInfo,
   videoStatus,
   invite_info,
-  videoOrAudioRef,
-  muteRef,
   setVideoStatus,
   sendIpcMsg,
   closeVideoConnectPassive

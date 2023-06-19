@@ -41,8 +41,8 @@ const setUserInfo = data => {
   const {user, oppositeUser, video_info_type} = data;
   if (video_info_type) {
     setVideoInfoType(video_info_type)
+    setRemoteDesktopRole(RemoteDesktopRole.Positive)
   }
-  setRemoteDesktopRole(RemoteDesktopRole.Positive)
   setUser(data)
   if (user && oppositeUser) {
     setVideoStatus(VIDEO_CLIENT_STATUS.INVITING)
