@@ -57,6 +57,6 @@ export default defineConfig({
                 video: path.resolve(__dirname, 'pages/video/index.html')
             },
             plugins: [buildPlugin()],
-        },
+        }
     }
 })

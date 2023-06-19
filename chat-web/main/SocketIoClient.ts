@@ -35,13 +35,19 @@ export class SocketIoClient {
             })
         });
         // 发给视频进程
-        ['offer_invite', 'answer_invite', 'create_invite_room', 'video_room_message', 'video_room_change_msg'].forEach(eventName => {
+        ['offer_invite', 'answer_invite', 'create_invite_room', 'video_room_message', 'video_room_change_msg',].forEach(eventName => {
             this.socket.on(eventName, (data) => {
                 console.log(`socket client 收到消息:${eventName},${JSON.stringify(data)}`)
                 ipcMain.emit(Within_Main_Events.transfer_main_msg, {
                     eventName,
                     data
                 })
+            })
+        })
+        this.socket.on('remote_control', (data) => {
+            console.log(`socket client 收到消息:remote_control,${JSON.stringify(data)}`)
+            ipcMain.emit(Within_Main_Events.operator_compute, {
+                data
             })
         })
         this.socket.on('error', () => {

@@ -1,3 +1,4 @@
+const robot = require('robotjs')
 import {app, ipcMain, globalShortcut, session, desktopCapturer, screen} from "electron";
 import * as path from "path";
 import {
@@ -17,7 +18,6 @@ let mainWindow: MainWindow
 let captureWindow
 let socketIoClient
 let videoWindow: VideoWindow
-
 // 关闭 electron Security Warning (Insecure Content-Security-Policy) This renderer process has either no Content Security
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
 app.whenReady().then(async () => {
@@ -76,6 +76,12 @@ ipcMain.on('desk', data => {
             console.log(source)
         }
     })
+})
+
+ipcMain.on(Within_Main_Events.operator_compute,data => {
+    const {clientX,clientY} = data.data;
+    robot.moveMouse(clientX,clientY)
+//    console.log(clientX,clientY);
 })
 
 
