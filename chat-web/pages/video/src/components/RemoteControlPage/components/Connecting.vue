@@ -8,10 +8,14 @@ const oppositeRef = ref();
 let deltaX = 0;
 let deltaY = 0;
 onMounted(() => {
+  document.addEventListener('keydown',handleKeyEvent)
   const {left, top} = oppositeRef.value.getBoundingClientRect();
   deltaX = left;
   deltaY = top;
   console.log(`left:${left},top:${top}`)
+})
+onUnmounted(() => {
+  document.removeEventListener('keydown',handleKeyEvent)
 })
 const {sendIpcMsg, invite_info,} = hooks();
 const handleEvent = _.throttle((e) => {
@@ -34,6 +38,7 @@ const getMsg = (e) => {
 }
 const handleKeyEvent = _.throttle(e => {
   const msg = getKeydownMsg(e)
+  console.log(JSON.stringify(msg))
   sendIpcMsg(msg);
 }, 20)
 
@@ -62,7 +67,6 @@ const getKeydownMsg = (e) => {
              @mousedown="handleEvent"
              @mousemove="handleEvent"
              @mouseup="handleEvent"
-             @keydown="handleKeyEvent"
              class="video_container"
       ></video>
     </div>
@@ -76,6 +80,6 @@ const getKeydownMsg = (e) => {
 
 <style scoped>
 .video_container {
-  @apply h-full object-contain
+  @apply h-full object-contain cursor-none
 }
 </style>
