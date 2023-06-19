@@ -78,10 +78,18 @@ ipcMain.on('desk', data => {
     })
 })
 
-ipcMain.on(Within_Main_Events.operator_compute,data => {
-    const {clientX,clientY} = data.data;
-    robot.moveMouse(clientX,clientY)
-//    console.log(clientX,clientY);
+ipcMain.on(Within_Main_Events.operator_compute,(data: any) => {
+    const {clientX,clientY,type} = data.data;
+    switch (type) {
+        case 'mousemove':
+            robot.moveMouse(clientX,clientY)
+            break;
+        case 'click':
+            robot.mouseClick()
+            break;
+        default:
+            break;
+    }
 })
 
 

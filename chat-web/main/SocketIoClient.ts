@@ -45,7 +45,6 @@ export class SocketIoClient {
             })
         })
         this.socket.on('remote_control', (data) => {
-            console.log(`socket client 收到消息:remote_control,${JSON.stringify(data)}`)
             ipcMain.emit(Within_Main_Events.operator_compute, {
                 data
             })

@@ -4,13 +4,18 @@ import hooks from '../../../hook/hooks.js'
 import {SocketEvent} from "/common/types.ts";
 import _ from 'lodash'
 
-const {sendIpcMsg,invite_info,} = hooks();
+const oppositeRef = ref();
+onMounted(() => {
+  console.log(oppositeRef.value.getBoundingClientRect())
+})
+const {sendIpcMsg, invite_info,} = hooks();
 const handleEvent = _.throttle((e) => {
   const msg = getMsg(e)
   sendIpcMsg(msg);
 }, 10)
 const getMsg = (e) => {
   const {type, clientX, clientY} = e;
+  console.log(clientX, clientY)
   return {
     type: SocketEvent.REMOTE_CONTROL,
     data: {
@@ -35,7 +40,7 @@ const getMsg = (e) => {
              @mousedown="handleEvent"
              @mousemove="handleEvent"
              @mouseup="handleEvent"
-             class="h-full object-contain"
+             class="h-full object-contain hover:cursor-none"
       ></video>
     </div>
 
