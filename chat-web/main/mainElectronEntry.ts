@@ -81,16 +81,23 @@ ipcMain.on('desk', data => {
 
 ipcMain.on(Within_Main_Events.operator_compute, (data: any) => {
     const {clientX, clientY, type, key} = data.data;
+    key as string;
     if(type === 'mousemove'){
         robot.moveMouse(clientX, clientY)
     }else if(type === 'click'){
         robot.mouseClick()
     }else if(type === 'keydown'){
         console.log(`tap: ${key}`)
+        let tapkey = '';
+        if(key.length === 1){
+            tapkey = key;
+        }else{
+            tapkey = key.toLocaleLowerCase()
+        }
         try {
-            robot.keyTap(key)
+            robot.keyTap(tapkey)
         }catch(e){
-            console.log(`${key} is error`)
+            console.log(`${tapkey} is error`)
             console.log(e)
         }
     }
