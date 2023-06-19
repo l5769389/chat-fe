@@ -7,8 +7,6 @@ sockInitHook()
 const store = useStore()
 
 
-
-
 </script>
 
 <template>

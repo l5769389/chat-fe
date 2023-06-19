@@ -13,12 +13,13 @@ import InviteVideo from "./components/inviteVideo.vue";
 import WaitForConnect from "./components/WaitForConnect.vue";
 import Connecting from "./components/Connecting.vue";
 import {WebRtc} from "@video/util/WebRtc.js";
+import {RemoteDesktopRole} from "@video/types/types.ts";
 
 const {
   userInfo,
   videoStatus,
   invite_info,
-
+  remoteDesktopRoleRef,
   setVideoStatus,
   sendIpcMsg,
   closeVideoConnectPassive
@@ -180,7 +181,7 @@ const onCreateOffer = desc => {
   <div class="w-full h-full">
     <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITING"></invite-video>
     <wait-for-connect v-if="videoStatus ===VIDEO_CLIENT_STATUS.INVITING"></wait-for-connect>
-    <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED" ref="connectRef"></connecting>
+    <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED && remoteDesktopRoleRef === RemoteDesktopRole.Positive" ref="connectRef"></connecting>
   </div>
 </template>
 

@@ -9,9 +9,13 @@ import {
   VIDEO_CLIENT_STATUS, Video_Info_Type
 } from "../../../common/types.ts";
 import RemoteControl from "./components/RemoteControlPage/RemoteControl.vue";
-import TestRemoteControl from "@video/components/TestRemoteControl.vue";
+import {RemoteDesktopRole} from "@video/types/types.ts";
 
-const {userInfo, invite_info, setUser, setInviteInfo, setVideoStatus} = hooks();
+const {userInfo, invite_info, setUser, setInviteInfo, setVideoStatus,
+  videoInfoTypeRef,
+  setVideoInfoType,
+  remoteDesktopRoleRef,
+  setRemoteDesktopRole} = hooks();
 const handleCreateInviteRoom = data => {
   console.log(`房间roomId:${data}`)
   setInviteInfo({
@@ -20,18 +24,21 @@ const handleCreateInviteRoom = data => {
 }
 const handleOfferInvite = data => {
   const {fromUserId, msg: {roomId}, video_info_type} = data;
-  videoInfoTypeRef.value = video_info_type;
+  setVideoInfoType(video_info_type)
+  setRemoteDesktopRole(RemoteDesktopRole.Passive)
   setInviteInfo({
     videoRoomId: roomId,
     oppositeUserId: fromUserId,
   })
   console.log(`收到服务器事件：${SocketEvent.OFFER_INVITE}`)
 }
-const videoInfoTypeRef = ref('')
 
+
+//进入这里说明是主动发起方。
 const setUserInfo = data => {
   const {user, oppositeUser, video_info_type} = data;
-  videoInfoTypeRef.value = video_info_type;
+  setVideoInfoType(video_info_type)
+  setRemoteDesktopRole(RemoteDesktopRole.Positive)
   setUser(data)
   if (user && oppositeUser) {
     setVideoStatus(VIDEO_CLIENT_STATUS.INVITING)
@@ -61,9 +68,8 @@ ipcRenderer.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
 </script>
 
 <template>
-<!--  <video-pop v-if="videoInfoTypeRef === Video_Info_Type.video"></video-pop>-->
-<!--  <remote-control v-else-if="videoInfoTypeRef ===Video_Info_Type.remote_desktop "></remote-control>-->
-  <test-remote-control></test-remote-control>
+  <video-pop v-if="videoInfoTypeRef === Video_Info_Type.video"></video-pop>
+  <remote-control v-else-if="videoInfoTypeRef ===Video_Info_Type.remote_desktop "></remote-control>
 </template>
 
 <style scoped>

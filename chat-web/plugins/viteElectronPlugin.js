@@ -2,6 +2,7 @@ import esbuild from 'esbuild'
 import {spawn} from 'child_process'
 import electron from 'electron'
 import {protocol, electron_host} from '../common/config.ts';
+
 export let viteElectronPlugin = () => {
     return {
         name: "vite-electron-plugin",
@@ -11,8 +12,9 @@ export let viteElectronPlugin = () => {
                 bundle: true,
                 platform: "node",
                 outdir: "./dist",
-                outExtension:{'.js':'.cjs'},
-                external: ["electron"],
+                loader: {'.node': 'file'},
+                outExtension: {'.js': '.cjs'},
+                external: ["electron",'robotjs'],
             });
             server.httpServer.once("listening", () => {
                 let addressInfo = server.httpServer.address();
@@ -40,7 +42,7 @@ export let getReplacer = () => {
         });
     }
     result["electron"] = () => {
-        let electronModules = ["clipboard", "ipcRenderer", "nativeImage", "shell", "webFrame","desktopCapturer"].join(",");
+        let electronModules = ["clipboard", "ipcRenderer", "nativeImage", "shell", "webFrame", "desktopCapturer"].join(",");
         return {
             find: new RegExp(`^electron$`),
             code: `const {${electronModules}} = require('electron');export {${electronModules}}`,
