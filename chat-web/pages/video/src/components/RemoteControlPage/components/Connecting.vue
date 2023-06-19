@@ -5,25 +5,47 @@ import {SocketEvent} from "/common/types.ts";
 import _ from 'lodash'
 
 const oppositeRef = ref();
+let deltaX = 0;
+let deltaY = 0;
 onMounted(() => {
-  console.log(oppositeRef.value.getBoundingClientRect())
+  const {left, top} = oppositeRef.value.getBoundingClientRect();
+  deltaX = left;
+  deltaY = top;
+  console.log(`left:${left},top:${top}`)
 })
 const {sendIpcMsg, invite_info,} = hooks();
 const handleEvent = _.throttle((e) => {
   const msg = getMsg(e)
   sendIpcMsg(msg);
-}, 10)
+}, 20)
 const getMsg = (e) => {
   const {type, clientX, clientY} = e;
-  console.log(clientX, clientY)
   return {
     type: SocketEvent.REMOTE_CONTROL,
     data: {
       roomId: invite_info.value.videoRoomId,
       content: {
         type,
-        clientX,
-        clientY
+        clientX: clientX - deltaX,
+        clientY: clientY - deltaY
+      }
+    }
+  }
+}
+const handleKeyEvent = _.throttle(e => {
+  const msg = getKeydownMsg(e)
+  sendIpcMsg(msg);
+}, 20)
+
+const getKeydownMsg = (e) => {
+  const {type, key} = e;
+  return {
+    type: SocketEvent.REMOTE_CONTROL,
+    data: {
+      roomId: invite_info.value.videoRoomId,
+      content: {
+        type,
+        key
       }
     }
   }
@@ -40,7 +62,8 @@ const getMsg = (e) => {
              @mousedown="handleEvent"
              @mousemove="handleEvent"
              @mouseup="handleEvent"
-             class="h-full object-contain hover:cursor-none"
+             @keydown="handleKeyEvent"
+             class="video_container"
       ></video>
     </div>
 
@@ -52,5 +75,7 @@ const getMsg = (e) => {
 </template>
 
 <style scoped>
-
+.video_container {
+  @apply h-full object-contain
+}
 </style>

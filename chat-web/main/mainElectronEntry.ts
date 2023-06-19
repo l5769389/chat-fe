@@ -53,7 +53,7 @@ ipcMain.on(Socket_Main_Render_Events.start_connect, () => {
  * 收到render发送给别的用户的消息
  */
 ipcMain.on(Socket_Main_Render_Events.to_socket_server_msg, (event, args) => {
-    console.log('ipcMain收到', args)
+    // console.log('ipcMain收到', args)
     socketIoClient.sendToSocketServer(args)
 })
 
@@ -78,14 +78,18 @@ ipcMain.on('desk', data => {
     })
 })
 
-ipcMain.on(Within_Main_Events.operator_compute,(data: any) => {
-    const {clientX,clientY,type} = data.data;
+ipcMain.on(Within_Main_Events.operator_compute, (data: any) => {
+    const {clientX, clientY, type, key} = data.data;
     switch (type) {
         case 'mousemove':
-            robot.moveMouse(clientX,clientY)
+            robot.moveMouse(clientX, clientY)
             break;
         case 'click':
             robot.mouseClick()
+            break;
+        case "keydown":
+            console.log(`tap: ${key}`)
+            robot.keyTap(key)
             break;
         default:
             break;

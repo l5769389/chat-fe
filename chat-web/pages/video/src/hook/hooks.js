@@ -45,7 +45,7 @@ export default function () {
     }
 
     const sendIpcMsg = (data) => {
-        console.log(`video页面的ipcRender发出:内容：${JSON.stringify(data)}`)
+        // console.log(`video页面的ipcRender发出:内容：${JSON.stringify(data)}`)
         ipcRenderer.send(Socket_Main_Render_Events.to_socket_server_msg, data)
     }
 
