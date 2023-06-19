@@ -10,9 +10,8 @@ const userInfo = reactive({
 })
 
 
-
 const videoInfoTypeRef = ref(Video_Info_Type.video)
-const remoteDesktopRoleRef = ref(RemoteDesktopRole.Positive)
+const remoteDesktopRoleRef = ref('')
 
 const invite_info = ref({
     videoRoomId: '',

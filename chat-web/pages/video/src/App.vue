@@ -11,11 +11,13 @@ import {
 import RemoteControl from "./components/RemoteControlPage/RemoteControl.vue";
 import {RemoteDesktopRole} from "@video/types/types.ts";
 
-const {userInfo, invite_info, setUser, setInviteInfo, setVideoStatus,
+const {
+  userInfo, setUser, setInviteInfo, setVideoStatus,
   videoInfoTypeRef,
   setVideoInfoType,
-  remoteDesktopRoleRef,
-  setRemoteDesktopRole} = hooks();
+  invite_info,
+  setRemoteDesktopRole
+} = hooks();
 const handleCreateInviteRoom = data => {
   console.log(`房间roomId:${data}`)
   setInviteInfo({
@@ -37,7 +39,9 @@ const handleOfferInvite = data => {
 //进入这里说明是主动发起方。
 const setUserInfo = data => {
   const {user, oppositeUser, video_info_type} = data;
-  setVideoInfoType(video_info_type)
+  if (video_info_type) {
+    setVideoInfoType(video_info_type)
+  }
   setRemoteDesktopRole(RemoteDesktopRole.Positive)
   setUser(data)
   if (user && oppositeUser) {

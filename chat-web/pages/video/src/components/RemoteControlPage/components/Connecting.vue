@@ -4,7 +4,7 @@ import hooks from '../../../hook/hooks.js'
 import {SocketEvent} from "/common/types.ts";
 import _ from 'lodash'
 
-const {sendIpcMsg} = hooks();
+const {sendIpcMsg,invite_info,} = hooks();
 const handleEvent = _.throttle((e) => {
   const msg = getMsg(e)
   sendIpcMsg(msg);
@@ -14,7 +14,7 @@ const getMsg = (e) => {
   return {
     type: SocketEvent.REMOTE_CONTROL,
     data: {
-      roomId: '123',
+      roomId: invite_info.value.videoRoomId,
       content: {
         type,
         clientX,

@@ -150,7 +150,6 @@ const sockInitHook = function () {
             eventName: Render_Render_Events.video_info,
             data: {
                 user: user.value,
-                video_info_type: data.video_info_type
             }
         }
         ipcRenderer.send(Between_Main_Render_Events.transfer_video_msg, JSON.stringify(invokePageInfo));
