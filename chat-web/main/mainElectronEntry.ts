@@ -25,6 +25,7 @@ app.whenReady().then(async () => {
     createMainWin()
     registerSocketIo()
     registerShortcut()
+
 });
 
 const getShareWinInfo = () => {

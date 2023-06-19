@@ -1,12 +1,18 @@
 import {ref} from "vue";
-import {Socket_Main_Render_Events, SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
+import {Socket_Main_Render_Events, SocketEvent, VIDEO_CLIENT_STATUS, Video_Info_Type} from "/common/types.ts";
 import {ipcRenderer} from "electron";
+import {RemoteDesktopRole} from "@video/types/types.ts";
 
 // 自己的信息和对方的信息。
 const userInfo = reactive({
     user: {},
     oppositeUser: {}
 })
+
+
+
+const videoInfoTypeRef = ref(Video_Info_Type.video)
+const remoteDesktopRoleRef = ref(RemoteDesktopRole.Positive)
 
 const invite_info = ref({
     videoRoomId: '',
@@ -76,6 +82,14 @@ export default function () {
         })
     }
 
+    const setVideoInfoType = (type) => {
+        videoInfoTypeRef.value = type;
+    }
+
+    const setRemoteDesktopRole = type => {
+        remoteDesktopRoleRef.value = type
+    }
+
 
     return {
         userInfo,
@@ -91,6 +105,12 @@ export default function () {
         toggleVideoOrAudio,
         toggleMute,
         closeVideoConnectPositive,
-        closeVideoConnectPassive
+        closeVideoConnectPassive,
+
+        videoInfoTypeRef,
+        setVideoInfoType,
+        remoteDesktopRoleRef,
+        setRemoteDesktopRole
+
     }
 }
