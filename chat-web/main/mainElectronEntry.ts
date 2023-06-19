@@ -12,6 +12,7 @@ import {MainWindow} from "./pages/MainWindow";
 import {CaptureWindow} from "./pages/CaptureWindow";
 import {SocketIoClient} from "./SocketIoClient";
 import {VideoWindow} from "./pages/VideoWindow";
+import { tr } from "element-plus/es/locale";
 
 const vueDevToolsPath = path.resolve(__dirname, '../extension/vue-devtools')
 let mainWindow: MainWindow
@@ -80,19 +81,18 @@ ipcMain.on('desk', data => {
 
 ipcMain.on(Within_Main_Events.operator_compute, (data: any) => {
     const {clientX, clientY, type, key} = data.data;
-    switch (type) {
-        case 'mousemove':
-            robot.moveMouse(clientX, clientY)
-            break;
-        case 'click':
-            robot.mouseClick()
-            break;
-        case "keydown":
-            console.log(`tap: ${key}`)
+    if(type === 'mousemove'){
+        robot.moveMouse(clientX, clientY)
+    }else if(type === 'click'){
+        robot.mouseClick()
+    }else if(type === 'keydown'){
+        console.log(`tap: ${key}`)
+        try {
             robot.keyTap(key)
-            break;
-        default:
-            break;
+        }catch(e){
+            console.log(`${key} is error`)
+            console.log(e)
+        }
     }
 })
 
