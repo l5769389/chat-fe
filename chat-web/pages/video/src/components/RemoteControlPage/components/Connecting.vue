@@ -7,13 +7,39 @@ import _ from 'lodash'
 const oppositeRef = ref();
 let deltaX = 0;
 let deltaY = 0;
+let oppositeSize = {
+  width: 1680,
+  height: 1050
+}
+let ratio = 1;
 onMounted(() => {
+  getRectSize()
+  watchSizeChange();
+})
+
+const getRectSize = () => {
   document.addEventListener('keydown', handleKeyEvent)
   const {left, top} = oppositeRef.value.getBoundingClientRect();
   deltaX = left;
   deltaY = top;
   console.log(`left:${left},top:${top}`)
-})
+}
+
+const watchSizeChange = () => {
+  const resizeObserver = new ResizeObserver(_.debounce(entries => {
+    const {width, height} = entries[0].contentRect
+    calcCurrentRatio(width, height)
+  }, 100))
+  resizeObserver.observe(oppositeRef.value);
+}
+
+const calcCurrentRatio = (width, height) => {
+  const widthRatio = Number.parseFloat((oppositeSize.width / width).toFixed(4));
+  const heightRatio = Number.parseFloat((oppositeSize.height / height).toFixed(4));
+  console.log(`width:${width},height:${height}, w_ratio:${widthRatio}, h_ratio:${heightRatio}`)
+  ratio = Math.min(widthRatio, heightRatio)
+}
+
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeyEvent)
 })
@@ -40,8 +66,8 @@ const getMsg = (e) => {
       roomId: invite_info.value.videoRoomId,
       content: {
         type: ansType,
-        clientX: 2 * (clientX - deltaX),
-        clientY: 2 * (clientY - deltaY)
+        clientX: (ratio * (clientX - deltaX)).toFixed(0),
+        clientY: (ratio * (clientY - deltaY)).toFixed(0)
       }
     }
   }
@@ -67,6 +93,7 @@ const getKeydownMsg = (e) => {
     }
   }
 }
+
 </script>
 
 <template>
@@ -92,7 +119,7 @@ const getKeydownMsg = (e) => {
 
 <style scoped>
 .video-wrapper {
-  @apply w-[840px] h-[525px] absolute top-0 left-0 bg-dark
+  @apply w-full h-full absolute top-0 left-0 bg-dark
 }
 
 .video_container {

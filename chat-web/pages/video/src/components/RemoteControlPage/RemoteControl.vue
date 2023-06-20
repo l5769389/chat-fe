@@ -179,9 +179,11 @@ const onCreateOffer = desc => {
 
 <template>
   <div class="w-full h-full">
-    <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITING"></invite-video>
-    <wait-for-connect v-if="videoStatus ===VIDEO_CLIENT_STATUS.INVITING"></wait-for-connect>
-    <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED && remoteDesktopRoleRef === RemoteDesktopRole.Positive" ref="connectRef"></connecting>
+        <invite-video v-if="videoStatus ===VIDEO_CLIENT_STATUS.BEINVITING"></invite-video>
+        <wait-for-connect v-if="videoStatus ===VIDEO_CLIENT_STATUS.INVITING"></wait-for-connect>
+        <connecting v-else-if="videoStatus === VIDEO_CLIENT_STATUS.CONNECTED && remoteDesktopRoleRef === RemoteDesktopRole.Positive" ref="connectRef"></connecting>
+<!--    <connecting ref="connectRef"></connecting>-->
+
   </div>
 </template>
 

@@ -10,6 +10,7 @@ import {
 } from "../../../common/types.ts";
 import RemoteControl from "./components/RemoteControlPage/RemoteControl.vue";
 import {RemoteDesktopRole} from "@video/types/types.ts";
+import OperateHeader from "@video/components/OperateHeader.vue";
 
 const {
   userInfo, setUser, setInviteInfo, setVideoStatus,
@@ -72,10 +73,15 @@ ipcRenderer.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
 </script>
 
 <template>
-  <video-pop v-if="videoInfoTypeRef === Video_Info_Type.video"></video-pop>
-  <remote-control v-else-if="videoInfoTypeRef ===Video_Info_Type.remote_desktop "></remote-control>
+  <operate-header class="h-[35px]"></operate-header>
+  <div class="video-wrapper">
+    <video-pop v-if="videoInfoTypeRef === Video_Info_Type.video"></video-pop>
+    <remote-control v-else-if="videoInfoTypeRef ===Video_Info_Type.remote_desktop "></remote-control>
+  </div>
 </template>
 
 <style scoped>
-
+.video-wrapper {
+  @apply w-full h-[calc(100vh-35px)]
+}
 </style>

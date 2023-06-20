@@ -56,7 +56,7 @@ export class SocketIoClient {
 
     sendToSocketServer(msg) {
         const {type, data} = msg;
-        console.log(`向socket server 发出:${JSON.stringify(msg)}`)
+        // console.log(`向socket server 发出:${JSON.stringify(msg)}`)
         this.socket.emit(type, data)
     }
 }

@@ -29,7 +29,7 @@ export class VideoWindow {
                 spellcheck: false,
                 disableHtmlFullscreenWindowResize: true,
             },
-            frame: true,
+            frame: false,
         };
         const win = new BrowserWindow(config);
         win.webContents.openDevTools()

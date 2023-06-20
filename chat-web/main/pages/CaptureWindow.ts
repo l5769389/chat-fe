@@ -46,7 +46,7 @@ export class CaptureWindow {
                 autoHideMenuBar: true,
                 movable: false,
                 resizable: false,
-                hasShadow: false
+                hasShadow: false,
             });
             captureWindow.webContents.openDevTools()
             captureWindow.loadURL(path.join(process.argv[2], '/pages/capture/index.html'))
