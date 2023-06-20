@@ -37,8 +37,8 @@ const getShareWinInfo = () => {
 const registerSocketIo = () => {
     socketIoClient = new SocketIoClient(mainWindow)
 }
-const createVideoPage = () => {
-    videoWindow = new VideoWindow();
+const createVideoPage = (windowType) => {
+    videoWindow = new VideoWindow(windowType);
 }
 /**
  * socket.io开启连接
@@ -64,9 +64,15 @@ ipcMain.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
     sendMsgToVideoWindow(args)
 })
 
-ipcMain.on(Within_Main_Events.transfer_main_msg, data => {
+ipcMain.on(Within_Main_Events.transfer_main_msg, (event, data) => {
     console.log(`收到：${Within_Main_Events.transfer_main_msg},${data}`)
-    sendMsgToVideoWindow(data)
+    const {eventName} = data;
+    if (eventName === 'offer_invite') {
+        sendMsgToVideoWindow(data, 'remote_control')
+    } else {
+        sendMsgToVideoWindow(data, 'video')
+    }
+
 })
 
 ipcMain.on('desk', data => {
@@ -111,9 +117,9 @@ ipcMain.on(Within_Main_Events.operator_compute, (data: any) => {
 })
 
 
-const sendMsgToVideoWindow = (msg) => {
+const sendMsgToVideoWindow = (msg, windowType = 'video') => {
     if (!VideoWindow?.win) {
-        createVideoPage();
+        createVideoPage(windowType);
     }
     videoWindow.sendToRender(msg)
 }

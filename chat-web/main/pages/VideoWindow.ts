@@ -7,19 +7,21 @@ export class VideoWindow {
     static win = null;
     static ready = false;
 
-    constructor() {
+    constructor(windowType) {
         if (!VideoWindow.win) {
-            VideoWindow.win = this.getWinInstance()
+            VideoWindow.win = this.getWinInstance(windowType)
             this.addListen()
         }
     }
 
-    getWinInstance() {
+    getWinInstance(windowType = 'video') {
+        const initWidth = windowType === 'video' ? 500 : 200
+        const initHeight = windowType === 'video' ? 700 : 400
         let config: BrowserWindowConstructorOptions = {
-            width: 500,
-            height: 700,
-            minWidth: 800,
-            minHeight: 700,
+            width: initWidth,
+            height: initHeight,
+            minWidth: initWidth,
+            minHeight: initHeight,
             webPreferences: {
                 nodeIntegration: true,
                 webSecurity: false,
