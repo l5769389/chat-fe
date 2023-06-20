@@ -91,7 +91,11 @@ export class WebRtc {
                 video: {
                     mandatory: {
                         chromeMediaSource: 'desktop',
-                    }
+                    },
+                    optional: [
+                        {minFrameRate: 10},
+                        {maxFrameRate: 15}
+                    ]
                 },
                 audio: false,
             }

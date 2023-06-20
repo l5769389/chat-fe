@@ -12,7 +12,6 @@ import {MainWindow} from "./pages/MainWindow";
 import {CaptureWindow} from "./pages/CaptureWindow";
 import {SocketIoClient} from "./SocketIoClient";
 import {VideoWindow} from "./pages/VideoWindow";
-import { tr } from "element-plus/es/locale";
 
 const vueDevToolsPath = path.resolve(__dirname, '../extension/vue-devtools')
 let mainWindow: MainWindow
@@ -82,21 +81,30 @@ ipcMain.on('desk', data => {
 ipcMain.on(Within_Main_Events.operator_compute, (data: any) => {
     const {clientX, clientY, type, key} = data.data;
     key as string;
-    if(type === 'mousemove'){
+    if (type === 'mousemove') {
         robot.moveMouse(clientX, clientY)
-    }else if(type === 'click'){
+    } else if (type === 'mousedown') {
+        console.log('down')
+        robot.mouseToggle('down')
+    } else if (type === 'mouseup') {
+        console.log('up')
+        robot.mouseToggle('up')
+    } else if (type === 'dragMouse') {
+        console.log('drag')
+        robot.dragMouse(clientX, clientY)
+    } else if (type === 'click') {
         robot.mouseClick()
-    }else if(type === 'keydown'){
+    } else if (type === 'keydown') {
         console.log(`tap: ${key}`)
         let tapkey = '';
-        if(key.length === 1){
+        if (key.length === 1) {
             tapkey = key;
-        }else{
+        } else {
             tapkey = key.toLocaleLowerCase()
         }
         try {
             robot.keyTap(tapkey)
-        }catch(e){
+        } catch (e) {
             console.log(`${tapkey} is error`)
             console.log(e)
         }

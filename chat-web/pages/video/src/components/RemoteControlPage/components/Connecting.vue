@@ -8,34 +8,46 @@ const oppositeRef = ref();
 let deltaX = 0;
 let deltaY = 0;
 onMounted(() => {
-  document.addEventListener('keydown',handleKeyEvent)
+  document.addEventListener('keydown', handleKeyEvent)
   const {left, top} = oppositeRef.value.getBoundingClientRect();
   deltaX = left;
   deltaY = top;
   console.log(`left:${left},top:${top}`)
 })
 onUnmounted(() => {
-  document.removeEventListener('keydown',handleKeyEvent)
+  document.removeEventListener('keydown', handleKeyEvent)
 })
 const {sendIpcMsg, invite_info,} = hooks();
 const handleEvent = _.throttle((e) => {
   const msg = getMsg(e)
   sendIpcMsg(msg);
 }, 20)
+let mousedownFlag = false;
 const getMsg = (e) => {
   const {type, clientX, clientY} = e;
+  let ansType = type;
+  if (type === 'mousedown') {
+    mousedownFlag = true;
+  } else if (type === 'mouseup') {
+    mousedownFlag = false;
+  } else if (type === 'mousemove' && mousedownFlag) {
+    // 鼠标按下左键且拖动。
+    ansType = 'dragMouse'
+  }
   return {
     type: SocketEvent.REMOTE_CONTROL,
     data: {
       roomId: invite_info.value.videoRoomId,
       content: {
-        type,
-        clientX: clientX - deltaX,
-        clientY: clientY - deltaY
+        type: ansType,
+        clientX: 2 * (clientX - deltaX),
+        clientY: 2 * (clientY - deltaY)
       }
     }
   }
 }
+
+
 const handleKeyEvent = _.throttle(e => {
   const msg = getKeydownMsg(e)
   console.log(JSON.stringify(msg))
@@ -59,7 +71,7 @@ const getKeydownMsg = (e) => {
 
 <template>
   <div class="w-full h-full relative">
-    <div class="w-full h-full absolute top-0 left-0 bg-dark">
+    <div class="video-wrapper">
       <video ref="oppositeRef"
              autoplay
              playsinline
@@ -79,7 +91,11 @@ const getKeydownMsg = (e) => {
 </template>
 
 <style scoped>
+.video-wrapper {
+  @apply w-[840px] h-[525px] absolute top-0 left-0 bg-dark
+}
+
 .video_container {
-  @apply h-full object-contain cursor-none
+  @apply h-full w-full cursor-none
 }
 </style>

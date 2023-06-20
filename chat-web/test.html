@@ -9,9 +9,11 @@
 <video style="width: 400px;height: 400px" id="video"></video>
 <script>
  const video = document.getElementById('video')
- document.addEventListener('keydown', e => {
-     console.log(e)
+ let down = false;
+ document.addEventListener('mousedown', e => {
+     down = true;
  })
+
 </script>
 </body>
 </html>
