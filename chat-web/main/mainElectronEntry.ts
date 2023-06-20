@@ -1,11 +1,12 @@
-const robot = require('robotjs')
-import {app, ipcMain, globalShortcut, session, desktopCapturer, screen} from "electron";
+import {app, ipcMain, globalShortcut, session, desktopCapturer, screen} from 'electron';
 import * as path from "path";
+
+const robot = require('robotjs')
 import {
     Between_Main_Render_Events,
     MainEvent,
     Shortcut,
-    Socket_Main_Render_Events,
+    Socket_Main_Render_Events, WindowOperateMsg,
     Within_Main_Events
 } from "../common/types";
 import {MainWindow} from "./pages/MainWindow";
@@ -25,6 +26,7 @@ app.whenReady().then(async () => {
     createMainWin()
     registerSocketIo()
     registerShortcut()
+    addIpcListen()
 });
 
 const getShareWinInfo = () => {
@@ -64,7 +66,7 @@ ipcMain.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
     sendMsgToVideoWindow(args)
 })
 
-ipcMain.on(Within_Main_Events.transfer_main_msg, (event, data) => {
+ipcMain.on(Within_Main_Events.transfer_main_msg, (data: any) => {
     console.log(`收到：${Within_Main_Events.transfer_main_msg},${data}`)
     const {eventName} = data;
     if (eventName === 'offer_invite') {
@@ -159,7 +161,33 @@ const registerShortcut = () => {
 }
 
 
+const addIpcListen = () => {
+    ipcMain.on(Between_Main_Render_Events.op_window, (event, data: WindowOperateMsg) => {
+        const {opType, window, value} = data;
+        console.log(opType, window, value)
+        const win = window === 'main' ? mainWindow : VideoWindow
+        switch (opType) {
+            case MainEvent.window_pin:
+                win.win.setAlwaysOnTop(value)
+                break;
+            case MainEvent.window_minimize:
+                win.win.minimize()
+                break;
+            case MainEvent.window_full:
+                if (win.win.isMaximized()) {
+                    win.win.restore()
+                } else {
+                    win.win.maximize()
+                }
+                break;
+            case MainEvent.window_close:
+                win.destroy()
+                break;
+            default:
+                break;
+        }
+    })
 
-
+}
 
 

@@ -31,6 +31,7 @@ export const Within_Main_Events = {
 // 负责分发给视频页面的消息类型， 在主线程和渲染进程之间
 export const Between_Main_Render_Events = {
     transfer_video_msg: 'transfer_video_msg',
+    op_window: 'op_window'
 }
 
 
@@ -77,3 +78,11 @@ export enum MainEvent {
     window_full = 'window_full',
     window_close = 'window_close',
 }
+
+export type WindowOperateMsg = {
+    // 类型是枚举的其中之一
+    opType: keyof typeof MainEvent,
+    window: 'main' | 'video',
+    value?: boolean
+}
+

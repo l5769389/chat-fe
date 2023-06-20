@@ -1,7 +1,6 @@
 import {BrowserWindow, ipcMain,} from "electron";
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions;
 import {Socket_Main_Render_Events, MainEvent} from "../../common/types";
-import path from "path";
 
 export class MainWindow {
     win = null;
@@ -32,7 +31,6 @@ export class MainWindow {
         const win = new BrowserWindow(config);
         win.webContents.openDevTools()
         win.loadURL(process.argv[2]);
-        this.addIpcListen()
         return win;
     }
 
@@ -41,25 +39,6 @@ export class MainWindow {
             this.win.close()
             this.win = null;
         }
-    }
-
-    addIpcListen() {
-        ipcMain.on(MainEvent.window_pin, (event, args) => {
-            this.win.setAlwaysOnTop(args)
-        })
-        ipcMain.on(MainEvent.window_minimize, () => {
-            this.win.minimize()
-        })
-        ipcMain.on(MainEvent.window_full, () => {
-            if (this.win.isMaximized()) {
-                this.win.restore()
-            } else {
-                this.win.maximize()
-            }
-        })
-        ipcMain.once(MainEvent.window_close, () => {
-            this.destroy()
-        })
     }
 
     sendToRender({

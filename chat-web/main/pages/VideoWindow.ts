@@ -56,8 +56,9 @@ export class VideoWindow {
         }
     }
 
-    destroyVideoWindow = () => {
+    static destroy(){
         if (VideoWindow.win) {
+            VideoWindow.win.close();
             VideoWindow.win = null;
             VideoWindow.ready = false;
         }
@@ -66,7 +67,7 @@ export class VideoWindow {
     addListen() {
         VideoWindow.win.once('closed', () => {
             console.log('closed')
-            this.destroyVideoWindow()
+            VideoWindow.destroy()
         })
     }
 }

@@ -1,22 +1,42 @@
-<script setup>
-import {Close,Minus,FullScreen,Pushpin} from '@icon-park/vue-next';
+<script setup lang="ts">
+import {Close, Minus, FullScreen, Pushpin} from '@icon-park/vue-next';
 import {ipcRenderer} from "electron";
+import {Between_Main_Render_Events, MainEvent} from "../../../../common/types.js";
+import {WindowOperateMsg} from "../../../../common/types.js";
+import {ref} from "vue";
 
 
 const pinRef = ref(false)
+const winName = 'video'
 const handlePin = () => {
   pinRef.value = !pinRef.value;
-  ipcRenderer.send('window_pin',pinRef.value)
+  sendOp({
+    opType: MainEvent.window_pin,
+    window: winName,
+    value: pinRef.value
+  })
 }
 const handleMinus = () => {
-  console.log('min')
-  ipcRenderer.send('window_minimize')
+  sendOp({
+    opType: MainEvent.window_minimize,
+    window: winName,
+  })
 }
 const handleFullScreen = () => {
-  ipcRenderer.send('window_full')
+  sendOp({
+    opType: MainEvent.window_full,
+    window: winName
+  })
 }
 const handleClose = () => {
-  ipcRenderer.send('window_close')
+  sendOp({
+    opType: MainEvent.window_close,
+    window: winName
+  })
+}
+
+const sendOp = (op: WindowOperateMsg) => {
+  ipcRenderer.send(Between_Main_Render_Events.op_window, op)
 }
 
 const icons = [
@@ -26,7 +46,7 @@ const icons = [
   },
   {
     icon: Minus,
-    handler:handleMinus
+    handler: handleMinus
   },
   {
     icon: FullScreen,
