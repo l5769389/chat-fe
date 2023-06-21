@@ -87,7 +87,7 @@ async function connectToSignalServer() {
 }
 
 const handle_Answer_Invite = async (data) => {
-  const {msg: {answer}} = data;
+  const {msg: {answer},screenInfo} = data;
   console.log(`收到:${SocketEvent.ANSWER_INVITE}`)
   if (answer) {
     localStream = await rtcInstance.getLocalStream()

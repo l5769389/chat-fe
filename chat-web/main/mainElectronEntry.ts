@@ -35,8 +35,8 @@ app.whenReady().then(async () => {
 const registerSocketIo = () => {
     socketIoClient = new SocketIoClient(mainWindow)
 }
-const createVideoPage = (windowType) => {
-    videoWindow = new VideoWindow(windowType);
+const createVideoPage = (windowType,aspectRatio) => {
+    videoWindow = new VideoWindow(windowType,aspectRatio);
 }
 /**
  * socket.io开启连接
@@ -67,10 +67,13 @@ ipcMain.on(Within_Main_Events.transfer_main_msg, (data: any) => {
     const {eventName} = data;
     if (eventName === 'offer_invite') {
         sendMsgToVideoWindow(data, 'remote_control')
-    } else {
+    } else if (eventName === 'answer_invite'){
+        const {screenInfo} = data;
+        const aspectRatio = Number.parseFloat((screenInfo.width / screenInfo.height).toFixed(2))
+        sendMsgToVideoWindow(data, 'video',aspectRatio)
+    }else {
         sendMsgToVideoWindow(data, 'video')
     }
-
 })
 
 ipcMain.on('desk', data => {
@@ -115,9 +118,9 @@ ipcMain.on(Within_Main_Events.operator_compute, (data: any) => {
 })
 
 
-const sendMsgToVideoWindow = (msg, windowType = 'video') => {
+const sendMsgToVideoWindow = (msg, windowType = 'video',aspectRatio = null) => {
     if (!VideoWindow?.win) {
-        createVideoPage(windowType);
+        createVideoPage(windowType,aspectRatio);
     }
     videoWindow.sendToRender(msg)
 }
