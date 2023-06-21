@@ -31,12 +31,11 @@ app.whenReady().then(async () => {
 });
 
 
-
 const registerSocketIo = () => {
     socketIoClient = new SocketIoClient(mainWindow)
 }
-const createVideoPage = (windowType,aspectRatio) => {
-    videoWindow = new VideoWindow(windowType,aspectRatio);
+const createVideoPage = (windowType) => {
+    videoWindow = new VideoWindow(windowType);
 }
 /**
  * socket.io开启连接
@@ -67,11 +66,13 @@ ipcMain.on(Within_Main_Events.transfer_main_msg, (data: any) => {
     const {eventName} = data;
     if (eventName === 'offer_invite') {
         sendMsgToVideoWindow(data, 'remote_control')
-    } else if (eventName === 'answer_invite'){
+    } else if (eventName === 'answer_invite') {
         const {screenInfo} = data;
         const aspectRatio = Number.parseFloat((screenInfo.width / screenInfo.height).toFixed(2))
-        sendMsgToVideoWindow(data, 'video',aspectRatio)
-    }else {
+        console.log(`设置aspectRadio为：${aspectRatio}`)
+        VideoWindow.win.setAspectRatio(aspectRatio)
+        sendMsgToVideoWindow(data, 'video')
+    } else {
         sendMsgToVideoWindow(data, 'video')
     }
 })
@@ -118,9 +119,9 @@ ipcMain.on(Within_Main_Events.operator_compute, (data: any) => {
 })
 
 
-const sendMsgToVideoWindow = (msg, windowType = 'video',aspectRatio = null) => {
+const sendMsgToVideoWindow = (msg, windowType = 'video') => {
     if (!VideoWindow?.win) {
-        createVideoPage(windowType,aspectRatio);
+        createVideoPage(windowType);
     }
     videoWindow.sendToRender(msg)
 }
@@ -189,7 +190,7 @@ const addIpcListen = () => {
 }
 
 ipcMain.handle(Between_Main_Render_Events.render_to_main, (e, flag) => {
-     return getScreenInfo();
+    return getScreenInfo();
 })
 
 

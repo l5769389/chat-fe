@@ -7,16 +7,16 @@ export class VideoWindow {
     static win = null;
     static ready = false;
 
-    constructor(windowType, aspectRatio) {
+    constructor(windowType) {
         if (!VideoWindow.win) {
-            VideoWindow.win = this.getWinInstance(windowType, aspectRatio)
+            VideoWindow.win = this.getWinInstance(windowType)
             this.addListen()
         }
     }
 
-    getWinInstance(windowType = 'video', aspectRatio = 1) {
+    getWinInstance(windowType = 'video') {
         const initWidth = windowType === 'video' ? 700 : 500
-        const initHeight = initWidth * aspectRatio
+        const initHeight = initWidth
         let config: BrowserWindowConstructorOptions = {
             width: initWidth,
             height: initHeight,
@@ -34,8 +34,7 @@ export class VideoWindow {
             frame: false,
         };
         const win = new BrowserWindow(config);
-        console.log(`设置窗口的aspect为${aspectRatio}`)
-        win.setAspectRatio(aspectRatio)
+        // win.setAspectRatio(aspectRatio)
         win.webContents.openDevTools()
         win.loadURL(path.join(process.argv[2], '/pages/video/index.html'));
         win.on('ready-to-show', () => {
