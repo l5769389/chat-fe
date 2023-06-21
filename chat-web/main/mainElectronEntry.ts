@@ -70,9 +70,10 @@ ipcMain.on(Within_Main_Events.transfer_main_msg, (data: any) => {
         const {screenInfo} = data.data;
         const aspectRatio = Number.parseFloat((screenInfo.width / screenInfo.height).toFixed(2))
         const total_height = 500;
-        const video_height = 500 - 35;
+        const video_height = 500 - 20;
         videoWindow.win.setSize(video_height * aspectRatio, total_height)
-        const new_aspect = Number.parseFloat((video_height * aspectRatio / total_height).toFixed(2))
+        const new_aspect = Number.parseFloat((video_height * aspectRatio / total_height).toFixed(4))
+        console.log(new_aspect)
         videoWindow.win.setAspectRatio(new_aspect)
         sendMsgToVideoWindow(data, 'video')
     } else {
@@ -193,7 +194,7 @@ const addIpcListen = () => {
     })
 }
 
-ipcMain.handle(Between_Main_Render_Events.render_to_main, (e, flag) => {
+ipcMain.handle(Between_Main_Render_Events.render_to_main, (e, type) => {
     return getScreenInfo();
 })
 

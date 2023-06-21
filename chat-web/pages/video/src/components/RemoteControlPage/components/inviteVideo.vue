@@ -17,7 +17,7 @@ const cancel = () => {
   })
 }
 const confirm = async () => {
-  const screenInfo =await getScreenInfo();
+  const screenInfo = await getScreenInfo();
   setVideoStatus(VIDEO_CLIENT_STATUS.BEINVITED)
   const msg = {
     userId: invite_info.value.userId,
@@ -32,9 +32,16 @@ const confirm = async () => {
   })
 }
 const getScreenInfo = async () => {
-  const res = await ipcRenderer.invoke(Between_Main_Render_Events.render_to_main)
+  const res = await ipcRenderer.invoke(Between_Main_Render_Events.render_to_main, 'getScreenInfo')
   return res;
 }
+// const getAllScreenInfo = async () => {
+//   const res = await ipcRenderer.invoke(Between_Main_Render_Events.render_to_main)
+//   return res;
+// }
+
+// const showWindowRef = ref(false)
+
 
 </script>
 
@@ -42,6 +49,7 @@ const getScreenInfo = async () => {
   <div class="w-full h-full">
     <el-button @click="cancel">拒绝</el-button>
     <el-button @click="confirm">接受</el-button>
+<!--    <div v-if="showWindowRef"></div>-->
   </div>
 </template>
 

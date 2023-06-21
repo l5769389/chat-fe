@@ -110,10 +110,9 @@ const getKeydownMsg = (e) => {
       ></video>
     </div>
 
-    <div class="w-5/6 absolute bottom-1/4 left-1/2 bg-black" style="transform: translateX(-50%)">
-      <video-controller/>
-    </div>
-
+<!--    <div class="w-5/6 absolute bottom-1/4 left-1/2 bg-black" style="transform: translateX(-50%)">-->
+<!--      <video-controller/>-->
+<!--    </div>-->
   </div>
 </template>
 
