@@ -15,8 +15,8 @@ export class VideoWindow {
     }
 
     getWinInstance(windowType = 'video') {
-        const initWidth = windowType === 'video' ? 700 : 500
-        const initHeight = initWidth
+        const initWidth = 500
+        const initHeight = 500
         let config: BrowserWindowConstructorOptions = {
             width: initWidth,
             height: initHeight,

@@ -62,15 +62,18 @@ ipcMain.on(Between_Main_Render_Events.transfer_video_msg, (event, args) => {
 })
 
 ipcMain.on(Within_Main_Events.transfer_main_msg, (data: any) => {
-    console.log(`收到：${Within_Main_Events.transfer_main_msg},${data}`)
+    console.log(`收到：${Within_Main_Events.transfer_main_msg},${JSON.stringify(data)}`)
     const {eventName} = data;
     if (eventName === 'offer_invite') {
         sendMsgToVideoWindow(data, 'remote_control')
     } else if (eventName === 'answer_invite') {
-        const {screenInfo} = data;
+        const {screenInfo} = data.data;
         const aspectRatio = Number.parseFloat((screenInfo.width / screenInfo.height).toFixed(2))
-        console.log(`设置aspectRadio为：${aspectRatio}`)
-        VideoWindow.win.setAspectRatio(aspectRatio)
+        const total_height = 500;
+        const video_height = 500 - 35;
+        VideoWindow.win.setSize(video_height * aspectRatio, total_height)
+        const new_aspect = Number.parseFloat((video_height * aspectRatio / total_height).toFixed(2))
+        VideoWindow.win.setAspectRatio(new_aspect)
         sendMsgToVideoWindow(data, 'video')
     } else {
         sendMsgToVideoWindow(data, 'video')
