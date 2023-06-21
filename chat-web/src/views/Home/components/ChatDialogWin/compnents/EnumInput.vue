@@ -139,8 +139,6 @@ const handleChoose = (e) => {
   }
 }
 
-
-
 const invokeCapture = () => {
   ipcRenderer.send('capture', 123)
 }

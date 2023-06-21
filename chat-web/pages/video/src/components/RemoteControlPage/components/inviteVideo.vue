@@ -1,6 +1,7 @@
 <script setup>
-import {SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
+import {Between_Main_Render_Events, SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
 import hooks from "@video/hook/hooks.js";
+import {ipcRenderer} from "electron";
 
 const {invite_info, sendIpcMsg, setVideoStatus} = hooks();
 const cancel = () => {
@@ -15,18 +16,24 @@ const cancel = () => {
     data: msg
   })
 }
-const confirm = () => {
+const confirm = async () => {
+  const screenInfo = getScreenInfo();
   setVideoStatus(VIDEO_CLIENT_STATUS.BEINVITED)
   const msg = {
     userId: invite_info.value.userId,
     roomId: invite_info.value.videoRoomId,
     oppositeUserId: invite_info.value.oppositeUserId,
     answer: true,
+    screenInfo: screenInfo,
   }
   sendIpcMsg({
     type: SocketEvent.ANSWER_INVITE,
     data: msg
   })
+}
+const getScreenInfo = async () => {
+  const res = await ipcRenderer.invoke(Between_Main_Render_Events.render_to_main)
+  return res;
 }
 
 </script>

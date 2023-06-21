@@ -94,7 +94,7 @@ export class WebRtc {
                     },
                     optional: [
                         {minFrameRate: 10},
-                        {maxFrameRate: 15}
+                        {maxFrameRate: 60}
                     ]
                 },
                 audio: false,

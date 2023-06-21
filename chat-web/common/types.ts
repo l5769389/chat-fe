@@ -20,18 +20,18 @@ export enum Video_Info_Type {
 }
 
 
-
 // 只在electron main线程中的事件
 export const Within_Main_Events = {
     transfer_main_msg: 'transfer_main_msg',
-    operator_compute: 'operator_compute'
+    operator_compute: 'operator_compute',
 }
 
 
 // 负责分发给视频页面的消息类型， 在主线程和渲染进程之间
 export const Between_Main_Render_Events = {
     transfer_video_msg: 'transfer_video_msg',
-    op_window: 'op_window'
+    op_window: 'op_window', // 操作窗口 缩放、全屏等。
+    render_to_main: 'render_to_main' // 想要通过主进程获取一些信息。比如屏幕尺寸等。
 }
 
 
@@ -48,7 +48,6 @@ export class SocketEvent {
     static CREATE_INVITE_ROOM = 'create_invite_room'
     static VIDEO_ROOM_MSG = 'video_room_message'
     static VIDEO_ROOM_CHANGE_MSG = 'video_room_change_msg' //关闭，切换语音、视频等
-
 
     static REMOTE_CONTROL = 'remote_control'
 }

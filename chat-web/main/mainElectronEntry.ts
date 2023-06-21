@@ -1,18 +1,19 @@
-import {app, ipcMain, globalShortcut, session, desktopCapturer, screen} from 'electron';
+import {app, desktopCapturer, globalShortcut, ipcMain, screen, session} from 'electron';
 import * as path from "path";
-
-const robot = require('robotjs')
 import {
     Between_Main_Render_Events,
     MainEvent,
     Shortcut,
-    Socket_Main_Render_Events, WindowOperateMsg,
+    Socket_Main_Render_Events,
+    WindowOperateMsg,
     Within_Main_Events
 } from "../common/types";
 import {MainWindow} from "./pages/MainWindow";
 import {CaptureWindow} from "./pages/CaptureWindow";
 import {SocketIoClient} from "./SocketIoClient";
 import {VideoWindow} from "./pages/VideoWindow";
+
+const robot = require('robotjs')
 
 const vueDevToolsPath = path.resolve(__dirname, '../extension/vue-devtools')
 let mainWindow: MainWindow
@@ -29,12 +30,7 @@ app.whenReady().then(async () => {
     addIpcListen()
 });
 
-const getShareWinInfo = () => {
-    desktopCapturer.getSources({types: ['window', 'screen']}).then(
-        sources => {
-            console.log(sources) // sources就是获取到的窗口和桌面数组
-        })
-}
+
 
 const registerSocketIo = () => {
     socketIoClient = new SocketIoClient(mainWindow)
@@ -187,7 +183,18 @@ const addIpcListen = () => {
                 break;
         }
     })
-
 }
 
+ipcMain.handle(Between_Main_Render_Events.render_to_main, (e, flag) => {
+     return getScreenInfo();
+})
 
+
+const getScreenInfo = () => {
+    let display = screen.getAllDisplays()[0];
+    return {
+        width: display.bounds.width,
+        height: display.bounds.height,
+        scaleFactor: display.scaleFactor,
+    };
+}
