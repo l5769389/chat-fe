@@ -71,9 +71,9 @@ ipcMain.on(Within_Main_Events.transfer_main_msg, (data: any) => {
         const aspectRatio = Number.parseFloat((screenInfo.width / screenInfo.height).toFixed(2))
         const total_height = 500;
         const video_height = 500 - 35;
-        VideoWindow.win.setSize(video_height * aspectRatio, total_height)
+        videoWindow.win.setSize(video_height * aspectRatio, total_height)
         const new_aspect = Number.parseFloat((video_height * aspectRatio / total_height).toFixed(2))
-        VideoWindow.win.setAspectRatio(new_aspect)
+        videoWindow.win.setAspectRatio(new_aspect)
         sendMsgToVideoWindow(data, 'video')
     } else {
         sendMsgToVideoWindow(data, 'video')
@@ -123,7 +123,7 @@ ipcMain.on(Within_Main_Events.operator_compute, (data: any) => {
 
 
 const sendMsgToVideoWindow = (msg, windowType = 'video') => {
-    if (!VideoWindow?.win) {
+    if (!videoWindow?.win) {
         createVideoPage(windowType);
     }
     videoWindow.sendToRender(msg)
@@ -168,7 +168,7 @@ const addIpcListen = () => {
     ipcMain.on(Between_Main_Render_Events.op_window, (event, data: WindowOperateMsg) => {
         const {opType, window, value} = data;
         console.log(opType, window, value)
-        const win = window === 'main' ? mainWindow : VideoWindow
+        let win = window === 'main' ? mainWindow : videoWindow
         switch (opType) {
             case MainEvent.window_pin:
                 win.win.setAlwaysOnTop(value)
@@ -185,6 +185,7 @@ const addIpcListen = () => {
                 break;
             case MainEvent.window_close:
                 win.destroy()
+                win = null;
                 break;
             default:
                 break;
