@@ -17,7 +17,7 @@ const cancel = () => {
   })
 }
 const confirm = async () => {
-  const screenInfo = getScreenInfo();
+  const screenInfo =await getScreenInfo();
   setVideoStatus(VIDEO_CLIENT_STATUS.BEINVITED)
   const msg = {
     userId: invite_info.value.userId,
