@@ -1,7 +1,9 @@
 import {createStore} from "vuex";
 import service from "@/api/index.js";
-import sessionStore from "../utils/sessionStore";
+import webStorage from "../utils/webStorage.js";
 import Db from '@/plugin/db/Db.js'
+import {sendIpcMsg} from "@/utils/hooks/hooks.js";
+import {Socket_Main_Render_Events} from "../../common/types.ts";
 
 const db = new Db()
 export default createStore({
@@ -64,6 +66,8 @@ export default createStore({
             state.isLogin = false
             state.user = {}
             state.friends = []
+            webStorage.remove('access_token')
+            sendIpcMsg({type: Socket_Main_Render_Events.disconnect, msg: null})
         },
         setCurrentDialog(state, payload) {
             // 设置当前激活的会话框。需要将该id未读的消息清空。
@@ -71,7 +75,7 @@ export default createStore({
             this.commit('clearUnreadMsg', state.currentDialogInfo.id)
 
             this.dispatch('get_db_total_msg', {
-                chatId:payload.id,
+                chatId: payload.id,
                 limit: 20
             })
         },
@@ -97,7 +101,7 @@ export default createStore({
         },
         clearUnreadMsg(state, chatId) {
             state.unreadMsgMap[chatId] = [];
-            this.dispatch('clear_db_unread_msg')
+            this.dispatch('clear_db_unread_msg', chatId)
         },
         addTotalMsgMap(state, params) {
             const {chatId, ...msg} = params;
@@ -111,16 +115,38 @@ export default createStore({
 
         },
         async updateChatList(state, {...newChat}) {
+            const onTop = newChat.onTop;
+            if (state.chatList.length === 0) {
+                return state.chatList.unshift(newChat)
+            }
+            // 已有的列表中是否含有新添加的
             const index = state.chatList.findIndex(item => item.id === newChat.id)
+            const lastOnTopIndex = state.chatList.findLastIndex(item => item.onTop === true);
+            console.log(lastOnTopIndex);
             if (index === -1) {
-                state.chatList.unshift(newChat)
+                // 说明是从通讯录中点过来的，直接加入到未置顶的第一个。
+                state.chatList.splice(lastOnTopIndex + 1, 0, newChat)
             } else {
-                state.chatList.splice(index, 1)
-                state.chatList = [newChat, ...state.chatList]
+                // 已有，且置顶
+                let chatItem = state.chatList.splice(index, 1)[0];
+                chatItem.onTop = onTop;
+                if (onTop) {
+                    state.chatList.unshift(chatItem);
+                } else {
+                    state.chatList.splice(lastOnTopIndex + 1, 0, chatItem)
+                }
             }
             await this.dispatch('update_db_chatList')
         },
-
+        async removeChatList(state, {...newChat}) {
+            const index = state.chatList.findIndex(item => item.id === newChat.id)
+            if (index === -1) {
+                return;
+            } else {
+                state.chatList.splice(index, 1)
+            }
+            await this.dispatch('update_db_chatList')
+        },
         setGroupFriends(state, payload) {
             state.groupFriends = payload
         },
@@ -130,6 +156,12 @@ export default createStore({
         setVideoStatus(state, paylaod) {
             state.videoStatus = paylaod;
         },
+        onTopChatList(state, payload) {
+            this.commit('updateChatList', {
+                id: payload,
+                onTop: true,
+            })
+        }
     },
     actions: {
         async login({commit, state, dispatch}, {username, password}) {
@@ -144,7 +176,7 @@ export default createStore({
             commit('login', res)
         },
         async checkLogin({commit, state, dispatch}) {
-            const token = sessionStore.get('access_token')
+            const token = webStorage.get('access_token')
             if (!state.isLogin && token) {
                 await dispatch('loginByToken')
                 return true
@@ -182,13 +214,29 @@ export default createStore({
 
         async update_db_chatList({state}) {
             // 查询用户的所有最近聊天联系人
-            await db.put('chatList', {
-                id: 1,
-                recent: JSON.stringify(state.chatList)
+            await db.put('chatList', state.user.userId, {
+                chatId: state.user.userId,
+                recent: JSON.stringify(state.chatList),
             })
         },
-        async clear_db_unread_msg({state, commit, dispatch}, payload) {
-            await db.delete('unreadMsg');
+        async clear_db_unread_msg({state, commit, dispatch}, chatId) {
+            await db.deleteKey('unreadMsg', {
+                chatId: chatId
+            });
+        },
+        async deleteMsgByChatId({state, commit}, condition) {
+            const temp = {
+                id: condition.chatId
+            }
+            await commit('removeChatList', temp)
+            commit('setCurrentDialog', {
+                type: 'Single', //Single or Multi
+                id: '', //Single为 userId
+                nickname: '',
+                avatar: '',
+                joinIds: [],
+            })
+            await db.deleteKey('totalMsg', condition)
         },
         async update_db_unread_msg({state, commit, dispatch}, payload) {
             // 收到未读消息的时候放入db
@@ -199,7 +247,10 @@ export default createStore({
             await db.add('totalMsg', payload)
         },
         async get_db_chatList({state, commit, dispatch}) {
-            const chatList = await db.queryOne('chatList')
+            const userChatId = state.user.userId;
+            const chatList = await db.queryOne('chatList', {
+                chatId: userChatId
+            })
             try {
                 state.chatList = JSON.parse(chatList.recent)
             } catch (e) {

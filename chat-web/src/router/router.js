@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router"
+import {createRouter, createWebHashHistory} from "vue-router"
 import Home from '@/views/Home/Home.vue'
 import Address from '@/views/Address/Address.vue'
 import Layout from "@/layout/Layout.vue";
@@ -7,11 +7,12 @@ import Favorites from "@/views/Favorites/Favorites.vue";
 import Friends from "@/views/Friends/Friends.vue";
 import Login from '@/views/Login/Login.vue'
 import store from '../store/index.js'
-const routes =[
+
+const routes = [
     {
-        path:'/',
+        path: '/',
         component: Layout,
-        children:[
+        children: [
             {
                 path: '/',
                 name: 'home',
@@ -19,6 +20,7 @@ const routes =[
             },
             {
                 path: '/address',
+                name: 'address',
                 component: Address
             },
             {
@@ -49,17 +51,17 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const isLogin = store.getters.isLogin
     // 如果没有登录且前往的页面不是登录页面
-    if (!isLogin && to.name !== 'login'){
+    if (!isLogin && to.name !== 'login') {
         // 验证token
-       const flag = await store.dispatch('checkLogin')
-       if (flag){
-           next()
-       } else {
-           next({
-               name: 'login'
-           })
-       }
-    }else {
+        const flag = await store.dispatch('checkLogin')
+        if (flag) {
+            next()
+        } else {
+            next({
+                name: 'login'
+            })
+        }
+    } else {
         next()
     }
 })

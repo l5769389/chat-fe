@@ -1,14 +1,15 @@
 <template>
   <template v-if="useType === 'shortMsg'">
-    <div class="h-[60px] flex items-center  box-border p-1 w-52" @click="$emit('click', dialogInfo.userId)">
-      <div class="w-[50px] h-full flex justify-center items-center">
-        <el-badge class="w-full h-full" :value="dialogInfo.msgInfo.count" :hidden="dialogInfo.msgInfo.count === 0">
+    <div class="h-[60px] flex items-center  box-border p-1 w-full" @click="$emit('click', dialogInfo.userId)"
+         @click.right.native="handleRightClick($event,'chatList')">
+      <div class="w-[50px] h-full flex flex-col justify-center items-center">
+        <el-badge :value="dialogInfo.msgInfo.count" :hidden="dialogInfo.msgInfo.count === 0">
           <chat-avatar :avatars="msgType === 'Single' ? [dialogInfo.avatar]: avatars"></chat-avatar>
         </el-badge>
       </div>
-      <div class="ml-1 flex-1 h-full overflow-hidden">
+      <div class="ml-1 flex-1 flex-col h-4/5 overflow-hidden">
         <div class="flex justify-between">
-          <span class="text-black font-bold">{{ dialogInfo.nickname }}</span>
+          <span class="text-black text-base">{{ dialogInfo.nickname }}</span>
           <span class="text-gray-400">{{ dialogInfo.msgInfo.timestamp }}</span>
         </div>
         <p class="overflow-ellipsis overflow-hidden whitespace-nowrap min-w-full">{{ msgContent }}</p>
@@ -17,13 +18,13 @@
   </template>
   <template v-else-if="useType === 'address'">
     <!-- 通讯录中的 -->
-    <el-badge class="hover:bg-dark-400-hover" @click.right.native="handleRightClick" :hidden="true"
+    <el-badge class="hover:bg-white-400-hover !w-full" @click.right.native="handleRightClick($event,'address')" :hidden="true"
               @dblclick="$emit('dbClick', dialogInfo.userId)">
-      <div class="h-20 flex items-center  box-border p-3 w-52">
-        <el-avatar shape="square" :size="35" class="mr-2" :src="dialogInfo.avatar"/>
+      <div class="h-[60px] flex items-center  box-border p-3 w-full">
+        <el-avatar shape="square" :size="30" class="mr-2" :src="dialogInfo.avatar"/>
         <div class="flex-1">
           <div class="flex justify-between">
-            <span class="text-black font-bold">{{ dialogInfo.nickname }}</span>
+            <span class="text-black text-base">{{ dialogInfo.nickname }}</span>
           </div>
         </div>
       </div>
@@ -31,13 +32,13 @@
   </template>
   <template v-else-if="useType === 'select'">
     <!-- 可选择的 -->
-    <el-badge class="hover:bg-dark-400-hover" :hidden="true">
+    <el-badge class="hover:bg-white-400-hover" :hidden="true">
       <div class="flex items-center pl-5">
                 <span>
                     <el-checkbox size="large" v-model="checked"/>
                 </span>
         <div class="flex items-center  box-border p-3 w-52 h-14">
-          <el-avatar shape="square" :size="35" class="mr-2" :src="dialogInfo.avatar"/>
+          <el-avatar shape="square" :size="30" class="mr-2" :src="dialogInfo.avatar"/>
           <div class="flex-1">
             <div class="flex justify-between">
               <span class="text-black font-bold">{{ dialogInfo.nickname }}</span>
@@ -66,7 +67,9 @@ const props = defineProps({
           count: 0,
           timestamp: ''
         },
-        group: []
+        chatId: -1,
+        group: [],
+        onTop:false,
       }
     }
   },
@@ -128,25 +131,18 @@ const checked = computed({
   }
 })
 
-const menu = [
-   {
-    type: 'onTop',
-    label: '置顶',
-  },
-  {
-    type: 'delete',
-    label: '删除',
-  },
-  {
-    type: 'noDisturb',
-    label: '勿扰',
-  }
-]
 
-const handleRightClick = e => {
+
+const handleRightClick = (e, type) => {
+  const chatId = props.dialogInfo.chatId
+  const onTop = props.dialogInfo.onTop;
   e.preventDefault()
-  const {clientX,clientY} = e;
-  contextmenu(menu,{clientX,clientY})
+  const {clientX, clientY} = e;
+  if (type === 'chatList') {
+    contextmenu('menu', {clientX, clientY},chatId,onTop)
+  } else if (type === 'address') {
+    contextmenu('menu_address', {clientX, clientY},chatId,onTop)
+  }
 }
 
 </script>

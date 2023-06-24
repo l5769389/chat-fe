@@ -10,10 +10,10 @@ const store = useStore()
 </script>
 
 <template>
-  <header class="w-full h-[35px] flex">
+  <header class="w-full h-[23px] flex items-center">
     <operate-header></operate-header>
   </header>
-  <main class="w-full" style="height: calc(100% - 35px)">
+  <main class="w-full" style="height: calc(100% - 23px)">
     <router-view></router-view>
   </main>
 </template>

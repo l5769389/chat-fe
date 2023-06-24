@@ -10,9 +10,9 @@ import defaultPlugin from 'store/plugins/defaults';
 
 // 切换存储方式
 // const storages = [sessionStorage, cookieStorage];
-const storages = [sessionStorage];
+const storages = [localStorage];
 const plugins = [defaultPlugin];
 
-const sessionStore = engine.createStore(storages, plugins);
+const webStorage = engine.createStore(storages, plugins);
 
-export default sessionStore;
+export default webStorage;

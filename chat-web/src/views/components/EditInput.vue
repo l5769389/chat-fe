@@ -70,7 +70,6 @@ const createDom = async (name,  size) => {
 
 
 
-const socket = inject("socket");
 
 const editRef = ref(null);
 const fileContentMap = new Map();

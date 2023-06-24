@@ -1,6 +1,6 @@
 <template>
     <div class="relative">
-        <close-small @click="$emit('remove')" theme="outline" size="15"  class="absolute right-[-7px] top-[-7px] bg-dark-300 rounded-full fill-current hover:bg-dark-400-hover"/>
+        <close-small @click="$emit('remove')" theme="outline" size="15"  class="absolute right-[-7px] top-[-7px] bg-white-300 rounded-full fill-current hover:bg-white-400-hover"/>
                 <slot></slot>
     </div>
 </template>

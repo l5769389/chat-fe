@@ -93,13 +93,15 @@ const sockInitHook = function () {
             store.commit('updateChatList', {
                 type: 'Single',
                 id: chatId,
+                onTop: false,
             })
         } else if (eventName === 'Multi') {
             updateChatlist(data)
             store.commit('updateChatList', {
                 type: 'Multi',
                 id: chatId,
-                joinIds: joinIds
+                joinIds: joinIds,
+                onTop: false,
             })
         }
         store.commit("addTotalMsgMap", {
@@ -186,7 +188,8 @@ const sockInitHook = function () {
             type: 'Multi',
             id: roomId,
             joinIds,
-            chatRoomName
+            chatRoomName,
+            onTop: false
         })
         store.dispatch('getUnfriendInfo', joinIds)
     }

@@ -11,11 +11,12 @@ export class MainWindow {
 
     getWinInstance() {
         const pid = this.getAppPid()
+        // 1440 1040
         let config: BrowserWindowConstructorOptions = {
-            width: 1200,
-            height: 700,
-            minWidth: 800,
-            minHeight: 700,
+            width: 720,
+            height: 520,
+            minWidth: 720,
+            minHeight: 520,
             webPreferences: {
                 nodeIntegration: true,
                 webSecurity: false,
@@ -26,6 +27,7 @@ export class MainWindow {
                 disableHtmlFullscreenWindowResize: true,
                 // partition: `${pid}`,
             },
+            transparent:true,
             frame: false,
         };
         const win = new BrowserWindow(config);

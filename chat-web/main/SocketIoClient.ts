@@ -20,6 +20,10 @@ export class SocketIoClient {
         this.socket.connect();
     }
 
+    disconnect() {
+        this.socket.disconnect();
+    }
+
     listenInit() {
         // connection
         ["connect", 'disconnect', 'singleMsg', 'multiMsg', 'joinRoom', 'connected', 'offer_invite'].forEach(eventName => {
@@ -55,8 +59,13 @@ export class SocketIoClient {
     }
 
     sendToSocketServer(msg) {
+        if (!msg){
+            return;
+        }
         const {type, data} = msg;
         // console.log(`向socket server 发出:${JSON.stringify(msg)}`)
-        this.socket.emit(type, data)
+        if (type){
+            this.socket.emit(type, data)
+        }
     }
 }

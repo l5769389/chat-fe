@@ -3,7 +3,7 @@ import Dexie from "dexie";
 const schemas = {
     totalMsg: '++id,chatId,userId,type,timestamp',
     unreadMsg: '++id,chatId,userId,type,timestamp',
-    chatList: '++id'
+    chatList: 'chatId'
 }
 
 export default class Db {
@@ -19,12 +19,12 @@ export default class Db {
         await this.db[schema].add(data)
     }
 
-    async put(schema, data) {
-        await this.db[schema].put(data)
+    async put(schema,key,val) {
+        await this.db[schema].put(val,key)
     }
 
-    async queryOne(schema, key) {
-        return await this.db[schema].get(1);
+    async queryOne(schema, condition) {
+        return await this.db[schema].where(condition).first();
     }
 
     async query({schema, chatId, offset = 0, limit = 10}) {
@@ -32,9 +32,12 @@ export default class Db {
         return await this.db[schema].where('chatId').equals(chatId).offset(offset).limit(limit).toArray()
     }
 
-    async delete({scheme}) {
+    async deleteSchema(scheme) {
         if (this.db[scheme]) {
             await this.db[scheme].delete()
         }
+    }
+    async deleteKey(schema,condition){
+        await this.db[schema]?.where(condition).delete()
     }
 }

@@ -17,3 +17,7 @@
     }
 }
 
+.el-avatar--square{
+    --el-border-radius-base: 0px !important;
+}
+

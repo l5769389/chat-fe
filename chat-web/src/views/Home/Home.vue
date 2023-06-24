@@ -1,13 +1,16 @@
 <template>
   <div class="w-[230px] bg-gray-100 h-100 overflow-auto relative border-r-2 border-solid border-black">
-    <div class="bg-dark-100 sticky inset-x-0 top-0 h-14 flex items-center h-[50px]">
+    <div class="bg-white-400 sticky inset-x-0 top-0 flex items-center h-[40px]">
       <chat-search/>
     </div>
-    <div class="overflow-hidden bg-dark-200" style="height: calc( 100% - 3.5rem)">
-      <chat-list/>
-    </div>
+        <div class="overflow-hidden bg-white-300 h-[calc(100%-40px)]">
+          <el-scrollbar class="bg-white-300">
+            <chat-list/>
+          </el-scrollbar>
+        </div>
+
   </div>
-  <div class="flex-1 bg-dark-200 w-0 z-10">
+  <div class="flex-1 bg-white-200 w-0 z-10">
     <chat-dialog-win/>
   </div>
   <el-dialog

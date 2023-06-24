@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col h-full">
     <template v-if="currentDialogInfo.id !== ''">
-      <div class="h-12">
+      <div class="h-[40px]">
         <dialog-header />
       </div>
       <div

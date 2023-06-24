@@ -4,7 +4,7 @@
 export const Socket_Main_Render_Events = {
     // 开启socket连接
     start_connect: 'to_socket_server_start',
-
+    disconnect: 'to_socket_server_disconnect',
     // 分发给聊天主界面的消息类型
     to_socket_server_msg: 'to_socket_server_msg',
     from_socket_server_msg: 'from_socket_server_msg',

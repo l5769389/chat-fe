@@ -8,10 +8,9 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import Db from '@/plugin/db/dbPlugin.js'
 import store from '@/store/index.js'
-import engine from 'store/src/store-engine';
+import webStorage from "@/utils/webStorage.js";
 
-const storages = [sessionStorage];
-const sessionStore = engine.createStore(storages)
+
 const app = createApp(App)
 
 install(app)
@@ -19,7 +18,7 @@ install(app, 'i')
 app.use(router)
 app.use(store)
 app.use(ElementPlus)
-app.use(sessionStore)
+app.use(webStorage)
 
 app.use(Db)
 app.mount('#app')

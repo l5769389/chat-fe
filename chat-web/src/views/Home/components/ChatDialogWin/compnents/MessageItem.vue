@@ -98,7 +98,7 @@ const handleDownload = () => {
 }
 
 .bg_white {
-  @apply bg-white hover:bg-dark-200-hover
+  @apply bg-white hover:bg-white-200-hover
 }
 
 .bg_green {
@@ -106,7 +106,7 @@ const handleDownload = () => {
 }
 
 .bg_white::before {
-  @apply bg-white hover:bg-dark-200-hover
+  @apply bg-white hover:bg-white-200-hover
 }
 
 .bg_green::before {

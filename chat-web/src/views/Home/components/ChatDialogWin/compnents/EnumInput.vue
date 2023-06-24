@@ -3,7 +3,7 @@
     <div
         v-for="item in icons"
         :key="item.type"
-        class="text-dark-200 mr-3 flex justify-center items-center"
+        class="text-white-200 mr-3 flex justify-center items-center"
         :class="item.className"
         @click="item?.handler"
     >
@@ -11,7 +11,8 @@
         <el-popover
             placement="top"
             trigger="click"
-            content="this is content, this is content, this is content"
+            width="400"
+            popper-class="memepop"
         >
           <meme></meme>
           <template #reference>
@@ -176,4 +177,8 @@ const icons = [
 
 
 </script>
-<style scoped></style>
+<style>
+.memepop{
+  padding: 0!important;
+}
+</style>

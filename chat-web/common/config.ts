@@ -1,6 +1,6 @@
 export const electron_host = 'localhost'
 
-export const server_host = '192.168.3.198'
+export const server_host = '192.168.71.147'
 
 // electron本机是否开启https
 export const protocol: string = 'http'

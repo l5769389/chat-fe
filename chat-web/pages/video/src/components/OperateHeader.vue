@@ -62,8 +62,8 @@ const icons = [
 <template>
   <div class="w-full flex items-center">
     <div class="w-[50px] bg-dark draggable"></div>
-    <div class="w-[230px] bg-dark-100 border-r-2 border-solid border-black draggable"></div>
-    <div class="flex-1 bg-dark-100 flex items-center justify-end pr-5 space-x-[10px] draggable">
+    <div class="flex-1  bg-white-400 border-r-2 border-solid border-black draggable"></div>
+    <div class="w-[150px] bg-white-400 flex items-center justify-end pr-5 space-x-[10px] draggable">
       <div v-for="item in icons" :key="item.icon" @click="item.handler" class="no-draggable">
         <template v-if="item.icon === Pushpin">
           <component

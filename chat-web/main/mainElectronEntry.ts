@@ -18,7 +18,7 @@ const robot = require('robotjs')
 const vueDevToolsPath = path.resolve(__dirname, '../extension/vue-devtools')
 let mainWindow: MainWindow
 let captureWindow
-let socketIoClient
+let socketIoClient: SocketIoClient
 let videoWindow: VideoWindow
 // 关闭 electron Security Warning (Insecure Content-Security-Policy) This renderer process has either no Content Security
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
@@ -43,6 +43,11 @@ const createVideoPage = (windowType) => {
 ipcMain.on(Socket_Main_Render_Events.start_connect, () => {
     console.log('ipcMain 收到渲染进程的：连接socketIo服务器请求')
     socketIoClient.connect()
+})
+
+ipcMain.on(Socket_Main_Render_Events.disconnect, () => {
+    console.log('ipcMain 收到渲染进程的：断开socketIo服务器请求')
+    socketIoClient.disconnect()
 })
 
 /**

@@ -71,9 +71,9 @@ watch(() => route.name, (newVal,oldVal) => {
 
 <template>
     <template v-if="headerType === 'grid'">
-      <div class="w-[50px] bg-dark draggable"></div>
-      <div class="w-[230px] bg-dark-100 border-r-2 border-solid border-black draggable"></div>
-      <div class="flex-1 bg-dark-100 flex items-center justify-end pr-5 space-x-[10px] draggable">
+      <div class="w-[50px] h-full bg-dark draggable"></div>
+      <div class="w-[230px] h-full bg-white-400 border-r-2 border-solid border-black draggable"></div>
+      <div class="flex-1 h-full bg-white-400 flex items-center justify-end pr-5 space-x-[10px] draggable">
         <div v-for="item in icons" :key="item.icon" @click="item.handler" class="no-draggable">
           <template v-if="item.icon === Pushpin">
             <component
@@ -94,7 +94,7 @@ watch(() => route.name, (newVal,oldVal) => {
       </div>
     </template>
     <template v-else>
-      <div class="flex-1 bg-dark-100 flex items-center justify-end pr-5 space-x-[10px] draggable">
+      <div class="flex-1 h-full bg-white-400 flex items-center justify-end pr-5 space-x-[10px] draggable">
         <div v-for="item in icons" :key="item.icon" @click="item.handler" class="no-draggable">
           <template v-if="item.icon === Pushpin">
             <component
@@ -108,7 +108,7 @@ watch(() => route.name, (newVal,oldVal) => {
             <component
                 :is="item.icon"
                 theme="outline"
-                size="18"
+                size="15"
             ></component>
           </template>
         </div>

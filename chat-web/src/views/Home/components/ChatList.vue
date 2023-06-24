@@ -1,9 +1,9 @@
 <template>
-  <div class="flex  overflow-x-hidden overflow-y-auto flex-col h-full pt-3 items-center">
+  <div class="flex  overflow-x-hidden overflow-y-auto flex-col h-full items-center">
     <chat-item v-for="item in recentChats" :key="item.id"
-               :class="activeDialogId.id == item.id ? 'bg-dark-400-active' : ''"
+               :class="activeDialogId.id == item.id ? 'bg-white-400-active' : ''"
                @click="chooseDialog(item)"
-               class="hover:bg-dark-400-hover"
+               class="hover:bg-white-400-hover"
                :msgType="item.type"
                :dialog-info="getUnreadMsg(item)"
                :msg="getUnreadMsg1(item.id)"/>
@@ -30,11 +30,13 @@ const getUnreadMsg = (item) => {
     return {
       avatar: friendInfo?.avatar,
       nickname: friendInfo?.nickname,
+      chatId: chatId,
       msgInfo: {
         count: unreadmsg.length,
         timestamp: arr.length > 0 ? arr[arr.length - 1].timestamp : ''
       },
-      group: null
+      group: null,
+      onTop: item.onTop
     }
   } else if (chatType === 'Multi') {
     const friends = joinIds.map(item => {
@@ -52,7 +54,9 @@ const getUnreadMsg = (item) => {
         count: unreadmsg.length,
         timestamp: arr.length > 0 ? arr[arr.length - 1].timestamp : '',
       },
-      group: friends
+      chatId: chatId,
+      group: friends,
+      onTop: item.onTop
     }
   }
 }

@@ -2,7 +2,7 @@
   <div class="flex flex-col flex-1">
     <edit-input ref="editInputRef" class="max-h-[200px] overflow-auto"></edit-input>
     <div class="w-20 h-10 self-end">
-      <el-button plain class="ml" @click="sendMsg">Send</el-button>
+      <el-button plain class="ml" @click="sendMsg">发送</el-button>
     </div>
   </div>
 </template>
@@ -13,11 +13,9 @@ import {useStore} from "vuex";
 import {getFormatTime} from "@/utils/utils.js";
 import EditInput from "@/views/components/EditInput.vue";
 import {SocketEvent, VIDEO_CLIENT_STATUS} from "/common/types.ts";
-import service from "@/api/index.js";
 import API from "@/api/request.js";
 import {sendIpcMsg} from "@/utils/hooks/hooks.js";
 
-const socket = inject("socket");
 const store = useStore();
 const currentDialogInfo = computed(() => store.getters.currentDialogInfo);
 const user = computed(() => store.getters.user);
